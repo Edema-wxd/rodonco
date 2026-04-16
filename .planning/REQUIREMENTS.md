@@ -132,19 +132,61 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 to FOUND-05 | Phase 1 | Pending |
-| SHOP-01 to SHOP-04 | Phase 2 | Pending |
-| SHOP-05 to SHOP-11 | Phase 3 | Pending |
-| CART-01 to CART-05 | Phase 3 | Pending |
-| CHKT-01 to CHKT-03 | Phase 4 | Pending |
-| AUTH-01 to AUTH-03 | Phase 4 | Pending |
-| ORD-01 to ORD-05 | Phase 4 | Pending |
-| PROD-01 to PROD-05 | Phase 4 | Pending |
-| CHKT-04 to CHKT-07 | Phase 5 | Pending |
-| NOTF-01 to NOTF-03 | Phase 5 | Pending |
-| INFRA-01 to INFRA-04 | Phase 5 | Pending |
-| ANLT-01 to ANLT-04 | Phase 6 | Pending |
-| CONF-01 to CONF-03 | Phase 5 | Pending |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Pending |
+| FOUND-04 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Pending |
+| SHOP-01 | Phase 2 | Pending |
+| SHOP-02 | Phase 2 | Pending |
+| SHOP-03 | Phase 2 | Pending |
+| SHOP-04 | Phase 2 | Pending |
+| CART-04 | Phase 2 | Pending |
+| SHOP-05 | Phase 3 | Pending |
+| SHOP-06 | Phase 3 | Pending |
+| SHOP-07 | Phase 3 | Pending |
+| SHOP-08 | Phase 3 | Pending |
+| SHOP-09 | Phase 3 | Pending |
+| SHOP-10 | Phase 3 | Pending |
+| SHOP-11 | Phase 3 | Pending |
+| CART-01 | Phase 3 | Pending |
+| CART-02 | Phase 3 | Pending |
+| CART-03 | Phase 3 | Pending |
+| CART-05 | Phase 3 | Pending |
+| AUTH-01 | Phase 4 | Pending |
+| AUTH-02 | Phase 4 | Pending |
+| AUTH-03 | Phase 4 | Pending |
+| ORD-01 | Phase 4 | Pending |
+| ORD-02 | Phase 4 | Pending |
+| ORD-03 | Phase 4 | Pending |
+| ORD-04 | Phase 4 | Pending |
+| ORD-05 | Phase 4 | Pending |
+| PROD-01 | Phase 4 | Pending |
+| PROD-02 | Phase 4 | Pending |
+| PROD-03 | Phase 4 | Pending |
+| PROD-04 | Phase 4 | Pending |
+| PROD-05 | Phase 4 | Pending |
+| ANLT-01 | Phase 4 | Pending |
+| ANLT-02 | Phase 4 | Pending |
+| ANLT-03 | Phase 4 | Pending |
+| ANLT-04 | Phase 4 | Pending |
+| INFRA-03 | Phase 4 | Pending |
+| INFRA-04 | Phase 4 | Pending |
+| CHKT-01 | Phase 5 | Pending |
+| CHKT-02 | Phase 5 | Pending |
+| CHKT-03 | Phase 5 | Pending |
+| CHKT-04 | Phase 5 | Pending |
+| CHKT-05 | Phase 5 | Pending |
+| CHKT-06 | Phase 5 | Pending |
+| CHKT-07 | Phase 5 | Pending |
+| CONF-01 | Phase 5 | Pending |
+| CONF-02 | Phase 5 | Pending |
+| CONF-03 | Phase 5 | Pending |
+| NOTF-02 | Phase 5 | Pending |
+| NOTF-03 | Phase 5 | Pending |
+| INFRA-01 | Phase 6 | Pending |
+| INFRA-02 | Phase 6 | Pending |
+| NOTF-01 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 46 total
@@ -153,4 +195,4 @@
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-15 after initial definition*
+*Last updated: 2026-04-15 — traceability updated after roadmap creation*
