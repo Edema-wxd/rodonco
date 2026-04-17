@@ -29,9 +29,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. All 6 database tables exist in Supabase with RLS enabled and correct column types; `ordering_config` row 1 is seeded with `is_ordering_open = true`
   2. `lib/supabase/admin.ts` (service role) and `lib/supabase/server.ts` (SSR cookie client) exist and import without error; `SUPABASE_SERVICE_ROLE_KEY` is never prefixed `NEXT_PUBLIC_`
   3. `useCartStore` (Zustand + `persist` middleware) and `useHasHydrated` hook exist; a test component wrapping them renders on both server and client without a React hydration error
-  4. `app/(shop)/@drawer/default.tsx` returns `null`; `app/(shop)/layout.tsx` accepts and renders the `drawer` slot prop; hard-refreshing any shop URL does not 404
+  4. `app/(customer)/shop/@drawer/default.tsx` returns `null`; `app/(customer)/layout.tsx` accepts and renders the `drawer` slot prop; hard-refreshing any shop URL does not 404
   5. `.env.local.example` documents all required variables; `.env.local` is confirmed in `.gitignore`
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 01-01-PLAN.md — Install npm deps, shadcn init, TypeScript types, env docs
+- [ ] 01-02-PLAN.md — Supabase DB migration with RLS, seed, three client files
+- [ ] 01-03-PLAN.md — Zustand cart store, hydration hook, route skeleton, Navbar
 
 ### Phase 2: Static Shop UI
 **Goal**: A visitor can open the site, read the landing page, browse the shop product grid, and see individual product cards — all server-rendered from real DB data, with no cart interaction yet
@@ -99,11 +103,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Execution Order:**
 Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
-Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel with Phases 2–3, but is executed in sequence here for clarity.
+Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel with Phases 2-3, but is executed in sequence here for clarity.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/3 | Planning complete | - |
 | 2. Static Shop UI | 0/TBD | Not started | - |
 | 3. Interactive Shop | 0/TBD | Not started | - |
 | 4. Admin Panel | 0/TBD | Not started | - |
