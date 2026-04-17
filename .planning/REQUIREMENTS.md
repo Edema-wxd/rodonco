@@ -11,7 +11,7 @@
 
 - [ ] **FOUND-01**: Next.js 15 App Router project configured with TypeScript strict mode, Tailwind CSS v4, shadcn/ui, Zustand, React Hook Form, Zod, and Framer Motion
 - [ ] **FOUND-02**: Supabase project connected with server-side client (service role) and browser client (anon key)
-- [ ] **FOUND-03**: All 5 database tables created with correct schema and RLS enabled: `products`, `product_variants`, `product_prep_options`, `orders`, `order_items`, `ordering_config`
+- [ ] **FOUND-03**: All 6 database tables created with correct schema and RLS enabled: `products`, `product_variants`, `product_prep_options`, `orders`, `order_items`, `ordering_config`
 - [ ] **FOUND-04**: `ordering_config` seeded with row 1 (`is_ordering_open = true`, next Saturday delivery date populated)
 - [ ] **FOUND-05**: Environment variables documented in `.env.local.example`; `.env.local` in `.gitignore`
 
