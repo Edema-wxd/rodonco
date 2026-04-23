@@ -1,4 +1,4 @@
--- seed.sql — Applied via: npx supabase@latest db seed
+-- seed.sql — Applied via: npx supabase@latest db query --file supabase/seed.sql
 -- Seeds the single ordering_config row (FOUND-04).
 
 INSERT INTO ordering_config (id, is_ordering_open, next_delivery_date)
