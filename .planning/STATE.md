@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-04-24T08:44:30.613Z"
+stopped_at: Phase 2.1 context gathered
+last_updated: "2026-04-24T10:40:04.134Z"
 last_activity: 2026-04-17 -- Phase 01 execution started
 progress:
   total_phases: 7
@@ -69,7 +69,8 @@ Recent decisions affecting current work:
 
 ### Roadmap Evolution
 
-- Phase 7 added: Migrate Supabase to Neon and Uploadthing
+- Phase 7 added then moved: Migrate Supabase to Neon and Uploadthing re-inserted as Phase 2.1 (urgent — do before Phase 3)
+- Phase 2.1 inserted after Phase 2: Migrate Supabase to Neon and Uploadthing (URGENT)
 
 ### Pending Todos
 
@@ -82,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T08:44:30.607Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-static-shop-ui/02-UI-SPEC.md
+Last session: 2026-04-24T10:40:04.128Z
+Stopped at: Phase 2.1 context gathered
+Resume file: .planning/phases/02.1-migrate-supabase-to-neon-and-uploadthing/02.1-CONTEXT.md
