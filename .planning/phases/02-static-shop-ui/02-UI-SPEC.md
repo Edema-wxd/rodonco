@@ -45,6 +45,7 @@ Exceptions:
 - Navbar height: 64px (`h-16`) — established in Phase 1, do not change
 - Cutoff banner stacks below Navbar: `sticky top-16 z-40` (compensates for the 64px Navbar)
 - Cart icon touch target: 44px minimum (WCAG 2.5.5) — apply `min-h-[44px] min-w-[44px]` on the cart `<Link>` in Navbar if not already met
+- Hero vertical padding: 96px (`py-24`) — Hero vertical breathing room — exceeds 64px max to provide visual separation on large viewports.
 
 ---
 
@@ -52,15 +53,14 @@ Exceptions:
 
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
-| Body | 16px (`text-base`) | 400 (regular) | 1.5 | Body copy, product descriptions, How It Works step descriptions |
-| Label | 14px (`text-sm`) | 500 (medium) | 1.4 | Nav links, price display, card meta, banner message |
+| Body | 16px (`text-base`) | 400 (regular) | 1.5 | Body copy, product descriptions, How It Works step descriptions, hero subheadline |
+| Label | 14px (`text-sm`) | 400 (regular) | 1.4 | Nav links, price display, card meta, banner message |
 | Heading | 20px (`text-xl`) | 700 (bold) | 1.2 | Section headings (Fresh Produce / Cooking Kits), product card name |
 | Display | 36px (`text-4xl`) | 700 (bold) | 1.1 | Hero headline |
 
 Notes:
-- Hero subheadline: 18px (`text-lg`), weight 400, line-height 1.5 — treated as an extension of Body role
+- Hero subheadline: uses Body role at 16px (`text-base`), weight 400, line-height 1.5
 - Section heading style (from CONTEXT.md D-13): `text-xl font-bold` + `border-b` divider line below
-- Subheadline is not a separate typographic role; use Body role at 18px for it
 
 Source: CONTEXT.md D-13; Navbar pattern from `src/components/layout/Navbar.tsx`
 
@@ -72,13 +72,12 @@ Source: CONTEXT.md D-13; Navbar pattern from `src/components/layout/Navbar.tsx`
 |------|-------|-------|
 | Dominant (60%) | `--background: oklch(1 0 0)` (white) | Page backgrounds, hero section, card surfaces |
 | Secondary (30%) | `--secondary: oklch(0.97 0 0)` (near-white grey) | How It Works section background, muted section alternation |
-| Accent (10%) | `#16a34a` (Tailwind `green-600`) | CTA buttons only — hero CTA, "Add to Order" button on product cards |
+| Accent (10%) | `#16a34a` (Tailwind `green-600`) | Hero CTA button only |
 | Destructive | `--destructive: oklch(0.577 0.245 27.325)` (red) | Not used in Phase 2 (no destructive actions) |
 | Warning / Cutoff Banner | `bg-amber-50 border-amber-200 text-amber-800` | Cutoff banner only — displayed when `is_ordering_open = false` |
 
 Accent reserved for:
 - Hero CTA button ("Shop Fresh Produce")
-- Product card "Add to Order" button (`variant="default"` maps to `--primary: oklch(0.205 0 0)` / near-black in the current shadcn neutral preset)
 
 **Important:** The `variant="default"` Button from shadcn base-nova renders as near-black (neutral primary) by default. The CONTEXT.md (D-02, D-10) specifies the product card CTA as solid black (`variant="default"`) — this is correct and consistent with the design system. The green `#16a34a` is reserved for the hero CTA only as a brand colour placeholder; implement it as `bg-[#16a34a] text-white hover:bg-[#15803d]` using a Tailwind arbitrary value until the real moodboard arrives. Document this as `/* TODO: swap to brand token when moodboard arrives */` in the component.
 
@@ -104,17 +103,19 @@ Components to build or reuse in Phase 2:
 
 ### Page: `/` (Landing)
 
+Primary focal point: hero headline + green CTA button.
+
 Structure (top → bottom):
 1. `<Navbar />` — sticky top-0 z-50, height 64px
 2. Hero section — full-width, white background, center-aligned
    - Headline: Display role (36px bold)
-   - Subheadline: Body role at 18px, `text-muted-foreground`
+   - Subheadline: Body role (16px regular), `text-muted-foreground`
    - CTA button: green `#16a34a`, links to `/shop`, size `lg` (36px height from button variants)
-   - Vertical padding: `py-24` (96px top/bottom — nearest meaningful scale value above 64px for hero breathing room)
+   - Vertical padding: `py-24` (96px top/bottom — declared exception; hero vertical breathing room)
 3. How It Works section — `bg-secondary` (near-white), `py-16` (64px)
    - Section heading: Heading role (20px bold), centered
    - 3-column grid on md+, stacked on mobile
-   - Each step: Lucide icon + label (Heading role, 16px bold) + description (Body role, 16px)
+   - Each step: Lucide icon + label (Heading role, 20px bold) + description (Body role, 16px)
    - Step icons: `Search`, `Settings2`, `Truck` (placeholders — swap when brand assets arrive)
    - Step labels: "Browse", "Customise", "Deliver"
 
@@ -137,7 +138,7 @@ Layout (top → bottom):
 1. Image — `aspect-[4/3] w-full object-cover rounded-t-xl`
 2. Content area — `p-4 flex flex-col gap-2`
    - Product name — Heading role (20px bold)
-   - Price — Label role (14px medium): "From ₦X,XXX"
+   - Price — Label role (14px regular): "From ₦X,XXX"
    - "Add to Order" Button — `variant="default"` (solid black), `w-full`, `<Link href="/shop/[id]">`
 
 Card container: `rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden bg-card`
