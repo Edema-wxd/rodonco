@@ -1,7 +1,8 @@
 ---
 phase: 2
 slug: static-shop-ui
-status: draft
+status: approved
+reviewed_at: 2026-04-24
 shadcn_initialized: true
 preset: base-nova / neutral / cssVariables
 created: 2026-04-23
