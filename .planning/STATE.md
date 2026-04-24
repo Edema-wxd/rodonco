@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-04-24T08:33:34.689Z"
+stopped_at: Phase 2 UI-SPEC approved
+last_updated: "2026-04-24T08:44:30.613Z"
 last_activity: 2026-04-17 -- Phase 01 execution started
 progress:
   total_phases: 7
@@ -67,6 +67,10 @@ Recent decisions affecting current work:
 - Foundation: `SUPABASE_SERVICE_ROLE_KEY` server-only from day one — two-client pattern (`lib/supabase/admin.ts` and `lib/supabase/server.ts`) established in Phase 1, never touched again
 - Payments: Paystack webhook must call `req.text()` before any JSON parsing — body stream is one-time-read; parsing JSON first silently breaks HMAC verification
 
+### Roadmap Evolution
+
+- Phase 7 added: Migrate Supabase to Neon and Uploadthing
+
 ### Pending Todos
 
 None yet.
@@ -78,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T08:33:34.683Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-static-shop-ui/02-CONTEXT.md
+Last session: 2026-04-24T08:44:30.607Z
+Stopped at: Phase 2 UI-SPEC approved
+Resume file: .planning/phases/02-static-shop-ui/02-UI-SPEC.md
