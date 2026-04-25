@@ -14,6 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Foundation** - DB schema, env config, Supabase clients, Zustand cart store with SSR hydration guard, and @drawer slot skeleton
 - [ ] **Phase 2: Static Shop UI** - Landing page, shop product grid, product cards — fully server-rendered with placeholder data
+- [ ] **Phase 2.1: Migrate Supabase to Neon and Uploadthing** (INSERTED) - Swap database to Neon serverless Postgres, auth to Neon Auth, and media storage to Uploadthing
 - [ ] **Phase 3: Interactive Shop** - Product drawer (parallel route), cart sidebar, live price recalculation, and cutoff enforcement in UI
 - [ ] **Phase 4: Admin Panel** - Auth guard, orders table, product CRUD, analytics dashboard, and manual ordering-config toggle
 - [ ] **Phase 5: Payments + Email** - Paystack inline popup, webhook handler, order creation, Resend confirmation and admin-alert emails, order confirmation page
@@ -49,6 +50,19 @@ Plans:
   5. Navbar renders at all times and shows a cart icon (badge may show skeleton/zero until Phase 3 hydration guard is wired to real cart)
 **Plans**: TBD
 **UI hint**: yes
+
+### Phase 02.1: Migrate Supabase to Neon and Uploadthing (INSERTED)
+
+**Goal:** The app's infrastructure layer is fully migrated — Neon Postgres replaces Supabase PostgreSQL (all 7 tables in Drizzle schema-as-code, pushed live), NextAuth v5 Credentials provider replaces Supabase Auth (admin-only JWT sessions, middleware guards `/admin/*`), and Uploadthing v7 replaces Supabase Storage (productImage endpoint, auth-gated, typed client helpers ready for Phase 4). No customer-facing features change; all downstream phases (3–6) build on Neon + Drizzle + NextAuth + Uploadthing.
+**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-13, D-14, D-15, D-16, D-17
+**Depends on:** Phase 1
+**Plans:** 4 plans
+
+Plans:
+- [ ] 02.1-01-PLAN.md — Install Drizzle + Neon packages, declare all 7 tables in schema.ts, push schema to Neon, smoke test connectivity
+- [ ] 02.1-02-PLAN.md — NextAuth v5 config (auth.ts), route handler, middleware (middleware.ts), seed-admin.ts script
+- [ ] 02.1-03-PLAN.md — Uploadthing v7 FileRouter (core.ts, route.ts), typed client helpers, NextSSRPlugin in root layout
+- [ ] 02.1-04-PLAN.md — Uninstall @supabase/* packages, delete lib/supabase/*.ts files, update env.d.ts + .env.local.example
 
 ### Phase 3: Interactive Shop
 **Goal**: A customer can open a product drawer, configure quantity and prep options (or size for kits), see the price update live, add to cart, view and edit their cart in a sidebar, and be blocked from adding items when the ordering window is closed
@@ -101,7 +115,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
+Phases execute in numeric order: 1 → 2 → 2.1 → 3 → 4 → 5 → 6
 
 Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel with Phases 2-3, but is executed in sequence here for clarity.
 
@@ -109,6 +123,7 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/3 | Planning complete | - |
 | 2. Static Shop UI | 0/TBD | Not started | - |
+| 2.1 Migrate Supabase to Neon + Uploadthing | 0/4 | Planning complete | - |
 | 3. Interactive Shop | 0/TBD | Not started | - |
 | 4. Admin Panel | 0/TBD | Not started | - |
 | 5. Payments + Email | 0/TBD | Not started | - |
