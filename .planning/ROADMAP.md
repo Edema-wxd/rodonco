@@ -56,7 +56,7 @@ Plans:
 **Goal:** The app's infrastructure layer is fully migrated — Neon Postgres replaces Supabase PostgreSQL (all 7 tables in Drizzle schema-as-code, pushed live), NextAuth v5 Credentials provider replaces Supabase Auth (admin-only JWT sessions, middleware guards `/admin/*`), and Uploadthing v7 replaces Supabase Storage (productImage endpoint, auth-gated, typed client helpers ready for Phase 4). No customer-facing features change; all downstream phases (3–6) build on Neon + Drizzle + NextAuth + Uploadthing.
 **Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-13, D-14, D-15, D-16, D-17
 **Depends on:** Phase 1
-**Plans:** 2/4 plans executed
+**Plans:** 3/4 plans executed
 
 Plans:
 - [x] 02.1-01-PLAN.md — Install Drizzle + Neon packages, declare all 7 tables in schema.ts, push schema to Neon, smoke test connectivity
