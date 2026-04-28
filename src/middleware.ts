@@ -1,19 +1,18 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export default function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const isAdminRoute = pathname.startsWith("/admin");
   const isAdminLanding = pathname === "/admin";
 
-  // NextAuth v5 (jwt strategy) stores the session token in one of these cookies.
-  // Checking cookie presence keeps Edge middleware free of Node-only deps.
-  const hasSession =
-    req.cookies.has("authjs.session-token") ||
-    req.cookies.has("__Secure-authjs.session-token");
-
-  if (isAdminRoute && !isAdminLanding && !hasSession) {
-    return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
+  if (isAdminRoute && !isAdminLanding) {
+    // Cryptographically verify the session JWT (prevents forged cookie-name bypass).
+    const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+    if (!token) {
+      return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
+    }
   }
 
   return NextResponse.next();
