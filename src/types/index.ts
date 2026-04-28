@@ -1,5 +1,5 @@
 // src/types/index.ts
-// Shared domain types. DB column names mirror supabase/migrations/0001_initial_schema.sql exactly.
+// Shared domain types. DB column names mirror the legacy SQL schema exactly.
 // All price fields are integer kobo (1 NGN = 100 kobo) — D-10.
 
 // ── Products ──
