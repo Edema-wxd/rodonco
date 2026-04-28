@@ -61,7 +61,7 @@ Plans:
 Plans:
 - [x] 02.1-01-PLAN.md — Install Drizzle + Neon packages, declare all 7 tables in schema.ts, push schema to Neon, smoke test connectivity
 - [x] 02.1-02-PLAN.md — NextAuth v5 config (auth.ts), route handler, middleware (middleware.ts), seed-admin.ts script
-- [ ] 02.1-03-PLAN.md — Uploadthing v7 FileRouter (core.ts, route.ts), typed client helpers, NextSSRPlugin in root layout
+- [x] 02.1-03-PLAN.md — Uploadthing v7 FileRouter (core.ts, route.ts), typed client helpers, NextSSRPlugin in root layout
 - [ ] 02.1-04-PLAN.md — Uninstall @supabase/* packages, delete lib/supabase/*.ts files, update env.d.ts + .env.local.example
 
 ### Phase 3: Interactive Shop
@@ -123,7 +123,7 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/3 | Planning complete | - |
 | 2. Static Shop UI | 0/TBD | Not started | - |
-| 2.1 Migrate Supabase to Neon + Uploadthing | 0/4 | Planning complete | - |
+| 2.1 Migrate Supabase to Neon + Uploadthing | 3/4 | In Progress|  |
 | 3. Interactive Shop | 0/TBD | Not started | - |
 | 4. Admin Panel | 0/TBD | Not started | - |
 | 5. Payments + Email | 0/TBD | Not started | - |
