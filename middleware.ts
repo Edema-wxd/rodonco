@@ -1,10 +1,13 @@
 import { auth } from "@/auth";
+import { NextResponse } from "next/server";
 
 export default auth((req) => {
-  if (!req.auth && req.nextUrl.pathname.startsWith("/admin")) {
+  if (!req.auth?.user && req.nextUrl.pathname.startsWith("/admin")) {
     const loginUrl = new URL("/admin", req.nextUrl.origin);
-    return Response.redirect(loginUrl);
+    return NextResponse.redirect(loginUrl);
   }
+
+  return NextResponse.next();
 });
 
 export const config = {
