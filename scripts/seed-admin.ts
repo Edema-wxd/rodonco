@@ -21,6 +21,7 @@ async function main() {
     throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD must be set");
   }
 
+  const normalizedEmail = email.toLowerCase();
   const sql = neon(databaseUrl);
   const db = drizzle({ client: sql });
 
@@ -28,10 +29,10 @@ async function main() {
 
   await db
     .insert(admins)
-    .values({ email, password_hash })
+    .values({ email: normalizedEmail, password_hash })
     .onConflictDoNothing();
 
-  console.log("Admin seeded:", email);
+  console.log("Admin seeded:", normalizedEmail);
 }
 
 main()
