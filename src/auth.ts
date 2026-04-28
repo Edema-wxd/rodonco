@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import type { DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -7,6 +8,12 @@ import { db } from "@/lib/db";
 import { admins } from "../drizzle/schema";
 
 declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+    } & DefaultSession["user"];
+  }
+
   interface User {
     id: string;
     email: string;
@@ -43,14 +50,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    jwt: async ({ token, user }) => {
-      if (user?.id) token.id = user.id;
-      return token;
-    },
     session: async ({ session, token }) => {
-      if (session.user && token?.id) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (session.user as any).id = token.id;
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
       }
       return session;
     },
