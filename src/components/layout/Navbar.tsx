@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/store/cart";
+import { useCartUiStore } from "@/store/cartUi";
 import { useHasHydrated } from "@/hooks/useHasHydrated";
 
 export function Navbar() {
   const hasHydrated = useHasHydrated();
   const itemCount = useCartStore((s) => s.items.length);
+  const openCart = useCartUiStore((s) => s.openCart);
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white">
@@ -21,14 +23,19 @@ export function Navbar() {
             Shop
           </Link>
 
-          <Link href="/checkout" className="relative" aria-label="Cart">
+          <button
+            type="button"
+            className="relative"
+            aria-label="Open cart"
+            onClick={openCart}
+          >
             <ShoppingCart className="h-5 w-5" />
             {hasHydrated && itemCount > 0 && (
               <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
                 {itemCount}
               </span>
             )}
-          </Link>
+          </button>
         </div>
       </nav>
     </header>

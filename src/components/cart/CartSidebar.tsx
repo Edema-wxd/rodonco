@@ -8,6 +8,8 @@ import { useCartUiStore } from "@/store/cartUi";
 
 export type CartSidebarProps = {
   isOrderingOpen: boolean;
+  cutoffMessage?: string | null;
+  nextDeliveryDate?: string | null;
 };
 
 function formatNgn(kobo: number): string {
@@ -19,7 +21,11 @@ function formatNgn(kobo: number): string {
   }).format(naira);
 }
 
-export function CartSidebar({ isOrderingOpen }: CartSidebarProps) {
+export function CartSidebar({
+  isOrderingOpen,
+  cutoffMessage,
+  nextDeliveryDate,
+}: CartSidebarProps) {
   const isOpen = useCartUiStore((s) => s.isOpen);
   const closeCart = useCartUiStore((s) => s.closeCart);
 
@@ -69,7 +75,11 @@ export function CartSidebar({ isOrderingOpen }: CartSidebarProps) {
           </button>
         </div>
 
-        <OrderingClosedBanner isOpen={isOrderingOpen} />
+        <OrderingClosedBanner
+          isOpen={isOrderingOpen}
+          cutoffMessage={cutoffMessage}
+          nextDeliveryDate={nextDeliveryDate}
+        />
 
         <div className="flex-1 overflow-auto px-4 py-4">
           {items.length === 0 ? (
