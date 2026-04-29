@@ -1,5 +1,6 @@
 import ShopGrid from "@/components/shop/ShopGrid";
 
-export default function ShopPage() {
+export default function ShopDefault() {
   return <ShopGrid />;
 }
+
