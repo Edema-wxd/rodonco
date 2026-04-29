@@ -5,11 +5,16 @@ import type { CartItem } from "@/types";
 interface CartStore {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  removeItem: (productId: string, variantLabel: string | null) => void;
+  removeItem: (
+    productId: string,
+    variantLabel: string | null,
+    prepOption: string | null
+  ) => void;
   updateQuantity: (
     productId: string,
     variantLabel: string | null,
-    qty: number
+    qty: number,
+    prepOption: string | null
   ) => void;
   clearCart: () => void;
 }
@@ -46,17 +51,19 @@ export const useCartStore = create<CartStore>()(
           return { items: [...state.items, item] };
         }),
 
-      removeItem: (productId, variantLabel) =>
+      removeItem: (productId, variantLabel, prepOption) =>
         set((state) => ({
           items: state.items.filter(
             (i) =>
               !(
-                i.productId === productId && i.variantLabel === variantLabel
+                i.productId === productId &&
+                i.variantLabel === variantLabel &&
+                i.prepOption === prepOption
               )
           ),
         })),
 
-      updateQuantity: (productId, variantLabel, qty) =>
+      updateQuantity: (productId, variantLabel, qty, prepOption) =>
         set((state) => ({
           items:
             qty <= 0
@@ -64,12 +71,19 @@ export const useCartStore = create<CartStore>()(
                   (i) =>
                     !(
                       i.productId === productId &&
-                      i.variantLabel === variantLabel
+                      i.variantLabel === variantLabel &&
+                      i.prepOption === prepOption
                     )
                 )
               : state.items.map((i) =>
-                  i.productId === productId && i.variantLabel === variantLabel
-                    ? { ...i, quantity: qty, subtotalNgn: qty * i.unitPriceNgn }
+                  i.productId === productId &&
+                  i.variantLabel === variantLabel &&
+                  i.prepOption === prepOption
+                    ? {
+                        ...i,
+                        quantity: qty,
+                        subtotalNgn: qty * i.unitPriceNgn,
+                      }
                     : i
                 ),
         })),
