@@ -80,7 +80,7 @@ Primary focal point per page type:
     Products      /admin/products
     Analytics     /admin/analytics
     Settings      /admin/settings
-  Each link: 14px medium, px-4 py-3 min-h-10, rounded-md mx-2
+  Each link: 14px semibold, px-4 py-3 min-h-10, rounded-md mx-2
   Active state: bg-gray-100 text-gray-900
   Inactive state: text-gray-500 hover:text-gray-900 hover:bg-gray-50
   Icon (lucide, 16px): prefix each link — ShoppingBag, Package, BarChart2, Settings2
@@ -139,9 +139,9 @@ Exceptions:
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 14px | 400 | 1.5 | Table cell text, form helper text, secondary labels, allergy notes, delivery address, pagination, settings confirmation, analytics labels, admin email |
-| Label | 14px | 500 | 1.4 | Table column headers, form labels, nav links |
+| Label | 14px | 600 | 1.4 | Table column headers, form labels, nav links |
 | Heading | 20px | 600 | 1.2 | Page titles (`<h1>`), drawer header, settings card heading |
-| Display | 28px | 700 | 1.1 | Stat card numbers and ordering window OPEN/CLOSED state label |
+| Display | 28px | 600 | 1.1 | Stat card numbers and ordering window OPEN/CLOSED state label |
 
 All type is Geist via `font-sans`. No additional font families.
 
@@ -222,10 +222,10 @@ Ordering window state uses semantic green/red — the only place in admin where 
 
 **Source:** CONTEXT.md D-18, D-19
 
-- Layout: `grid grid-cols-2 gap-5` (2×2 on desktop, 1×1 on mobile via `sm:grid-cols-2`)
+- Layout: `grid grid-cols-2 gap-6` (2×2 on desktop, 1×1 on mobile via `sm:grid-cols-2`)
 - Each card: shadcn `<Card>` with `p-4`
   - Label: 14px text-gray-500 uppercase tracking-wide
-  - Metric: 28px font-bold text-gray-900
+  - Metric: 28px font-semibold text-gray-900
   - Sub-label (if applicable): 14px text-gray-400 (e.g. "this week")
 - Four cards:
   1. "Total Orders" — integer count
@@ -246,8 +246,8 @@ No charts. No charting library. Plain numbers only.
 - Single card: `<Card>` with `p-6`, max-w-lg, centered
 - Card heading: "Ordering Window" — 20px semibold
 - Current state label (large, prominent):
-  - OPEN: `text-green-700 font-bold text-[28px]` with `✓ Ordering is OPEN`
-  - CLOSED: `text-red-700 font-bold text-[28px]` with `✗ Ordering is CLOSED`
+  - OPEN: `text-green-700 font-semibold text-[28px]` with `✓ Ordering is OPEN`
+  - CLOSED: `text-red-700 font-semibold text-[28px]` with `✗ Ordering is CLOSED`
 - Toggle: shadcn `<Switch>` — large (`scale-125` or size="lg"), labeled "Enable ordering"
 - Confirmation before CLOSING: inline text appears below toggle: "This will prevent new orders. Confirm?" with "Yes, Close" button (`variant="destructive"`, sm) + "Cancel" (`variant="ghost"`, sm). No modal — inline only.
 - No confirmation needed when re-opening (low risk direction).
