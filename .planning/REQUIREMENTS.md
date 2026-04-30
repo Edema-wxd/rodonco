@@ -17,7 +17,7 @@
 
 ### Customer — Browse & Select
 
-- [ ] **SHOP-01**: Landing page renders statically with hero section (headline, subheadline, CTA to `/shop`) and 3-step How It Works section
+- [x] **SHOP-01**: Landing page renders statically with hero section (headline, subheadline, CTA to `/shop`) and 3-step How It Works section
 - [ ] **SHOP-02**: Shop page renders two product sections — Fresh Produce and Cooking Kits — populated from DB (`is_active = true` filter)
 - [ ] **SHOP-03**: Cutoff banner displayed at top of shop page when `is_ordering_open = false`, showing next delivery date; revalidates every 60 seconds
 - [ ] **SHOP-04**: Product card shows image, name, starting price, and `Add to Order` CTA
@@ -137,7 +137,7 @@
 | FOUND-03 | Phase 1 | Pending |
 | FOUND-04 | Phase 1 | Pending |
 | FOUND-05 | Phase 1 | Pending |
-| SHOP-01 | Phase 2 | Pending |
+| SHOP-01 | Phase 2 | Complete |
 | SHOP-02 | Phase 2 | Pending |
 | SHOP-03 | Phase 2 | Pending |
 | SHOP-04 | Phase 2 | Pending |
