@@ -34,7 +34,7 @@
 - [ ] **CART-01**: Cart state managed by Zustand store and persisted to `localStorage` for session recovery
 - [ ] **CART-02**: Cart supports add item, increment quantity, decrement quantity, remove item, and clear cart operations
 - [ ] **CART-03**: Cart accessible as a drawer/sidebar from anywhere in the app
-- [ ] **CART-04**: Navbar shows cart icon with item count badge
+- [x] **CART-04**: Navbar shows cart icon with item count badge
 - [ ] **CART-05**: Cart drawer shows itemised list, subtotal, and `Free delivery on Saturdays` note
 
 ### Customer — Checkout & Payment
@@ -141,7 +141,7 @@
 | SHOP-02 | Phase 2 | Complete |
 | SHOP-03 | Phase 2 | Complete |
 | SHOP-04 | Phase 2 | Complete |
-| CART-04 | Phase 2 | Pending |
+| CART-04 | Phase 2 | Complete |
 | SHOP-05 | Phase 3 | Pending |
 | SHOP-06 | Phase 3 | Pending |
 | SHOP-07 | Phase 3 | Pending |
