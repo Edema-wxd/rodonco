@@ -62,6 +62,13 @@ The existing `src/app/admin/layout.tsx` must be refactored. Replace the current 
 
 Sidebar is fixed/sticky — it does not scroll with content. Width: 224px (14rem / `w-56`).
 
+Primary focal point per page type:
+- Orders: the orders table
+- Products: the product list/table
+- Analytics: the stat cards grid
+- Settings: the OPEN/CLOSED state label
+- Login: the Sign In button
+
 ### Sidebar Anatomy
 
 ```
@@ -73,13 +80,13 @@ Sidebar is fixed/sticky — it does not scroll with content. Width: 224px (14rem
     Products      /admin/products
     Analytics     /admin/analytics
     Settings      /admin/settings
-  Each link: 14px medium, px-4 py-2.5, rounded-md mx-2
+  Each link: 14px medium, px-4 py-3 min-h-10, rounded-md mx-2
   Active state: bg-gray-100 text-gray-900
   Inactive state: text-gray-500 hover:text-gray-900 hover:bg-gray-50
   Icon (lucide, 16px): prefix each link — ShoppingBag, Package, BarChart2, Settings2
   ─────────────────────────────────
 [Bottom — sidebar footer]
-  Admin email (12px, text-gray-400, px-4 py-3)
+  Admin email (14px, text-gray-400, px-4 py-3) — color/opacity differentiates from nav links, not size
   Sign Out button — text-sm text-gray-500 hover:text-red-600, px-4 py-3
 ```
 
@@ -121,10 +128,9 @@ Declared values (multiples of 4):
 | 3xl | 64px | Page-level top/bottom breathing room (unused at MVP) |
 
 Exceptions:
-- Sidebar nav link height: 40px (`py-2.5` = 10px top+bottom + 20px line-height) — touch-safe
+- Sidebar nav link height: 40px — achieved via `py-3` (12px top+bottom) + `min-h-10` on the nav link element
 - Sidebar width: 224px (`w-56`)
 - Table row height: natural content height — no fixed row height constraint
-- Stat cards: `p-5` (20px) — sits between md and lg
 
 ---
 
@@ -132,10 +138,10 @@ Exceptions:
 
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
-| Body | 14px | 400 | 1.5 | Table cell text, form helper text, secondary labels |
+| Body | 14px | 400 | 1.5 | Table cell text, form helper text, secondary labels, allergy notes, delivery address, pagination, settings confirmation, analytics labels, admin email |
 | Label | 14px | 500 | 1.4 | Table column headers, form labels, nav links |
-| Heading | 20px | 600 | 1.2 | Page titles (`<h1>`), drawer section titles |
-| Display | 28px | 700 | 1.1 | Stat card numbers (analytics page only) |
+| Heading | 20px | 600 | 1.2 | Page titles (`<h1>`), drawer header, settings card heading |
+| Display | 28px | 700 | 1.1 | Stat card numbers and ordering window OPEN/CLOSED state label |
 
 All type is Geist via `font-sans`. No additional font families.
 
@@ -153,7 +159,7 @@ The admin panel uses the existing shadcn neutral token system — no brand warm 
 | Destructive | `--destructive` | #e5222a (oklch 0.577) | Delete button, "Ordering CLOSED" state label, error text |
 
 Accent reserved for:
-- Primary action buttons (Sign In, Save, Add Product)
+- Primary action buttons (Sign In, Save Settings, Add Product)
 - Active sidebar nav link background + text
 - Stat card metric numbers
 
@@ -183,14 +189,14 @@ Ordering window state uses semantic green/red — the only place in admin where 
 - Default sort: `created_at DESC`
 - Row expansion: clicking anywhere on the row toggles an inline expanded section (collapsible `<tr>` with `colspan={7}`). Expanded section shows:
   - Per-item rows: product name + quantity + prep option label
-  - Allergy notes (if any): italic 13px text-gray-500
-  - Delivery address: 13px text-gray-600
+  - Allergy notes (if any): italic 14px text-gray-500
+  - Delivery address: 14px text-gray-600
   - Expand/collapse controlled via local state (`useState` map keyed on order ID)
 - Chevron icon: `ChevronDown` 16px, rotates 180deg when expanded (CSS `transition-transform duration-150`)
 - Status column: shadcn `<Select>` inline — width `w-36`. On change triggers `PATCH /api/admin/orders/[id]` immediately. No save button.
 - Filters (above table): status `<Select>` + delivery week `<Input type="date">` — both in a `flex gap-3` row, right-aligned `<Button>` "Export CSV"
-- Empty state (no orders match filter): centered in table body — "No orders found" 14px text-gray-500, "Try adjusting your filters." 13px text-gray-400
-- Pagination: simple prev/next — 50 rows per page. Display: "Showing 1–50 of N orders" 13px text-gray-500
+- Empty state (no orders match filter): centered in table body — "No orders found" 14px text-gray-500, "Try adjusting your filters." 14px text-gray-400
+- Pagination: simple prev/next — 50 rows per page. Display: "Showing 1–50 of N orders" 14px text-gray-500
 
 ### Product Drawer (Right Side)
 
@@ -198,7 +204,7 @@ Ordering window state uses semantic green/red — the only place in admin where 
 
 - shadcn `<Sheet side="right">` — width: 480px (`max-w-[480px] w-full`)
 - Table remains visible/dimmed behind the sheet overlay
-- Drawer header: product name (edit) or "New Product" (create) — 18px semibold
+- Drawer header: product name (edit) or "New Product" (create) — 20px semibold
 - Form layout (top to bottom):
   1. Image upload block — `<UploadButton routeConfig="productImage" />`, shows current image preview (80px × 80px, rounded-md, object-cover) or placeholder
   2. Name input (label: "Product name")
@@ -217,14 +223,14 @@ Ordering window state uses semantic green/red — the only place in admin where 
 **Source:** CONTEXT.md D-18, D-19
 
 - Layout: `grid grid-cols-2 gap-5` (2×2 on desktop, 1×1 on mobile via `sm:grid-cols-2`)
-- Each card: shadcn `<Card>` with `p-5`
-  - Label: 13px text-gray-500 uppercase tracking-wide
+- Each card: shadcn `<Card>` with `p-4`
+  - Label: 14px text-gray-500 uppercase tracking-wide
   - Metric: 28px font-bold text-gray-900
-  - Sub-label (if applicable): 13px text-gray-400 (e.g. "this week")
+  - Sub-label (if applicable): 14px text-gray-400 (e.g. "this week")
 - Four cards:
   1. "Total Orders" — integer count
   2. "Total Revenue" — formatted as `₦N,NNN,NNN` (Nigerian locale, no decimals)
-  3. "Top Products" — ordered list of 5 items (product name + count), 14px body text, `gap-1.5`
+  3. "Top Products" — ordered list of 5 items (product name + count), 14px body text, `gap-2`
   4. "Order Status" — three rows: paid / processing / delivered + count each
 
 Top Products card spans full width on desktop: `col-span-2` or laid out as 4th card independently.
@@ -238,14 +244,14 @@ No charts. No charting library. Plain numbers only.
 **Source:** CONTEXT.md D-03, D-20
 
 - Single card: `<Card>` with `p-6`, max-w-lg, centered
-- Card heading: "Ordering Window" — 18px semibold
+- Card heading: "Ordering Window" — 20px semibold
 - Current state label (large, prominent):
-  - OPEN: `text-green-700 font-bold text-2xl` with `✓ Ordering is OPEN`
-  - CLOSED: `text-red-700 font-bold text-2xl` with `✗ Ordering is CLOSED`
+  - OPEN: `text-green-700 font-bold text-[28px]` with `✓ Ordering is OPEN`
+  - CLOSED: `text-red-700 font-bold text-[28px]` with `✗ Ordering is CLOSED`
 - Toggle: shadcn `<Switch>` — large (`scale-125` or size="lg"), labeled "Enable ordering"
 - Confirmation before CLOSING: inline text appears below toggle: "This will prevent new orders. Confirm?" with "Yes, Close" button (`variant="destructive"`, sm) + "Cancel" (`variant="ghost"`, sm). No modal — inline only.
 - No confirmation needed when re-opening (low risk direction).
-- Save state: "Save" button triggers `PATCH /api/admin/config`. On success: toast or inline "Saved" 13px text-green-600 that fades after 2 seconds.
+- Save state: "Save Settings" button triggers `PATCH /api/admin/config`. On success: toast or inline "Saved" 14px text-green-600 that fades after 2 seconds.
 
 ---
 
@@ -255,7 +261,7 @@ No charts. No charting library. Plain numbers only.
 |---------|------|
 | Primary CTA — login | "Sign in" |
 | Primary CTA — product create | "Save Product" |
-| Primary CTA — ordering window | "Save" |
+| Primary CTA — ordering window | "Save Settings" |
 | Sidebar brand text | "Rodo & Co Admin" |
 | Orders page heading | "Orders" |
 | Products page heading | "Products" |
