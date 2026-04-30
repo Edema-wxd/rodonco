@@ -40,7 +40,7 @@
 - **D-19:** Banner only renders when `ordering_config.is_ordering_open === false`; when open, component returns null
 
 ### Data fetching
-- **D-20:** Use `createSupabaseServerClient()` from `src/lib/supabase/server.ts` in server components — no client-side fetching on these pages
+- **D-20:** Use **server-only Drizzle/Neon reads** (e.g. `src/lib/shop/*` via `src/lib/db/index.ts`) in server components — no client-side fetching on these pages
 - **D-21:** Starting price for a product = MIN of its `product_variants.price_ngn` values; fetch variants in same query or separate query per product
 - **D-22:** Shop page uses `export const revalidate = 60` for the cutoff banner (SHOP-03 requirement)
 
@@ -222,14 +222,14 @@ Even though Phase 2 is “static”, the repository already contains Phase-3-gra
 
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
-| A1 | SHOP-03 acceptance can be satisfied by “no caching” semantics (updates faster than 60s), not strictly ISR `revalidate=60`. | Next.js pitfalls | If the team interprets SHOP-03 as strictly ISR-based, implementation may need adjustment. |
+| A1 | SHOP-03 acceptance can be satisfied by “no caching” semantics (updates faster than 60s) while still setting `export const revalidate = 60` on the `/shop` page as a *non-binding* freshness hint. | Next.js pitfalls | If the team interprets SHOP-03 as strictly ISR-based, implementation may need adjustment. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should Phase 2 keep the existing “ordering config is dynamic per request” behavior?**
+1. **Should Phase 2 keep the existing “ordering config is dynamic per request” behavior? (RESOLVED)**
    - What we know: `getOrderingConfig()` currently calls `unstable_noStore()` and is used in the customer layout. [VERIFIED: code]
    - What’s unclear: Phase 2 CONTEXT.md locked D-22 (“`revalidate=60` for cutoff banner”), but this conflicts with later INFRA-04 (“no caching on ordering checks”). [VERIFIED: requirements + code]
-   - Recommendation: Keep `noStore` for ordering checks; treat revalidate as a non-binding UI freshness target for the banner.
+   - **RESOLVED:** Keep `unstable_noStore()` for ordering checks (live truth). Also set `export const revalidate = 60` on the `/shop` page to satisfy SHOP-03’s “updates within 60s” intent, acknowledging `noStore` is stricter (updates faster than 60s).
 
 ## Sources
 

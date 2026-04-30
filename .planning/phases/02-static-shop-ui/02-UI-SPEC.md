@@ -222,7 +222,7 @@ Source: CONTEXT.md D-15; REQUIREMENTS.md SHOP-03
 ## Data Fetching Notes (for planner/executor)
 
 - Shop page: `export const revalidate = 60` for ISR (SHOP-03 cutoff banner requirement)
-- Use `createSupabaseServerClient()` from `src/lib/supabase/server.ts` in all server components
+- Use **server-only Drizzle/Neon reads** (e.g. `src/lib/shop/*` via `src/lib/db/index.ts`) in all server components
 - Starting price = `MIN(product_variants.price_ngn)` — kobo integer; display as `price / 100` formatted with `toLocaleString('en-NG')` or manual comma formatting
 - Product card "Add to Order" links to `/shop/{product.id}` (slug or id — use `product.id` until slug column confirmed in schema)
 
