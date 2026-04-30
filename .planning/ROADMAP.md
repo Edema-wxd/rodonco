@@ -48,8 +48,13 @@ Plans:
   3. Cutoff banner appears at the top of `/shop` when `ordering_config.is_ordering_open = false`, displays the next delivery date, and the page revalidates every 60 seconds
   4. Each product card shows image, name, starting price in NGN, and an `Add to Order` CTA
   5. Navbar renders at all times and shows a cart icon (badge may show skeleton/zero until Phase 3 hydration guard is wired to real cart)
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 02-01-PLAN.md — Landing page hero + How It Works (SHOP-01)
+- [ ] 02-02-PLAN.md — Shop grid sections + product card + cutoff banner alignment (SHOP-02/03/04)
+- [ ] 02-03-PLAN.md — Vitest coverage for cart badge + formatting contracts (CART-04)
 
 ### Phase 02.1: Migrate Supabase to Neon and Uploadthing (INSERTED)
 
