@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { HowItWorks } from "@/components/landing/HowItWorks";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <HowItWorks />
     </div>
   );
 }
