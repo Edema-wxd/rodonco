@@ -1,0 +1,67 @@
+import "server-only";
+
+import { and, asc, eq } from "drizzle-orm";
+
+import { db, schema } from "@/lib/db";
+import type { PrepOption, Product, ProductVariant } from "@/types";
+
+type ProductDetails = {
+  product: Product;
+  variants: ProductVariant[];
+  prepOptions: PrepOption[];
+};
+
+function toIsoString(value: unknown): string {
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "string") return value;
+  return new Date(0).toISOString();
+}
+
+export async function getProductDetailsById(productId: string): Promise<ProductDetails | null> {
+  const [productRow] = await db
+    .select()
+    .from(schema.products)
+    .where(and(eq(schema.products.id, productId), eq(schema.products.is_active, true)))
+    .limit(1);
+
+  if (!productRow) return null;
+
+  const [variantRows, prepRows] = await Promise.all([
+    db
+      .select()
+      .from(schema.product_variants)
+      .where(eq(schema.product_variants.product_id, productId))
+      .orderBy(asc(schema.product_variants.label)),
+    db
+      .select()
+      .from(schema.product_prep_options)
+      .where(eq(schema.product_prep_options.product_id, productId))
+      .orderBy(asc(schema.product_prep_options.label)),
+  ]);
+
+  return {
+    product: {
+      id: productRow.id,
+      name: productRow.name,
+      description: productRow.description ?? null,
+      type: productRow.type as Product["type"],
+      image_url: productRow.image_url ?? null,
+      is_active: productRow.is_active,
+      created_at: toIsoString(productRow.created_at),
+    },
+    variants: variantRows.map((v) => ({
+      id: v.id,
+      product_id: v.product_id,
+      label: v.label,
+      price_ngn: v.price_ngn,
+      is_default: v.is_default,
+    })),
+    prepOptions: prepRows.map((p) => ({
+      id: p.id,
+      product_id: p.product_id,
+      label: p.label,
+      extra_cost_ngn: p.extra_cost_ngn,
+    })),
+  };
+}
+
