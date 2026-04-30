@@ -38,10 +38,9 @@ created: 2026-04-30
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 02-01-01 | 01 | 1 | SHOP-01/02 | — | N/A | unit/e2e-lite | `npm test` | ✅ | ⬜ pending |
-| 02-01-02 | 01 | 1 | SHOP-03 | — | N/A | unit/e2e-lite | `npm test` | ✅ | ⬜ pending |
-| 02-02-01 | 02 | 2 | SHOP-04 | — | N/A | unit | `npm test` | ✅ | ⬜ pending |
-| 02-02-02 | 02 | 2 | CART-04 | — | N/A | unit | `npm test` | ✅ | ⬜ pending |
+| 02-01-01 | 01 | 1 | SHOP-01 | — | N/A | unit/e2e-lite | `npm test` | ✅ | ⬜ pending |
+| 02-02-01 | 02 | 1 | SHOP-02/SHOP-03/SHOP-04 | — | N/A | unit/e2e-lite | `npm test` | ✅ | ⬜ pending |
+| 02-03-01 | 03 | 2 | CART-04 | — | N/A | unit | `npm test` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 

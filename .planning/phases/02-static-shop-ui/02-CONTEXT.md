@@ -43,7 +43,7 @@ Server-render the landing page and shop product grid from real Supabase DB data.
 - **D-19:** Banner only renders when `ordering_config.is_ordering_open === false`; when open, component returns null
 
 ### Data fetching
-- **D-20:** Use `createSupabaseServerClient()` from `src/lib/supabase/server.ts` in server components — no client-side fetching on these pages
+- **D-20:** Use **server-only Drizzle/Neon reads** (e.g. `src/lib/shop/*` via `src/lib/db/index.ts`) in server components — no client-side fetching on these pages. *(Supabase note: this repo has migrated off Supabase; the previous Supabase-client decision is superseded.)*
 - **D-21:** Starting price for a product = MIN of its `product_variants.price_ngn` values; fetch variants in same query or separate query per product
 - **D-22:** Shop page uses `export const revalidate = 60` for the cutoff banner (SHOP-03 requirement)
 
@@ -66,10 +66,11 @@ Server-render the landing page and shop product grid from real Supabase DB data.
 
 ### Types and schema
 - `src/types/index.ts` — `Product`, `ProductVariant`, `OrderingConfig` interfaces; price fields are kobo (integer); divide by 100 for ₦ display
-- `supabase/migrations/0001_initial_schema.sql` — authoritative column names and constraints for `products`, `product_variants`, `ordering_config`
+- `drizzle/schema.ts` — authoritative table/column definitions for `products`, `product_variants`, `ordering_config`
 
-### Supabase clients
-- `src/lib/supabase/server.ts` — `createSupabaseServerClient()` — use this in all server components for DB queries; see Next.js 15 async cookies() pattern already implemented
+### DB access
+- `src/lib/db/index.ts` — server-only Drizzle client (Neon) + `schema` exports
+- `src/lib/shop/*` — server-only shop reads (preferred surface for Phase 2 SSR)
 
 ### Existing components
 - `src/components/layout/Navbar.tsx` — existing Navbar with cart icon + hydration guard; do NOT replace; only modify if needed
@@ -85,12 +86,11 @@ Server-render the landing page and shop product grid from real Supabase DB data.
 
 ### Reusable Assets
 - `src/components/ui/button.tsx` — shadcn/ui Button; `variant="default"` for solid black CTA
-- `src/lib/supabase/server.ts` — `createSupabaseServerClient()` for server-side queries; already handles Next.js 15 async `cookies()`
 - `src/hooks/useHasHydrated.ts` — SSR hydration guard (used in Navbar; no need to use in Phase 2 server components)
 - `src/lib/utils.ts` — `cn()` utility for conditional class names
 
 ### Established Patterns
-- Server components fetch data via `createSupabaseServerClient()` — no `use client` on page files
+- Server components fetch data via server-only Drizzle reads (`src/lib/shop/*`) — no `use client` on page files
 - All prices stored as kobo integers → display divides by 100
 - Root layout uses Geist font via `--font-sans` CSS variable
 - `(customer)` route group wraps all customer-facing pages; `CustomerLayout` renders `<Navbar />` above `<main>`
