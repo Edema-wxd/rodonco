@@ -12,7 +12,11 @@ Customers can browse, configure, and pay for weekly food prep orders in one smoo
 
 ### Validated
 
-(None yet — ship to validate)
+**Admin Panel** *(Validated in Phase 4: Admin Panel)*
+- [x] Admin auth — NextAuth v5 Credentials login backed by `admins` table, server-side route guard via `src/middleware.ts`
+- [x] Orders view — filterable table, expandable rows with prep instructions, status updates, CSV export
+- [x] Product management — CRUD products, variants, prep options, image upload via UploadThing (`productImage` endpoint), URL stored in `products.image_url`
+- [x] Analytics dashboard — orders count, revenue, top 5 products, status breakdown (sourced from Drizzle aggregate queries)
 
 ### Active
 
@@ -27,11 +31,7 @@ Customers can browse, configure, and pay for weekly food prep orders in one smoo
 - [ ] Order confirmation page — fetched by Paystack reference after payment
 
 **Admin Panel**
-- [ ] Admin auth — Supabase email/password login, server-side route guard
-- [ ] Orders view — filterable table, expandable rows with prep instructions, status updates, CSV export
-- [ ] Product management — CRUD products, variants, prep options, image upload (Supabase Storage)
 - [ ] Delivery reminders — admin triggers email reminders to all paid orders for a given week
-- [ ] Analytics dashboard — orders count, revenue, top 5 products, status breakdown (from DB)
 
 **Infrastructure**
 - [ ] Weekly cutoff automation — Vercel Cron (Thu 22:59 UTC) calls `/api/cutoff` to close orders
@@ -77,6 +77,9 @@ Customers can browse, configure, and pay for weekly food prep orders in one smoo
 | Product drawer as parallel route (`@drawer`) | No full page reload when opening product; URL-addressable | — Pending |
 | Vercel Cron for cutoff (not Supabase Edge Function) | Simpler ops; Vercel manages the scheduler | — Pending |
 | Next.js 15 (already installed) vs spec-stated 14 | Scaffold already on 15; App Router is identical, no regression | — Pending |
+| NextAuth v5 Credentials over Supabase Auth (Phase 2) | Neon migration removed Supabase; NextAuth v5 + JWT sessions is lighter and server-only | ✓ Validated Phase 4 |
+| UploadThing over Supabase Storage (Phase 2) | Neon migration removed Supabase; UploadThing `productImage` endpoint is typed and auth-gated | ✓ Validated Phase 4 |
+| Neon Postgres + Drizzle over Supabase PostgreSQL (Phase 2) | Full ORM control, schema-as-code, no RLS complexity for admin-only writes | ✓ Validated Phase 4 |
 
 ## Evolution
 
@@ -96,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-15 after initialization*
+*Last updated: 2026-05-01 — Phase 4 (Admin Panel) complete*
