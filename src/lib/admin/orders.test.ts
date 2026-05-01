@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { order_items, orders } from "../../../drizzle/schema";
 
+vi.mock("server-only", () => ({}));
+
 vi.mock("@/lib/db", () => {
   const rows = [
     {
