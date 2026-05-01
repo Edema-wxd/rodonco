@@ -848,20 +848,23 @@ const [config] = await db.select().from(ordering_config).where(eq(ordering_confi
 
 ## Open Questions
 
+## Open Questions (RESOLVED)
+
 1. **Neon HTTP driver transaction support**
-   - What we know: `drizzle-orm/neon-http` is used (confirmed in `src/lib/db/index.ts`). Drizzle `db.transaction()` API exists.
-   - What's unclear: Whether `neon-http` supports the full interactive transaction API or only batch queries.
-   - Recommendation: If `db.transaction()` fails at runtime, replace with: (1) insert product + (2) delete old variants + (3) insert new variants + (4) delete old prep options + (5) insert new prep options — all sequential, no transaction wrapper. Accept the small risk of partial writes at MVP scale.
+   - **Decision:** Treat interactive transactions as **not required** for MVP correctness. All product mutations MUST be implemented as **sequential statements** (update product, delete/reinsert variants, delete/reinsert prep options). This is the primary path in the plans, not a fallback.
+   - **Rationale:** The admin panel can tolerate the extremely small risk of partial writes during an unexpected mid-request failure. This keeps implementation compatible with the current driver and avoids runtime surprises.
+   - **Verification:** Not required for planning; execution plans explicitly avoid `db.transaction()` for product CRUD.
 
 2. **shadcn `sidebar` component complexity**
-   - What we know: The UI-SPEC calls for a simple fixed sidebar (224px, nav links, sign-out button). The shadcn `sidebar` component is a full feature set with collapsible behaviour.
-   - What's unclear: Whether the shadcn sidebar component is overkill and whether it introduces complexity vs. building a simple `<aside>` directly.
-   - Recommendation: Install `npx shadcn add sidebar` as specified in UI-SPEC. If it adds excessive complexity (e.g., requires specific Provider wrappers), fall back to a hand-built `<aside>` using the UI-SPEC dimensions directly — it's simple enough to not need a library component.
+   - **Decision:** Prefer a **hand-built `<aside>`** that matches `04-UI-SPEC.md` exactly (w-56 fixed sidebar), even if `npx shadcn add sidebar` exists.
+   - **Rationale:** The UI contract is simple and fixed; shadcn’s sidebar component can introduce extra provider/state complexity with no functional benefit for this internal tool.
+   - **Verification:** Sidebar implementation plan (`04-02-PLAN.md`) hardcodes the UI-SPEC anatomy and does not require shadcn sidebar primitives.
 
 3. **`count()` and `sum()` import path in drizzle-orm 0.45.2**
-   - What we know: Drizzle ORM exposes SQL helpers. The exact import path for `count()` and `sum()` may be `"drizzle-orm"` or `"drizzle-orm/sql"`.
-   - What's unclear: Whether `import { count, sum } from "drizzle-orm"` works in v0.45.2.
-   - Recommendation: Use `import { sql } from "drizzle-orm"` and write `sql<number>\`count(*)\`` as a fallback if named exports fail. Or verify with `grep -r "export.*count" node_modules/drizzle-orm/index.js` before writing.
+   - **Decision:** Use named exports from `"drizzle-orm"`: `import { count, sum } from "drizzle-orm"`.
+   - **Verification command:** `node -e "import('drizzle-orm').then(m=>{console.log('count' in m, 'sum' in m);}).catch(e=>{console.error(e);process.exit(1);})"`
+   - **Expected output:** `true true`
+   - **Observed output:** `true true` (verified in this workspace on 2026-05-01)
 
 ---
 

@@ -29,7 +29,7 @@ Auth (NextAuth middleware protecting `/admin/*`) was completed in Phase 02.1. Th
 ### Login Page
 - **D-05:** Login form at `/admin` — **centered card on neutral background** (`bg-gray-50`). Fields: Email, Password. One "Sign In" button. No logo or heavy branding — this is an internal tool.
 - **D-06:** After successful login, redirect to **`/admin/orders`** (the daily-use view).
-- **D-07:** Login uses `signIn("credentials", { email, password, redirectTo: "/admin/orders" })` from `src/auth.ts`. Error states shown inline (e.g. "Invalid credentials" below the form).
+- **D-07:** Login uses `signIn("credentials", { email, password, redirectTo: "/admin/orders" })` from `next-auth/react` (Client Component). Server-side session checks use `auth()` from `src/auth.ts`. Error states shown inline (e.g. "Invalid credentials" below the form).
 
 ### Orders Table
 - **D-08:** Order details revealed via **inline expandable row** — clicking a row expands it in-place to show order items, prep instructions per item, allergy notes, and delivery address. No modal or drawer.

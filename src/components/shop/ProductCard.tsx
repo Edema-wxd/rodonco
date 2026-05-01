@@ -1,6 +1,7 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
 
 function formatFromPrice(priceNgnKobo: number): string {
@@ -34,11 +35,13 @@ export function ProductCard({
       <div className="flex flex-col gap-2 p-4">
         <h3 className="text-xl font-bold">{product.name}</h3>
         <p className="text-sm text-muted-foreground">{formatFromPrice(startingPriceNgn)}</p>
-        <Button asChild variant="default" className="w-full">
-          <Link href={`/shop/${product.id}`} scroll={false}>
-            Add to Order
-          </Link>
-        </Button>
+        <Link
+          href={`/shop/${product.id}`}
+          scroll={false}
+          className={cn(buttonVariants({ variant: "default", className: "w-full" }))}
+        >
+          Add to Order
+        </Link>
       </div>
     </div>
   );
