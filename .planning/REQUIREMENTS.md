@@ -55,7 +55,7 @@
 
 ### Admin — Authentication
 
-- [ ] **AUTH-01**: Admin login page at `/admin` with Supabase email/password authentication
+- [ ] **AUTH-01**: Admin login page at `/admin` with NextAuth Credentials authentication (email/password backed by the `admins` table in Postgres)
 - [ ] **AUTH-02**: All `/admin/*` routes protected by server-side auth guard in `app/admin/layout.tsx`
 - [ ] **AUTH-03**: Unauthenticated access to admin routes redirects to `/admin` login
 
@@ -70,7 +70,7 @@
 ### Admin — Products
 
 - [ ] **PROD-01**: Admin can add new products and edit name, description, type, active status
-- [ ] **PROD-02**: Admin can upload product images to Supabase Storage; URL stored in `products.image_url`
+- [ ] **PROD-02**: Admin can upload product images via UploadThing; URL stored in `products.image_url`
 - [ ] **PROD-03**: Admin can add, edit, and remove size variants and prices per product
 - [ ] **PROD-04**: Admin can add, edit, and remove prep options per product
 - [ ] **PROD-05**: Admin can toggle `is_active` to show/hide products on the shop page
