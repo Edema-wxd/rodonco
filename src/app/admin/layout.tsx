@@ -1,16 +1,23 @@
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import * as React from "react";
+
+import { auth } from "@/auth";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+
+  // Middleware protects /admin/:path* (not /admin). If we're unauthenticated here,
+  // we are on /admin (login) and should render full-bleed without the sidebar.
+  if (!session?.user) {
+    return <>{children}</>;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white">
-        <div className="mx-auto flex h-14 max-w-7xl items-center px-4">
-          <span className="text-lg font-semibold">Rodo &amp; Co Admin</span>
-        </div>
-      </header>
-      <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
+    <div className="flex min-h-screen bg-gray-50">
+      <AdminSidebar adminEmail={session.user.email ?? null} />
+      <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
   );
 }
