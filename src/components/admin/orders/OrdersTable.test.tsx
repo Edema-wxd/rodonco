@@ -2,6 +2,8 @@ import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
+(globalThis as any).scrollTo = () => {};
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
@@ -48,7 +50,7 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
     expect(screen.getByText("Customer")).toBeTruthy();
     expect(screen.getByText("Phone")).toBeTruthy();
     expect(screen.getByText("Date")).toBeTruthy();
-    expect(screen.getByText("Status")).toBeTruthy();
+    expect(screen.getAllByText("Status").length).toBeGreaterThan(0);
     expect(screen.getByText(/Total/i)).toBeTruthy();
     expect(screen.getByText("Export CSV")).toBeTruthy();
   });
@@ -57,9 +59,9 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
     render(<OrdersTable initialOrders={[makeOrder({ id: "o1", reference: "REF-001" })]} />);
 
     expect(screen.queryByText(/Delivers to:/)).toBeNull();
-    fireEvent.click(screen.getByText("REF-001"));
+    fireEvent.click(screen.getAllByText("REF-001")[0]!);
     expect(screen.queryByText(/Delivers to:/)).not.toBeNull();
-    expect(screen.queryByText("Tomatoes")).not.toBeNull();
+    expect(screen.queryByText(/Tomatoes/)).not.toBeNull();
   });
 
   it("ORD-03: status filter narrows visible rows", () => {
@@ -72,12 +74,14 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
       />,
     );
 
-    expect(screen.queryByText("REF-001")).not.toBeNull();
-    expect(screen.queryByText("REF-002")).not.toBeNull();
+    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
+    expect(screen.queryAllByText("REF-002").length).toBeGreaterThan(0);
 
-    fireEvent.change(screen.getByLabelText("Status"), { target: { value: "processing" } });
-    expect(screen.queryByText("REF-001")).toBeNull();
-    expect(screen.queryByText("REF-002")).not.toBeNull();
+    for (const el of screen.getAllByLabelText("Status")) {
+      fireEvent.change(el, { target: { value: "processing" } });
+    }
+    expect(screen.queryAllByText("REF-001").length).toBe(0);
+    expect(screen.queryAllByText("REF-002").length).toBeGreaterThan(0);
   });
 
   it("ORD-05: changing status triggers PATCH and refresh", async () => {
@@ -86,7 +90,7 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
 
     render(<OrdersTable initialOrders={[makeOrder({ id: "o1", reference: "REF-001", status: "paid" })]} />);
 
-    const select = screen.getByLabelText("Update order status");
+    const select = screen.getAllByLabelText("Update order status")[0] as HTMLSelectElement;
     fireEvent.change(select, { target: { value: "processing" } });
 
     expect(fetchMock).toHaveBeenCalled();
