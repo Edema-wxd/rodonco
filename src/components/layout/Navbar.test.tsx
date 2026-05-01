@@ -1,5 +1,5 @@
 import React from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 
 import { useCartStore } from "@/store/cart";

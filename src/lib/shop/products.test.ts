@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import * as actualSchema from "../../../drizzle/schema";
 
