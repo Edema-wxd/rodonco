@@ -20,11 +20,11 @@ export function AdminLogin() {
     const email = String(fd.get("email") ?? "").trim();
     const password = String(fd.get("password") ?? "");
 
-    const result = await signIn("credentials", {
+    const result = (await signIn("credentials", {
       email,
       password,
       redirectTo: "/admin/orders",
-    });
+    })) as unknown as { error?: string } | undefined;
 
     if (result?.error) {
       setError("Invalid email or password. Please try again.");
