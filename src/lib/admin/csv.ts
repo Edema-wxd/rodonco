@@ -11,24 +11,16 @@ export type CsvOrderRow = {
   total_ngn: number;
 };
 
+const CSV_HEADER =
+  "Reference,Customer Name,Phone,Email,Delivery Address,Week Of,Items,Total NGN";
+
 function csvEscape(value: string, forceQuotes = false): string {
-  const needsQuotes = /[",\n]/.test(value);
+  const needsQuotes = /[",\n\r]/.test(value);
   const escaped = value.replaceAll('"', '""');
   return needsQuotes || forceQuotes ? `"${escaped}"` : escaped;
 }
 
 export function serializeOrdersCsv(rows: CsvOrderRow[]): string {
-  const header = [
-    "Reference",
-    "Customer Name",
-    "Phone",
-    "Email",
-    "Delivery Address",
-    "Week Of",
-    "Items",
-    "Total NGN",
-  ].join(",");
-
   const lines = rows.map((r) => {
     const items = r.items.map((i) => `${i.product_name} x${i.quantity}`).join("; ");
     return [
@@ -43,6 +35,6 @@ export function serializeOrdersCsv(rows: CsvOrderRow[]): string {
     ].join(",");
   });
 
-  return [header, ...lines].join("\n");
+  return [CSV_HEADER, ...lines].join("\n");
 }
 

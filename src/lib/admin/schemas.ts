@@ -6,17 +6,17 @@ const emptyStringToUndefined = (v: unknown) =>
 const variantSchema = z
   .object({
     id: z.string().uuid().optional(),
-    label: z.string().min(1).max(120),
+    label: z.string().min(1).max(80),
     price_ngn: z.coerce.number().int().nonnegative(),
-    is_default: z.boolean(),
+    is_default: z.boolean().default(false),
   })
   .strict();
 
 const prepOptionSchema = z
   .object({
     id: z.string().uuid().optional(),
-    label: z.string().min(1).max(120),
-    extra_cost_ngn: z.coerce.number().int().nonnegative(),
+    label: z.string().min(1).max(80),
+    extra_cost_ngn: z.coerce.number().int().nonnegative().default(0),
   })
   .strict();
 
@@ -24,7 +24,7 @@ export const productPayloadSchema = z
   .object({
     name: z.string().min(1).max(120),
     description: z
-      .preprocess(emptyStringToUndefined, z.string().max(5000))
+      .preprocess(emptyStringToUndefined, z.string().max(2000))
       .nullable()
       .optional(),
     type: z.enum(["fresh_produce", "cooking_kit"]),
@@ -42,7 +42,7 @@ export type ProductPayload = z.infer<typeof productPayloadSchema>;
 
 export const orderStatusPatchSchema = z
   .object({
-    status: z.enum(["paid", "processing", "delivered"]),
+    status: z.enum(["paid","processing","delivered"]),
   })
   .strict();
 
@@ -51,3 +51,6 @@ export const orderingConfigPatchSchema = z
     is_ordering_open: z.boolean(),
   })
   .strict();
+
+export type OrderStatusPatch = z.infer<typeof orderStatusPatchSchema>;
+export type OrderingConfigPatch = z.infer<typeof orderingConfigPatchSchema>;
