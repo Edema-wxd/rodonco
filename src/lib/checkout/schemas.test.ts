@@ -32,7 +32,7 @@ describe("checkoutPayloadSchema", () => {
       const validPhones = ["07012345678", "08012345678", "08112345678", "09012345678", "09112345678"];
       for (const phone of validPhones) {
         const result = checkoutPayloadSchema.safeParse({ ...validPayload, phone });
-        expect(result.success, `phone ${phone} should pass`).toBe(true);
+        expect(result.success).toBe(true);
       }
     });
 
