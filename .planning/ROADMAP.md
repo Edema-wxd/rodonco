@@ -102,10 +102,18 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Checkout page at `/checkout` renders the full RHF + Zod form (name, Nigerian phone, email, address, allergy notes, terms checkbox) without requiring a customer account; when `is_ordering_open = false` the entire page shows a blocked state with no form
   2. Submitting the checkout form calls `POST /api/orders/init`, which creates a `pending` order in DB and returns a Paystack reference; the Paystack inline popup opens and the customer can complete payment without leaving the page
-  3. `POST /api/paystack/webhook` reads raw body first, verifies HMAC-SHA512 signature, performs idempotency check against `orders.paystack_reference` (UNIQUE constraint), sets order status to `paid`, and returns 200 in under 5 seconds
+  3. `POST /api/paystack/webhook` reads raw body first, verifies HMAC-SHA512 signature, performs idempotency check against **`orders.reference`** (UNIQUE constraint — this is also the Paystack transaction reference), sets order status to `paid`, and returns 200 in under 5 seconds
   4. Customer receives a Resend order confirmation email and admin receives a new-order alert email on every `charge.success` event; Resend errors are caught and logged without causing the webhook to return non-200
   5. Order confirmation page at `/order/[ref]` fetches the order by Paystack reference, displays order reference, customer name, itemised summary, delivery address, and next Saturday delivery date; a reference not found or with non-`paid` status renders a clear error state
-**Plans**: TBD
+**Plans**: 5 plans
+**UI hint**: yes
+
+Plans:
+- [ ] 05-01-PLAN.md — Dependencies + checkout Zod + Paystack initialize helper (`CHKT-02`)
+- [ ] 05-02-PLAN.md — Checkout page UI + Inline JS + wiring to `/api/orders/init` (`CHKT-01`, `CHKT-03`, `CHKT-05`)
+- [ ] 05-03-PLAN.md — `POST /api/orders/init` pending order + Paystack initialize (`CHKT-04`)
+- [ ] 05-04-PLAN.md — Paystack webhook HMAC + `paid` transition + Resend emails (`CHKT-06`, `CHKT-07`, `NOTF-02`, `NOTF-03`)
+- [ ] 05-05-PLAN.md — Order confirmation `/order/[ref]` (`CONF-01`–`CONF-03`)
 
 ### Phase 6: Automation + Launch
 **Goal**: The ordering window closes automatically every Thursday at 22:59 UTC via Vercel Cron, admin can trigger bulk delivery reminder emails, and the platform passes a pre-launch hardening checklist — live Paystack keys wired, environment assertions in place, and the webhook URL registered in the Paystack live dashboard
@@ -131,5 +139,5 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 | 2.1 Migrate Supabase to Neon + Uploadthing | 3/4 | In Progress|  |
 | 3. Interactive Shop | 0/TBD | Not started | - |
 | 4. Admin Panel | 0/TBD | Not started | - |
-| 5. Payments + Email | 0/TBD | Not started | - |
+| 5. Payments + Email | 0/5 | Planning complete | - |
 | 6. Automation + Launch | 0/TBD | Not started | - |
