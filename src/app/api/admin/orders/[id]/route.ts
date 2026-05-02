@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { orders } from "../../../../../../drizzle/schema";
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -27,7 +27,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     );
   }
 
-  const { id } = params;
+  const { id } = await params;
   await db.update(orders).set({ status: parsed.data.status }).where(eq(orders.id, id));
 
   return NextResponse.json({ ok: true });

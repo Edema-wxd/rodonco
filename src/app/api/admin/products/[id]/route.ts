@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { product_prep_options, product_variants, products } from "../../../../../../drizzle/schema";
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -27,7 +27,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     );
   }
 
-  const { id } = params;
+  const { id } = await params;
   const { name, description, type, image_url, is_active, variants, prep_options } = parsed.data;
 
   // Sequential statements (replace-all for variants/prep options).
@@ -68,13 +68,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = params;
+  const { id } = await params;
   // FK ON DELETE CASCADE removes variants + prep options.
   await db.delete(products).where(eq(products.id, id));
 

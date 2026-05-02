@@ -12,26 +12,32 @@ export function Navbar() {
   const openCart = useCartUiStore((s) => s.openCart);
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-white">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
+      <nav className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-4 sm:px-6">
+        <Link
+          href="/"
+          className="font-heading text-2xl italic tracking-tight text-foreground hover:text-primary transition-colors"
+        >
           Rodo &amp; Co
         </Link>
 
-        <div className="flex items-center gap-6">
-          <Link href="/shop" className="text-sm font-medium hover:underline">
+        <div className="flex items-center gap-7">
+          <Link
+            href="/shop"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
             Shop
           </Link>
 
           <button
             type="button"
-            className="relative"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary transition-colors"
             aria-label="Open cart"
             onClick={openCart}
           >
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-[1.125rem] w-[1.125rem] text-foreground" />
             {hasHydrated && itemCount > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-[1.125rem] w-[1.125rem] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                 {itemCount}
               </span>
             )}

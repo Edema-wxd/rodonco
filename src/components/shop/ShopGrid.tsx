@@ -13,19 +13,22 @@ export default async function ShopGrid() {
   const cookingKits = products.filter((p) => p.type === "cooking_kit");
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <OrderingClosedBanner
         isOpen={ordering.is_ordering_open}
         cutoffMessage={ordering.cutoff_message}
         nextDeliveryDate={ordering.next_delivery_date}
       />
 
-      <div className="space-y-10">
+      <div className="space-y-14">
         <section>
-          <h2 className="border-b pb-2 text-xl font-bold">Fresh Produce</h2>
+          <div className="flex items-baseline gap-3 pb-5 border-b border-border">
+            <h2 className="font-heading text-3xl italic text-foreground">Fresh Produce</h2>
+            <span className="text-sm text-muted-foreground">{freshProduce.length} items</span>
+          </div>
 
           {freshProduce.length ? (
-            <div className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-7 grid grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {freshProduce.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -35,15 +38,18 @@ export default async function ShopGrid() {
               ))}
             </div>
           ) : (
-            <p className="mt-4 text-sm text-muted-foreground">No products available</p>
+            <p className="mt-5 text-sm text-muted-foreground">No products available yet.</p>
           )}
         </section>
 
         <section>
-          <h2 className="border-b pb-2 text-xl font-bold">Cooking Kits</h2>
+          <div className="flex items-baseline gap-3 pb-5 border-b border-border">
+            <h2 className="font-heading text-3xl italic text-foreground">Cooking Kits</h2>
+            <span className="text-sm text-muted-foreground">{cookingKits.length} items</span>
+          </div>
 
           {cookingKits.length ? (
-            <div className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-7 grid grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {cookingKits.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -53,11 +59,10 @@ export default async function ShopGrid() {
               ))}
             </div>
           ) : (
-            <p className="mt-4 text-sm text-muted-foreground">No products available</p>
+            <p className="mt-5 text-sm text-muted-foreground">No products available yet.</p>
           )}
         </section>
       </div>
     </div>
   );
 }
-

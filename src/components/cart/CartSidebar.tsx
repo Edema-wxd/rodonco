@@ -56,18 +56,18 @@ export function CartSidebar({
         aria-modal="true"
         aria-label="Cart"
         className={[
-          "absolute bottom-0 left-0 right-0 flex max-h-[85vh] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl",
+          "absolute bottom-0 left-0 right-0 flex max-h-[85vh] flex-col overflow-hidden rounded-t-2xl bg-card shadow-2xl",
           "sm:bottom-auto sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[420px] sm:rounded-none",
         ].join(" ")}
       >
-        <div className="flex items-center justify-between border-b px-4 py-4">
+        <div className="flex items-center justify-between border-b border-border px-4 py-4">
           <div>
-            <p className="text-sm font-semibold text-black">Your cart</p>
-            <p className="mt-0.5 text-xs text-black/60">{items.length} item(s)</p>
+            <p className="font-heading text-lg italic text-foreground">Your cart</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{items.length} item(s)</p>
           </div>
           <button
             type="button"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-black/5"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary transition-colors"
             onClick={closeCart}
             aria-label="Close"
           >

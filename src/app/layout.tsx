@@ -2,17 +2,29 @@ import type { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import "./globals.css";
-import { Geist } from "next/font/google";
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import { extractRouterConfig } from "uploadthing/server";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const dmSerifDisplay = DM_Serif_Display({
+  weight: ["400"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Coming Soon",
-  description: "We are cooking for you.",
+  title: "Rodo & Co",
+  description: "Fresh produce and cooking kits, delivered weekly.",
 };
 
 export default function RootLayout({
@@ -21,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="en" className={cn("font-sans", dmSans.variable, dmSerifDisplay.variable)}>
       <body>
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         {children}

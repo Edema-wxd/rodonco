@@ -43,7 +43,7 @@ export async function getOrderingConfig(): Promise<OrderingConfig> {
       next_delivery_date: row.next_delivery_date ?? null,
     };
   } catch (err) {
-    console.error("[getOrderingConfig] Failed to read ordering_config; defaulting ordering to OPEN", err);
+    console.warn("[getOrderingConfig] DB unavailable (likely cold start); defaulting ordering to OPEN");
     return SAFE_DEFAULT;
   }
 }
