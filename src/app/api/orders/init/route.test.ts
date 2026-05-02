@@ -8,9 +8,9 @@ import { NextRequest } from "next/server";
 // --- Mock server-only ---
 vi.mock("server-only", () => ({}));
 
-// --- Hoist mock state ---
-const { mockState } = vi.hoisted(() => ({
-  mockState: {
+// --- Hoist all mock state and mock functions ---
+const { mockState, mockDbInsert, mockDbSelect } = vi.hoisted(() => {
+  const mockState = {
     isOrderingOpen: true,
     paystackResult: {
       access_code: "test_access_code",
@@ -23,10 +23,14 @@ const { mockState } = vi.hoisted(() => ({
       total_ngn: number;
       week_of: string;
     } | null,
-    dbInsertError: null as Error | null,
     paystackError: null as Error | null,
-  },
-}));
+  };
+
+  const mockDbInsert = vi.fn();
+  const mockDbSelect = vi.fn();
+
+  return { mockState, mockDbInsert, mockDbSelect };
+});
 
 // --- Mock dependencies ---
 vi.mock("@/lib/shop/orderingConfig", () => ({
@@ -48,16 +52,24 @@ vi.mock("@/lib/paystack/initialize", () => ({
   }),
 }));
 
-const mockDbInsert = vi.fn();
-const mockDbSelect = vi.fn();
-
 vi.mock("@/lib/db", () => ({
   db: {
     insert: mockDbInsert,
     select: mockDbSelect,
   },
   schema: {
-    orders: { id: "orders.id", reference: "orders.reference" },
+    orders: {
+      id: "orders.id",
+      reference: "orders.reference",
+      customer_name: "orders.customer_name",
+      customer_email: "orders.customer_email",
+      customer_phone: "orders.customer_phone",
+      delivery_address: "orders.delivery_address",
+      allergy_notes: "orders.allergy_notes",
+      status: "orders.status",
+      total_ngn: "orders.total_ngn",
+      week_of: "orders.week_of",
+    },
     order_items: {},
   },
 }));
@@ -68,6 +80,7 @@ vi.mock("nanoid", () => ({
 
 // Import after mocks
 import { POST } from "./route";
+import { initializePaystackTransaction } from "@/lib/paystack/initialize";
 
 // ─────────────────────────────────────────
 // Test helpers
@@ -104,20 +117,15 @@ function makeRequest(body: unknown) {
 }
 
 function setupSuccessfulDbInsert() {
-  const mockOrderId = "new-order-uuid";
-  const returningOrder = vi.fn().mockResolvedValue([{ id: mockOrderId, reference: "RDC-test1234567" }]);
-  const valuesOrder = vi.fn().mockReturnValue({ returning: returningOrder });
-  const intoOrder = vi.fn().mockReturnValue({ values: valuesOrder });
+  const returning = vi.fn().mockResolvedValue([{ id: "new-order-uuid", reference: "RDC-test1234567" }]);
+  const values = vi.fn().mockReturnValue({ returning });
 
-  const returningItems = vi.fn().mockResolvedValue([]);
-  const valuesItems = vi.fn().mockReturnValue({ returning: returningItems });
-  const intoItems = vi.fn().mockReturnValue({ values: valuesItems });
+  // Second call for order_items (no returning needed)
+  const values2 = vi.fn().mockResolvedValue([]);
 
   mockDbInsert
-    .mockReturnValueOnce({ values: valuesOrder })
-    .mockReturnValueOnce({ values: valuesItems });
-
-  return { mockOrderId };
+    .mockReturnValueOnce({ values })
+    .mockReturnValueOnce({ values: values2 });
 }
 
 // ─────────────────────────────────────────
@@ -130,8 +138,12 @@ describe("POST /api/orders/init", () => {
     // Reset state
     mockState.isOrderingOpen = true;
     mockState.pendingReuseResult = null;
-    mockState.dbInsertError = null;
     mockState.paystackError = null;
+    mockState.paystackResult = {
+      access_code: "test_access_code",
+      authorization_url: "https://checkout.paystack.com/abc",
+      reference: "RDC-test1234567",
+    };
   });
 
   describe("validation", () => {
@@ -238,14 +250,12 @@ describe("POST /api/orders/init", () => {
 
     it("inserts order into DB before calling Paystack", async () => {
       setupSuccessfulDbInsert();
-      const { initializePaystackTransaction } = await import("@/lib/paystack/initialize");
 
       const req = makeRequest(validPayload);
       await POST(req);
 
-      // DB insert should have been called
-      expect(mockDbInsert).toHaveBeenCalled();
-      // Paystack should also be called
+      // DB insert should have been called for both orders and order_items
+      expect(mockDbInsert).toHaveBeenCalledTimes(2);
       expect(initializePaystackTransaction).toHaveBeenCalled();
     });
   });
@@ -265,7 +275,7 @@ describe("POST /api/orders/init", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.reference).toBe("RDC-existing123");
-      // DB insert should NOT have been called when reusing
+      // DB insert should NOT be called when reusing
       expect(mockDbInsert).not.toHaveBeenCalled();
     });
   });
