@@ -126,10 +126,22 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
+
+**Wave 0** *(must complete before Wave 1)*
 - [ ] 06-01-PLAN.md — Test stubs (Wave 0): cutoff route, reminders lib, reminders route, validateEnv
+
+**Wave 1** *(blocked on Wave 0 — 06-02 and 06-03 run in parallel)*
 - [ ] 06-02-PLAN.md — vercel.json cron config + /api/cutoff GET handler (INFRA-01, INFRA-02)
 - [ ] 06-03-PLAN.md — Reminders backend + ReminderForm UI + settings page wiring (NOTF-01)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 06-04-PLAN.md — validateEnv module + next.config.ts security headers + error boundaries + LAUNCH-CHECKLIST.md
+
+**Cross-cutting constraints:**
+- `/api/cutoff` must NOT call `auth()` — Vercel cron invocation has no session cookie
+- `global-error.tsx` must include `<html>` and `<body>` tags (replaces root layout)
+- CSP must allowlist `https://js.paystack.co` and `https://utfs.io` or Phase 5 payments + Phase 4 image uploads break
+- `validateEnv()` must check `AUTH_SECRET` not `NEXTAUTH_SECRET` (NextAuth v5 convention in this codebase)
 
 ## Progress
 
