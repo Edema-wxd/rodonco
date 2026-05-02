@@ -8,20 +8,54 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // Mock server-only so the import doesn't fail in test environment
 vi.mock("server-only", () => ({}));
 
-// We mock the DB module to avoid real DB calls in unit tests
-const mockDb = {
-  select: vi.fn(),
-};
+// Mock cartToOrderDraft to use a controlled fingerprint function
+vi.mock("@/lib/checkout/cartToOrderDraft", () => ({
+  cartFingerprint: (items: Array<{ productId: string; variantLabel: string | null; prepOption: string | null; quantity: number }>) => {
+    const segments = items.map((item) =>
+      [item.productId, item.variantLabel ?? "", item.prepOption ?? "", String(item.quantity)].join(":")
+    );
+    segments.sort();
+    return segments.join("|");
+  },
+}));
+
+// Use vi.hoisted to create stable mock references for the db module
+const { mockSelectChain } = vi.hoisted(() => {
+  const mockLimit = vi.fn();
+  const mockWhere = vi.fn();
+  const mockFrom = vi.fn();
+  const mockSelect = vi.fn();
+
+  // Default chain setup - can be overridden per test
+  mockLimit.mockResolvedValue([]);
+  mockWhere.mockReturnValue({ limit: mockLimit });
+  mockFrom.mockReturnValue({ where: mockWhere });
+  mockSelect.mockReturnValue({ from: mockFrom });
+
+  return {
+    mockSelectChain: { select: mockSelect, from: mockFrom, where: mockWhere, limit: mockLimit },
+  };
+});
 
 vi.mock("@/lib/db", () => ({
-  db: mockDb,
+  db: {
+    select: mockSelectChain.select,
+  },
   schema: {
     orders: {
+      id: "orders.id",
+      reference: "orders.reference",
+      total_ngn: "orders.total_ngn",
+      week_of: "orders.week_of",
       customer_email: "orders.customer_email",
       status: "orders.status",
     },
     order_items: {
       order_id: "order_items.order_id",
+      product_id: "order_items.product_id",
+      variant_label: "order_items.variant_label",
+      prep_option: "order_items.prep_option",
+      quantity: "order_items.quantity",
     },
   },
 }));
@@ -61,8 +95,6 @@ describe("findPendingReuse", () => {
   const mockPendingOrder = {
     id: "order-uuid-123",
     reference: "RDC-abc1234567",
-    customer_email: testEmail,
-    status: "pending",
     total_ngn: 500000,
     week_of: "2026-05-09",
   };
@@ -70,14 +102,12 @@ describe("findPendingReuse", () => {
   // Order items that match testCartItems (same product/variant/prep/qty)
   const matchingOrderItems = [
     {
-      order_id: "order-uuid-123",
       product_id: "prod-abc",
       variant_label: "1kg",
       prep_option: null,
       quantity: 2,
     },
     {
-      order_id: "order-uuid-123",
       product_id: "prod-xyz",
       variant_label: null,
       prep_option: "Chopped",
@@ -85,27 +115,18 @@ describe("findPendingReuse", () => {
     },
   ];
 
-  function buildDbChain(returnValue: unknown[]) {
-    const limit = vi.fn().mockResolvedValue(returnValue);
-    const where = vi.fn().mockReturnValue({ limit });
-    const from = vi.fn().mockReturnValue({ where });
-    mockDb.select.mockReturnValue({ from });
-    return { from, where, limit };
-  }
-
-  function buildDbChainNoWhere(returnValue: unknown[]) {
-    const where = vi.fn().mockResolvedValue(returnValue);
-    const from = vi.fn().mockReturnValue({ where });
-    mockDb.select.mockReturnValue({ from });
-    return { from, where };
-  }
-
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset to default: no results
+    mockSelectChain.limit.mockResolvedValue([]);
+    mockSelectChain.where.mockReturnValue({ limit: mockSelectChain.limit });
+    mockSelectChain.from.mockReturnValue({ where: mockSelectChain.where });
+    mockSelectChain.select.mockReturnValue({ from: mockSelectChain.from });
   });
 
   it("returns null when no pending orders exist for this email", async () => {
-    buildDbChain([]);
+    // select().from().where().limit() => []
+    mockSelectChain.limit.mockResolvedValue([]);
 
     const result = await findPendingReuse(testEmail, testCartItems);
 
@@ -113,25 +134,25 @@ describe("findPendingReuse", () => {
   });
 
   it("returns null when pending order exists but cart items differ", async () => {
-    // First call: returns pending orders for email
-    const limit1 = vi.fn().mockResolvedValue([mockPendingOrder]);
-    const where1 = vi.fn().mockReturnValue({ limit: limit1 });
-    const from1 = vi.fn().mockReturnValue({ where: where1 });
-
-    // Second call: returns order items that DO NOT match (different qty)
     const differentItems = [
       {
-        order_id: "order-uuid-123",
         product_id: "prod-abc",
         variant_label: "1kg",
         prep_option: null,
         quantity: 99, // different!
       },
     ];
+
+    // First select: returns pending order
+    const limit1 = vi.fn().mockResolvedValue([mockPendingOrder]);
+    const where1 = vi.fn().mockReturnValue({ limit: limit1 });
+    const from1 = vi.fn().mockReturnValue({ where: where1 });
+
+    // Second select: returns different items
     const where2 = vi.fn().mockResolvedValue(differentItems);
     const from2 = vi.fn().mockReturnValue({ where: where2 });
 
-    mockDb.select
+    mockSelectChain.select
       .mockReturnValueOnce({ from: from1 })
       .mockReturnValueOnce({ from: from2 });
 
@@ -141,16 +162,16 @@ describe("findPendingReuse", () => {
   });
 
   it("returns the matching order when email and cart contents match", async () => {
-    // First call: returns pending orders for email
+    // First select: returns pending order
     const limit1 = vi.fn().mockResolvedValue([mockPendingOrder]);
     const where1 = vi.fn().mockReturnValue({ limit: limit1 });
     const from1 = vi.fn().mockReturnValue({ where: where1 });
 
-    // Second call: returns matching order items
+    // Second select: returns matching items
     const where2 = vi.fn().mockResolvedValue(matchingOrderItems);
     const from2 = vi.fn().mockReturnValue({ where: where2 });
 
-    mockDb.select
+    mockSelectChain.select
       .mockReturnValueOnce({ from: from1 })
       .mockReturnValueOnce({ from: from2 });
 
@@ -165,10 +186,18 @@ describe("findPendingReuse", () => {
     const limit = vi.fn().mockRejectedValue(new Error("DB connection failed"));
     const where = vi.fn().mockReturnValue({ limit });
     const from = vi.fn().mockReturnValue({ where });
-    mockDb.select.mockReturnValue({ from });
+    mockSelectChain.select.mockReturnValue({ from });
 
     const result = await findPendingReuse(testEmail, testCartItems);
 
     expect(result).toBeNull();
+  });
+
+  it("queries with limit 1 to find at most one pending order", async () => {
+    mockSelectChain.limit.mockResolvedValue([]);
+
+    await findPendingReuse(testEmail, testCartItems);
+
+    expect(mockSelectChain.limit).toHaveBeenCalledWith(1);
   });
 });
