@@ -123,7 +123,13 @@ Plans:
   1. `vercel.json` contains a cron entry for `/api/cutoff` at `59 22 * * 4` (Thursday 22:59 UTC = Thursday 23:59 WAT); the route validates `Authorization: Bearer CRON_SECRET` and sets `ordering_config.is_ordering_open = false` idempotently; running it twice has no side effect
   2. Admin can select a delivery week and trigger delivery reminder emails to all `paid` orders for that week; the Route Handler bulk-sends via Resend and returns a count of emails dispatched
   3. Production deployment uses live Paystack keys (`pk_live_`, `sk_live_`); the startup environment assertion verifies `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` starts with `pk_live_` in production; the Paystack live dashboard webhook URL points to the production domain
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Test stubs (Wave 0): cutoff route, reminders lib, reminders route, validateEnv
+- [ ] 06-02-PLAN.md — vercel.json cron config + /api/cutoff GET handler (INFRA-01, INFRA-02)
+- [ ] 06-03-PLAN.md — Reminders backend + ReminderForm UI + settings page wiring (NOTF-01)
+- [ ] 06-04-PLAN.md — validateEnv module + next.config.ts security headers + error boundaries + LAUNCH-CHECKLIST.md
 
 ## Progress
 
@@ -140,4 +146,4 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 | 3. Interactive Shop | 0/TBD | Not started | - |
 | 4. Admin Panel | 0/TBD | Not started | - |
 | 5. Payments + Email | 0/5 | Planning complete | - |
-| 6. Automation + Launch | 0/TBD | Not started | - |
+| 6. Automation + Launch | 0/4 | Planning complete | - |
