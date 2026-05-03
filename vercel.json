@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cutoff",
+      "schedule": "59 22 * * 4"
+    }
+  ]
+}
