@@ -107,6 +107,15 @@ function ConfirmedOrder({ order, items, nextDeliveryDate }: ConfirmedOrderProps)
         <h1 className="font-heading text-2xl">Order Confirmed</h1>
       </div>
 
+      {/* Customer greeting */}
+      <p className="mb-6 text-muted-foreground">
+        Thank you,{" "}
+        <span className="font-semibold text-foreground">
+          {order.customer_name}
+        </span>
+        . Your order is confirmed and will be delivered on the date below.
+      </p>
+
       <Card>
         <CardHeader className="pb-4">
           {/* Order reference */}
