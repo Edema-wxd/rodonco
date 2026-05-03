@@ -117,6 +117,16 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({ received: true });
   }
 
+  // ── Step 6b: Verify charged amount matches stored order total ─────────────
+  if (payload.data.amount !== pendingOrder.total_ngn) {
+    console.error(
+      `[webhook] Amount mismatch for ${reference}: ` +
+        `expected ${pendingOrder.total_ngn} kobo, got ${payload.data.amount} kobo`
+    );
+    // Return 200 so Paystack does not retry; mismatch flagged for ops monitoring.
+    return NextResponse.json({ received: true, mismatch: true });
+  }
+
   // ── Step 7: Transition order to paid ─────────────────────────────────────
   let updatedOrder: typeof schema.orders.$inferSelect;
 
