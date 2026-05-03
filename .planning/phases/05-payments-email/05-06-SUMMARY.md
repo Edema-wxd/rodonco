@@ -19,6 +19,7 @@ key_files:
     - src/components/order/OrderConfirmationView.tsx
 commits:
   - 22ff758
+  - 1716f1d
 completed_at: "2026-05-03"
 ---
 
@@ -50,5 +51,5 @@ None — no new endpoints/auth/trust boundaries introduced.
 ## Self-Check: PASSED
 
 - **SUMMARY exists**: `.planning/phases/05-payments-email/05-06-SUMMARY.md`
-- **Commit exists**: `22ff758`
+- **Commits exist**: `22ff758`, `1716f1d`
 
