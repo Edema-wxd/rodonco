@@ -15,12 +15,13 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { nanoid } from "nanoid";
+import { inArray } from "drizzle-orm";
 
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { db, schema } from "@/lib/db";
 import { findPendingReuse } from "@/lib/orders/findPendingReuse";
 import { initializePaystackTransaction } from "@/lib/paystack/initialize";
-import { buildOrderItemsDraftFromCart, cartTotalKobo } from "@/lib/checkout/cartToOrderDraft";
+import { buildOrderItemsDraftFromCart } from "@/lib/checkout/cartToOrderDraft";
 
 // ─────────────────────────────────────────
 // Request validation schema
@@ -89,11 +90,68 @@ export async function POST(req: Request): Promise<NextResponse> {
   // week_of from DB config (falls back to today's ISO date if missing)
   const weekOf = config.next_delivery_date ?? new Date().toISOString().slice(0, 10);
 
-  // 3. Compute total from cart lines (server-side recompute; never trust client totals)
-  const totalKobo = cartTotalKobo(cart);
+  // 3. Server-side price authority: fetch canonical prices from DB (CR-02 fix)
+  const productIds = [...new Set(cart.map((i) => i.productId))];
+
+  let totalKobo: number;
+  let pricedCart: typeof cart;
+
+  try {
+    const [dbVariants, dbPrepOptions] = await Promise.all([
+      db
+        .select()
+        .from(schema.product_variants)
+        .where(inArray(schema.product_variants.product_id, productIds)),
+      db
+        .select()
+        .from(schema.product_prep_options)
+        .where(inArray(schema.product_prep_options.product_id, productIds)),
+    ]);
+
+    let runningTotal = 0;
+    const computed = cart.map((item) => {
+      const variant =
+        item.variantLabel !== null
+          ? dbVariants.find(
+              (v) => v.product_id === item.productId && v.label === item.variantLabel
+            )
+          : dbVariants.find(
+              (v) => v.product_id === item.productId && v.is_default === true
+            );
+
+      if (!variant) {
+        throw new Error(`Unknown variant for product ${item.productId}`);
+      }
+
+      const prep =
+        item.prepOption !== null
+          ? dbPrepOptions.find(
+              (p) => p.product_id === item.productId && p.label === item.prepOption
+            )
+          : null;
+
+      const unitPrice = variant.price_ngn + (prep?.extra_cost_ngn ?? 0);
+      const subtotal = unitPrice * item.quantity;
+      runningTotal += subtotal;
+
+      return { ...item, unitPriceNgn: unitPrice, subtotalNgn: subtotal };
+    });
+
+    totalKobo = runningTotal;
+    pricedCart = computed;
+  } catch (err) {
+    console.error("[/api/orders/init] Price lookup failed:", err);
+    return NextResponse.json(
+      {
+        error:
+          "One or more items could not be priced. Please refresh your cart and try again.",
+      },
+      { status: 422 }
+    );
+  }
 
   // 4. Try to reuse existing pending order (D-05)
-  const existingOrder = await findPendingReuse(email, cart);
+  const existingOrder = await findPendingReuse(email, pricedCart);
 
   if (existingOrder) {
     // Reuse: skip DB insert, go straight to Paystack init
@@ -143,7 +201,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     newOrderId = insertedOrder.id;
 
     // Insert order items
-    const itemDrafts = buildOrderItemsDraftFromCart(cart, newOrderId);
+    const itemDrafts = buildOrderItemsDraftFromCart(pricedCart, newOrderId);
     await db.insert(schema.order_items).values(itemDrafts);
   } catch (err) {
     console.error("[/api/orders/init] DB insert error:", err);
