@@ -66,6 +66,10 @@ export function cartFingerprint(items: CartItem[]): string {
 }
 
 /**
+ * @deprecated Use server-side DB price lookup in /api/orders/init instead.
+ * This function sums client-submitted subtotalNgn values and must NOT be used
+ * to compute authoritative order totals. Retained for test compatibility only.
+ *
  * Computes the total order value in integer kobo from a CartItem[].
  * Sums subtotalNgn (already kobo) — result is always an integer.
  */
