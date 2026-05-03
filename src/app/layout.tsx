@@ -6,6 +6,7 @@ import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import { extractRouterConfig } from "uploadthing/server";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
+import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 
 const dmSans = DM_Sans({
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body>
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         {children}
+        <Toaster richColors position="bottom-center" />
         <SpeedInsights />
       </body>
     </html>
