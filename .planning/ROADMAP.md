@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Interactive Shop** - Product drawer (parallel route), cart sidebar, live price recalculation, and cutoff enforcement in UI
 - [ ] **Phase 4: Admin Panel** - Auth guard, orders table, product CRUD, analytics dashboard, and manual ordering-config toggle
 - [ ] **Phase 5: Payments + Email** - Paystack inline popup, webhook handler, order creation, Resend confirmation and admin-alert emails, order confirmation page
-- [ ] **Phase 6: Automation + Launch** - Vercel Cron cutoff job, delivery reminder emails, pre-launch key swap, and go-live hardening
+- [x] **Phase 6: Automation + Launch** - Vercel Cron cutoff job, delivery reminder emails, pre-launch key swap, and go-live hardening (completed 2026-05-04)
 
 ## Phase Details
 
@@ -131,14 +131,14 @@ Plans:
 Plans:
 
 **Wave 0** *(must complete before Wave 1)*
-- [ ] 06-01-PLAN.md — Test stubs (Wave 0): cutoff route, reminders lib, reminders route, validateEnv
+- [x] 06-01-PLAN.md — Test stubs (Wave 0): cutoff route, reminders lib, reminders route, validateEnv
 
 **Wave 1** *(blocked on Wave 0 — 06-02 and 06-03 run in parallel)*
-- [ ] 06-02-PLAN.md — vercel.json cron config + /api/cutoff GET handler (INFRA-01, INFRA-02)
-- [ ] 06-03-PLAN.md — Reminders backend + ReminderForm UI + settings page wiring (NOTF-01)
+- [x] 06-02-PLAN.md — vercel.json cron config + /api/cutoff GET handler (INFRA-01, INFRA-02)
+- [x] 06-03-PLAN.md — Reminders backend + ReminderForm UI + settings page wiring (NOTF-01)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 06-04-PLAN.md — validateEnv module + next.config.ts security headers + error boundaries + LAUNCH-CHECKLIST.md
+- [x] 06-04-PLAN.md — validateEnv module + next.config.ts security headers + error boundaries + LAUNCH-CHECKLIST.md
 
 **Cross-cutting constraints:**
 - `/api/cutoff` must NOT call `auth()` — Vercel cron invocation has no session cookie
@@ -161,4 +161,4 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 | 3. Interactive Shop | 0/TBD | Not started | - |
 | 4. Admin Panel | 0/TBD | Not started | - |
 | 5. Payments + Email | 0/5 | Planning complete | - |
-| 6. Automation + Launch | 0/4 | Planning complete | - |
+| 6. Automation + Launch | 4/4 | Complete | 2026-05-04 |
