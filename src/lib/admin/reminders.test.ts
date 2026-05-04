@@ -22,8 +22,8 @@ vi.mock("@/lib/db", () => ({
 }));
 
 vi.mock("drizzle-orm", () => ({
-  eq: vi.fn((col, val) => ({ col, val })),
-  and: vi.fn((...args) => args),
+  eq: vi.fn((col: unknown, val: unknown) => ({ col, val })),
+  and: vi.fn((...args: unknown[]) => args),
 }));
 
 import { getPaidOrdersForWeek } from "./reminders";
