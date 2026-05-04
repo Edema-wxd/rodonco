@@ -1,23 +1,59 @@
-import { describe, it, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-// These tests go GREEN when src/lib/validateEnv.ts is implemented in Wave 2 (Plan 06-04).
-// validateEnv() is a pure function — import it directly once the file exists.
+// These tests validate src/lib/validateEnv.ts — build-time env assertion function.
+// Each test uses dynamic import() inside the test body to pick up the mutated process.env
+// (static top-level imports are module-cached and won't see env changes).
+//
+// Note: NODE_ENV is typed as readonly in env.d.ts; we bypass this with type assertion
+// to allow mutation in tests — this is test-only code, not production code.
 
 describe("validateEnv", () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
     vi.resetModules();
-    process.env = { ...originalEnv };
+    process.env = {
+      ...originalEnv,
+      AUTH_SECRET: "valid-secret-abc",
+      RESEND_API_KEY: "re_test_123",
+      NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: "pk_live_validkey",
+      NODE_ENV: "production",
+    } as NodeJS.ProcessEnv;
   });
 
   afterEach(() => {
     process.env = originalEnv;
   });
 
-  it.todo("throws when NODE_ENV=production and NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY does not start with pk_live_");
-  it.todo("does not throw when NODE_ENV=development and NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY starts with pk_test_");
-  it.todo("throws when AUTH_SECRET is empty or missing");
-  it.todo("throws when RESEND_API_KEY is empty or missing");
-  it.todo("does not throw when all required vars are set correctly in production");
+  it("throws when NODE_ENV=production and NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY does not start with pk_live_", async () => {
+    (process.env as Record<string, string>).NODE_ENV = "production";
+    process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY = "pk_test_invalidkey";
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).toThrow("pk_live_");
+  });
+
+  it("does not throw when NODE_ENV=development and NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY starts with pk_test_", async () => {
+    (process.env as Record<string, string>).NODE_ENV = "development";
+    process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY = "pk_test_devkey";
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).not.toThrow();
+  });
+
+  it("throws when AUTH_SECRET is empty or missing", async () => {
+    process.env.AUTH_SECRET = "";
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).toThrow("AUTH_SECRET");
+  });
+
+  it("throws when RESEND_API_KEY is empty or missing", async () => {
+    delete (process.env as Record<string, string | undefined>).RESEND_API_KEY;
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).toThrow("RESEND_API_KEY");
+  });
+
+  it("does not throw when all required vars are set correctly in production", async () => {
+    // All vars set in beforeEach with valid values
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).not.toThrow();
+  });
 });
