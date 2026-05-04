@@ -1,4 +1,9 @@
-import { describe, it, vi, expect, beforeEach } from "vitest";
+import { describe, it, vi, expect as _expect, beforeEach } from "vitest";
+
+// Re-export with relaxed type so arrayContaining / objectContaining compile cleanly.
+// The runtime object is the real vitest expect; the cast is purely cosmetic for tsc.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const expect = _expect as any;
 
 const mockAuth = vi.fn();
 vi.mock("@/auth", () => ({ auth: mockAuth }));
