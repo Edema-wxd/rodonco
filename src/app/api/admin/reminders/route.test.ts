@@ -1,27 +1,81 @@
-import { describe, it, vi } from "vitest";
+import { describe, it, vi, expect, beforeEach } from "vitest";
 
-// These tests go GREEN when src/app/api/admin/reminders/route.ts is implemented in Wave 1 (Plan 06-03).
+const mockAuth = vi.fn();
+vi.mock("@/auth", () => ({ auth: mockAuth }));
 
-vi.mock("@/auth", () => ({
-  auth: vi.fn(),
-}));
-
+const mockGetPaidOrders = vi.fn();
 vi.mock("@/lib/admin/reminders", () => ({
-  getPaidOrdersForWeek: vi.fn().mockResolvedValue([]),
+  getPaidOrdersForWeek: mockGetPaidOrders,
 }));
 
+const mockBatchSend = vi.fn();
 vi.mock("resend", () => ({
   Resend: vi.fn().mockImplementation(() => ({
-    batch: {
-      send: vi.fn().mockResolvedValue({ data: [{}], error: null }),
-    },
+    batch: { send: mockBatchSend },
   })),
 }));
 
+async function callRoute(body: unknown, withSession = true) {
+  if (withSession) {
+    mockAuth.mockResolvedValueOnce({ user: { email: "admin@test.com" } });
+  } else {
+    mockAuth.mockResolvedValueOnce(null);
+  }
+
+  const { POST } = await import("./route");
+  const req = new Request("http://localhost/api/admin/reminders", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return POST(req);
+}
+
 describe("POST /api/admin/reminders", () => {
-  it.todo("returns 401 when no session exists");
-  it.todo("returns 400 when week_of is missing or invalid format");
-  it.todo("returns { sent: 0 } when no paid orders for the week");
-  it.todo("returns { sent: N } equal to the number of paid orders found");
-  it.todo("calls resend.batch.send with one email per paid order");
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetModules();
+    mockBatchSend.mockResolvedValue({ data: [{}], error: null });
+    process.env.RESEND_FROM_EMAIL = "noreply@rodoandco.com";
+  });
+
+  it("returns 401 when no session exists", async () => {
+    const res = await callRoute({ week_of: "2025-01-11" }, false);
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 400 when week_of is missing", async () => {
+    const res = await callRoute({});
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 when week_of is not a Saturday", async () => {
+    const res = await callRoute({ week_of: "2025-01-13" }); // Monday
+    expect(res.status).toBe(400);
+  });
+
+  it("returns { sent: 0 } when no paid orders for the week", async () => {
+    mockGetPaidOrders.mockResolvedValueOnce([]);
+    const res = await callRoute({ week_of: "2025-01-11" }); // Saturday
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual({ sent: 0 });
+  });
+
+  it("returns { sent: 2 } and calls batch.send with 2 emails", async () => {
+    mockGetPaidOrders.mockResolvedValueOnce([
+      { id: "1", customer_name: "Ada", customer_email: "ada@test.com" },
+      { id: "2", customer_name: "Bola", customer_email: "bola@test.com" },
+    ]);
+    const res = await callRoute({ week_of: "2025-01-11" });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual({ sent: 2 });
+    expect(mockBatchSend).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ to: ["ada@test.com"] }),
+        expect.objectContaining({ to: ["bola@test.com"] }),
+      ])
+    );
+  });
 });
