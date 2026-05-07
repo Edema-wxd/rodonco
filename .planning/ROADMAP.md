@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Payments + Email** - Paystack inline popup, webhook handler, order creation, Resend confirmation and admin-alert emails, order confirmation page
 - [x] **Phase 6: Automation + Launch** - Vercel Cron cutoff job, delivery reminder emails, pre-launch key swap, and go-live hardening (completed 2026-05-04)
 - [x] **Phase 7: Missing Pages + Route Completeness** (INSERTED) - Global 404 page, Privacy/Terms/Cookie Policy legal pages, dedicated Plans page, and Footer dead-link cleanup (completed 2026-05-07)
+- [ ] **Phase 8: Missing Admin Structures** (INSERTED) - Weekly prep/packing list, delivery manifest, customer search, analytics week picker, ordering config week management, pending order visibility, and bulk status transitions
 
 ## Phase Details
 
@@ -187,10 +188,24 @@ Plans:
 - `src/components/landing/Footer.tsx` — Remove 5 dead links, keep Wall of Love + 3 legal
 - `src/components/layout/Navbar.tsx` — Update Plans href from `/shop` to `/plans`
 
+### Phase 8: Missing Admin Structures (INSERTED)
+**Goal**: The admin panel is operationally complete — every gap that breaks the weekly prep workflow is closed. Staff can generate a per-week prep/packing list, view a delivery manifest, search for a customer by name or phone, see historical analytics for any week, update the customer-facing delivery date from Settings, see and clean up abandoned checkout orders, and bulk-transition order statuses in one action instead of one-by-one.
+**Depends on**: Phase 4
+**Requirements**: OPS-01, OPS-02, OPS-03, OPS-04, OPS-05, OPS-06, OPS-07
+**Success Criteria** (what must be TRUE):
+  1. Admin can select a delivery week and view a prep list: aggregate quantities per `product_name + variant_label + prep_option` across all `paid` and `processing` orders for that week — sourced from a single Drizzle JOIN query
+  2. Analytics page has a week picker; `getWeeklyAnalytics()` `weekOverride` parameter is wired to the UI — past weeks' revenue and order counts are accessible without a code change
+  3. Orders table has a search field that filters across `customer_name`, `customer_phone`, and `customer_email` in real time
+  4. Admin can view a per-week delivery manifest showing customer name, phone, address, and order items — printable, sortable by address or name — without exporting to a spreadsheet
+  5. Settings page exposes `next_delivery_date` and `cutoff_message` fields from `ordering_config` with a save action; changes are reflected immediately in the customer-facing cutoff banner
+  6. Admin can see `pending` (abandoned checkout) orders in a separate view with a count badge; orders can be manually deleted or ignored
+  7. Admin can bulk-transition all `paid` → `processing` or all `processing` → `delivered` orders for a selected delivery week in a single action
+**Plans:** TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 2.1 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 → 2 → 2.1 → 3 → 4 → 5 → 6 → 7 → 8
 
 Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel with Phases 2-3, but is executed in sequence here for clarity.
 
@@ -204,3 +219,4 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 | 5. Payments + Email | 0/5 | Planning complete | - |
 | 6. Automation + Launch | 4/4 | Complete | 2026-05-04 |
 | 7. Missing Pages + Route Completeness | 3/3 | Complete | 2026-05-07 |
+| 8. Missing Admin Structures | 0/TBD | Not started | - |
