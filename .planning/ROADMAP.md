@@ -163,7 +163,7 @@ Plans:
 Plans:
 
 **Wave 0** *(no blockers)*
-- [ ] 07-01-PLAN.md — Global not-found.tsx + Footer link cleanup (R1, R6)
+- [x] 07-01-PLAN.md — Global not-found.tsx + Footer link cleanup (R1, R6)
 
 **Wave 1** *(parallel, blocked on Wave 0)*
 - [ ] 07-02-PLAN.md — Privacy Policy + Terms of Service pages (R2, R3)
