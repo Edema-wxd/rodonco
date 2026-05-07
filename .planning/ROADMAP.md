@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Admin Panel** - Auth guard, orders table, product CRUD, analytics dashboard, and manual ordering-config toggle
 - [ ] **Phase 5: Payments + Email** - Paystack inline popup, webhook handler, order creation, Resend confirmation and admin-alert emails, order confirmation page
 - [x] **Phase 6: Automation + Launch** - Vercel Cron cutoff job, delivery reminder emails, pre-launch key swap, and go-live hardening (completed 2026-05-04)
-- [ ] **Phase 7: Missing Pages + Route Completeness** (INSERTED) - Global 404 page, Privacy/Terms/Cookie Policy legal pages, dedicated Plans page, and Footer dead-link cleanup
+- [x] **Phase 7: Missing Pages + Route Completeness** (INSERTED) - Global 404 page, Privacy/Terms/Cookie Policy legal pages, dedicated Plans page, and Footer dead-link cleanup (completed 2026-05-07)
 
 ## Phase Details
 
@@ -166,8 +166,8 @@ Plans:
 - [x] 07-01-PLAN.md — Global not-found.tsx + Footer link cleanup (R1, R6)
 
 **Wave 1** *(parallel, blocked on Wave 0)*
-- [ ] 07-02-PLAN.md — Privacy Policy + Terms of Service pages (R2, R3)
-- [ ] 07-03-PLAN.md — Cookie Policy + Plans page + Navbar fix (R4, R5)
+- [x] 07-02-PLAN.md — Privacy Policy + Terms of Service pages (R2, R3)
+- [x] 07-03-PLAN.md — Cookie Policy + Plans page + Navbar fix (R4, R5)
 
 **Design System Constraints:**
 - Background: `bg-stone-100` on all customer pages
@@ -203,4 +203,4 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 | 4. Admin Panel | 0/TBD | Not started | - |
 | 5. Payments + Email | 0/5 | Planning complete | - |
 | 6. Automation + Launch | 4/4 | Complete | 2026-05-04 |
-| 7. Missing Pages + Route Completeness | 0/3 | Not started | - |
+| 7. Missing Pages + Route Completeness | 3/3 | Complete | 2026-05-07 |
