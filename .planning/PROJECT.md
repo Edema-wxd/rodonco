@@ -12,6 +12,13 @@ Customers can browse, configure, and pay for weekly food prep orders in one smoo
 
 ### Validated
 
+**Route Completeness** *(Validated in Phase 7: Missing Pages + Route Completeness)*
+- [x] Global 404 page — root-level `not-found.tsx` with Navbar + Footer, no CartSidebar (avoids DB query on dead-end routes)
+- [x] Legal pages — `/privacy`, `/terms`, `/cookie-policy` as static server components inside `(customer)` layout, placeholder copy marked for client review
+- [x] Plans page — `/plans` marketing page with weekly ordering model overview and placeholder pricing
+- [x] Footer dead-link cleanup — 5 dead hrefs removed, "Our Mission" column dropped, grid updated to `sm:grid-cols-3`
+- [x] Navbar Plans fix — Plans href corrected from `/shop` to `/plans`
+
 **Admin Panel** *(Validated in Phase 4: Admin Panel)*
 - [x] Admin auth — NextAuth v5 Credentials login backed by `admins` table, server-side route guard via `src/middleware.ts`
 - [x] Orders view — filterable table, expandable rows with prep instructions, status updates, CSV export
