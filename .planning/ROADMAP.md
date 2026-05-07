@@ -19,6 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Admin Panel** - Auth guard, orders table, product CRUD, analytics dashboard, and manual ordering-config toggle
 - [ ] **Phase 5: Payments + Email** - Paystack inline popup, webhook handler, order creation, Resend confirmation and admin-alert emails, order confirmation page
 - [x] **Phase 6: Automation + Launch** - Vercel Cron cutoff job, delivery reminder emails, pre-launch key swap, and go-live hardening (completed 2026-05-04)
+- [ ] **Phase 7: Missing Pages + Route Completeness** (INSERTED) - Global 404 page, Privacy/Terms/Cookie Policy legal pages, dedicated Plans page, and Footer dead-link cleanup
 
 ## Phase Details
 
@@ -146,10 +147,50 @@ Plans:
 - CSP must allowlist `https://js.paystack.co` and `https://utfs.io` or Phase 5 payments + Phase 4 image uploads break
 - `validateEnv()` must check `AUTH_SECRET` not `NEXTAUTH_SECRET` (NextAuth v5 convention in this codebase)
 
+### Phase 7: Missing Pages + Route Completeness (INSERTED)
+**Goal**: Every route linked from the Navbar and Footer resolves to a real, on-brand page. Ships the global 404, three legal pages (Privacy, Terms, Cookie Policy), a dedicated Plans page replacing the Navbar placeholder, and Footer dead-link cleanup. All pages match the homepage design system (stone-100 bg, Lexend/Quicksand/Inter fonts, asymmetric rounded cards, red-600/green-800 accents).
+**Depends on**: Phase 6
+**Requirements**: R1 (404), R2 (Privacy), R3 (Terms), R4 (Cookie Policy), R5 (Plans), R6 (Footer cleanup)
+**Success Criteria** (what must be TRUE):
+  1. `/privacy`, `/terms`, `/cookie-policy`, `/plans` all return HTTP 200 — no broken links from Footer or Navbar
+  2. Any unmatched URL (e.g. `/foo/bar`) renders the custom 404 page with Navbar and Footer visible — not Next.js's default white screen
+  3. The "Plans" Navbar link points to `/plans` and the page renders without errors
+  4. The Footer contains no links that resolve to 404 — the 5 unbuilt marketing pages are removed from Footer.tsx
+  5. All 5 new pages visually match the homepage design system — stone-100 bg, brand fonts, asymmetric card corners, brand accent colors
+  6. `tsc --noEmit` passes with zero errors after all changes
+**Plans:** 3 plans
+
+Plans:
+
+**Wave 0** *(no blockers)*
+- [ ] 07-01-PLAN.md — Global not-found.tsx + Footer link cleanup (R1, R6)
+
+**Wave 1** *(parallel, blocked on Wave 0)*
+- [ ] 07-02-PLAN.md — Privacy Policy + Terms of Service pages (R2, R3)
+- [ ] 07-03-PLAN.md — Cookie Policy + Plans page + Navbar fix (R4, R5)
+
+**Design System Constraints:**
+- Background: `bg-stone-100` on all customer pages
+- Fonts: Quicksand for H1s, Lexend for labels/buttons/badges, Inter for body copy
+- Section label: `text-xs font-black uppercase tracking-wider text-red-600`
+- H1: `text-5xl font-black leading-[1.05] text-zinc-800` in Quicksand
+- Cards: `bg-white rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] shadow-sm outline outline-1 outline-stone-200/60 p-10`
+- CTA: red-600 rounded-full pill (primary); stone-200 rounded-full (secondary)
+- Body: `text-base leading-7 text-stone-600` in Inter
+
+**Files Touched:**
+- `src/app/not-found.tsx` — Create (root level, catches all unmatched routes)
+- `src/app/(customer)/privacy/page.tsx` — Create
+- `src/app/(customer)/terms/page.tsx` — Create
+- `src/app/(customer)/cookie-policy/page.tsx` — Create
+- `src/app/(customer)/plans/page.tsx` — Create
+- `src/components/landing/Footer.tsx` — Remove 5 dead links, keep Wall of Love + 3 legal
+- `src/components/layout/Navbar.tsx` — Update Plans href from `/shop` to `/plans`
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 2.1 → 3 → 4 → 5 → 6
+Phases execute in numeric order: 1 → 2 → 2.1 → 3 → 4 → 5 → 6 → 7
 
 Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel with Phases 2-3, but is executed in sequence here for clarity.
 
@@ -162,3 +203,4 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 | 4. Admin Panel | 0/TBD | Not started | - |
 | 5. Payments + Email | 0/5 | Planning complete | - |
 | 6. Automation + Launch | 4/4 | Complete | 2026-05-04 |
+| 7. Missing Pages + Route Completeness | 0/3 | Not started | - |
