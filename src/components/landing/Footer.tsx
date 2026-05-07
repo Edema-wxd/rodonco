@@ -3,18 +3,8 @@ import Link from "next/link";
 
 const footerLinks = [
   {
-    heading: "Our Mission",
-    links: [
-      { label: "Sustainability", href: "/sustainability" },
-      { label: "Sourcing", href: "/sourcing" },
-      { label: "Chef Partners", href: "/chef-partners" },
-    ],
-  },
-  {
     heading: "Company",
     links: [
-      { label: "Careers", href: "/careers" },
-      { label: "Press", href: "/press" },
       { label: "Wall of Love", href: "/wall-of-love" },
     ],
   },
@@ -32,7 +22,7 @@ export function Footer() {
   return (
     <footer className="bg-zinc-100 px-8 py-16">
       <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-2 gap-12 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-12 sm:grid-cols-3">
           {/* Brand */}
           <div className="col-span-2 flex flex-col gap-6 sm:col-span-1">
             <Image
