@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { ProductDrawer } from "@/components/shop/ProductDrawer";
@@ -14,7 +14,17 @@ type DrawerPayload = {
   prepOptions: PrepOption[];
 };
 
+// Wraps in Suspense because useSearchParams() forces dynamic rendering
+// unless it sits below a Suspense boundary (Next.js 15 prerender requirement).
 export function ShopDrawerController() {
+  return (
+    <Suspense fallback={null}>
+      <ShopDrawerControllerInner />
+    </Suspense>
+  );
+}
+
+function ShopDrawerControllerInner() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

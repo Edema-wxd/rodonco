@@ -1,8 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export function AddToOrderButton({ productId }: { productId: string }) {
+const buttonClassName =
+  "w-full rounded-full bg-stone-100 py-3 text-center text-sm font-bold text-zinc-800 transition-colors hover:bg-stone-200 sm:py-4 sm:text-base";
+const buttonFontStyle = { fontFamily: "var(--font-lexend)" } as const;
+
+function AddToOrderButtonInner({ productId }: { productId: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -19,11 +24,35 @@ export function AddToOrderButton({ productId }: { productId: string }) {
     <button
       type="button"
       onClick={open}
-      className="w-full rounded-full bg-stone-100 py-3 text-center text-sm font-bold text-zinc-800 transition-colors hover:bg-stone-200 sm:py-4 sm:text-base"
-      style={{ fontFamily: "var(--font-lexend)" }}
+      className={buttonClassName}
+      style={buttonFontStyle}
     >
       Add to Order
     </button>
+  );
+}
+
+function AddToOrderButtonFallback() {
+  return (
+    <button
+      type="button"
+      disabled
+      aria-busy="true"
+      className={buttonClassName}
+      style={buttonFontStyle}
+    >
+      Add to Order
+    </button>
+  );
+}
+
+// Wraps in Suspense because useSearchParams() forces dynamic rendering
+// unless it sits below a Suspense boundary (Next.js 15 prerender requirement).
+export function AddToOrderButton({ productId }: { productId: string }) {
+  return (
+    <Suspense fallback={<AddToOrderButtonFallback />}>
+      <AddToOrderButtonInner productId={productId} />
+    </Suspense>
   );
 }
 
