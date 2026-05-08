@@ -14,13 +14,26 @@ export default async function AdminSettingsPage() {
   const config = await getOrderingConfig();
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-semibold text-gray-900">Settings</h1>
-      <div className="mt-6 max-w-lg space-y-6">
+    <div className="min-h-screen bg-stone-100 p-8">
+      <div className="mb-8">
+        <p
+          className="text-sm font-black uppercase tracking-wider text-red-600"
+          style={{ fontFamily: "var(--font-lexend)" }}
+        >
+          Admin
+        </p>
+        <h1
+          className="mt-2 text-5xl font-black leading-[1.05] text-zinc-800"
+          style={{ fontFamily: "var(--font-quicksand)" }}
+        >
+          Settings
+        </h1>
+      </div>
+
+      <div className="max-w-lg space-y-6">
         <OrderingToggle initialIsOpen={config.is_ordering_open} />
         <ReminderForm />
       </div>
     </div>
   );
 }
-

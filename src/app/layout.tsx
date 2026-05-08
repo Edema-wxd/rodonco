@@ -2,30 +2,35 @@ import type { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import "./globals.css";
-import { DM_Sans, DM_Serif_Display } from "next/font/google";
+import { Quicksand, Lexend, Inter } from "next/font/google";
 import { extractRouterConfig } from "uploadthing/server";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 
-const dmSans = DM_Sans({
+const quicksand = Quicksand({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-quicksand",
   display: "swap",
 });
 
-const dmSerifDisplay = DM_Serif_Display({
-  weight: ["400"],
-  style: ["normal", "italic"],
+const lexend = Lexend({
   subsets: ["latin"],
-  variable: "--font-heading",
+  variable: "--font-lexend",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Rodo & Co",
-  description: "Fresh produce and cooking kits, delivered weekly.",
+  title: "rodo&co — Nigeria's First High-Fidelity Meal Prep",
+  description:
+    "Premium prepped ingredients and chef-crafted sauces delivered to your door. From stovetop to table in under 15 minutes.",
 };
 
 export default function RootLayout({
@@ -34,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", dmSans.variable, dmSerifDisplay.variable)}>
+    <html lang="en" className={cn(quicksand.variable, lexend.variable, inter.variable)}>
       <body>
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         {children}

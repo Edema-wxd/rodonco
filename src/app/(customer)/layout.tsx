@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { CartSidebar } from "@/components/cart/CartSidebar";
+import { Footer } from "@/components/landing/Footer";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 
 export default async function CustomerLayout({
@@ -13,6 +14,7 @@ export default async function CustomerLayout({
     <>
       <Navbar />
       <main>{children}</main>
+      <Footer />
       <CartSidebar
         isOrderingOpen={orderingConfig.is_ordering_open}
         cutoffMessage={orderingConfig.cutoff_message}

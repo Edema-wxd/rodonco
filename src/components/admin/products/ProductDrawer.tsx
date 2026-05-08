@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { X, Plus, Trash2, AlertTriangle } from "lucide-react";
 
 import type { AdminProduct } from "@/lib/admin/products";
 import { productPayloadSchema, type ProductPayload } from "@/lib/admin/schemas";
@@ -20,6 +21,12 @@ const EMPTY_DEFAULTS: ProductPayload = {
   variants: [],
   prep_options: [],
 };
+
+const inputCls =
+  "h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm text-zinc-800 outline-none placeholder:text-stone-300 focus:border-red-400 focus:ring-2 focus:ring-red-100";
+
+const labelCls =
+  "block text-xs font-black uppercase tracking-wider text-stone-400";
 
 export function ProductDrawer({
   open,
@@ -81,20 +88,9 @@ export function ProductDrawer({
       body: JSON.stringify(values),
     });
 
-    if (res.status === 401) {
-      toast.error("Unauthorized");
-      return;
-    }
-
-    if (res.status === 400) {
-      toast.error("Invalid product details");
-      return;
-    }
-
-    if (!res.ok) {
-      toast.error("Failed to save product. Please try again.");
-      return;
-    }
+    if (res.status === 401) { toast.error("Unauthorized"); return; }
+    if (res.status === 400) { toast.error("Invalid product details"); return; }
+    if (!res.ok) { toast.error("Failed to save product. Please try again."); return; }
 
     toast.success("Product saved");
     router.refresh();
@@ -105,14 +101,8 @@ export function ProductDrawer({
     if (!product) return;
 
     const res = await fetch(`/api/admin/products/${product.id}`, { method: "DELETE" });
-    if (res.status === 401) {
-      toast.error("Unauthorized");
-      return;
-    }
-    if (!res.ok) {
-      toast.error("Failed to delete product.");
-      return;
-    }
+    if (res.status === 401) { toast.error("Unauthorized"); return; }
+    if (!res.ok) { toast.error("Failed to delete product."); return; }
 
     toast.success("Product deleted");
     router.refresh();
@@ -123,200 +113,278 @@ export function ProductDrawer({
 
   return (
     <div>
-      <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} aria-hidden="true" />
-      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-[480px] overflow-y-auto bg-white shadow-xl">
-        <div className="border-b px-4 py-4">
-          <div className="text-base font-semibold text-gray-900">
-            {product ? product.name : "New Product"}
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-40 bg-zinc-900/30 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Panel */}
+      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-[480px] flex-col bg-stone-50 shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-5">
+          <div>
+            <p
+              className="text-xs font-black uppercase tracking-wider text-red-600"
+              style={{ fontFamily: "var(--font-lexend)" }}
+            >
+              {product ? "Edit" : "New"}
+            </p>
+            <h2
+              className="mt-0.5 text-xl font-black text-zinc-800"
+              style={{ fontFamily: "var(--font-quicksand)" }}
+            >
+              {product ? product.name : "Product"}
+            </h2>
           </div>
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-100 text-stone-400 transition-colors hover:bg-stone-200 hover:text-zinc-800"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
 
+        {/* Form */}
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
-            <ProductImageUpload />
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-1 flex-col overflow-y-auto"
+          >
+            <div className="flex-1 space-y-6 p-6">
+              <ProductImageUpload />
 
-            <div className="space-y-1.5">
-              <label htmlFor="prod-name" className="text-sm font-medium text-gray-900">
-                Name
-              </label>
-              <input
-                id="prod-name"
-                className="h-10 w-full rounded-md border px-3"
-                {...form.register("name")}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label htmlFor="prod-desc" className="text-sm font-medium text-gray-900">
-                Description
-              </label>
-              <textarea
-                id="prod-desc"
-                rows={3}
-                className="w-full rounded-md border px-3 py-2"
-                {...form.register("description")}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label htmlFor="prod-type" className="text-sm font-medium text-gray-900">
-                Type
-              </label>
-              <select
-                id="prod-type"
-                className="h-10 w-full rounded-md border px-3"
-                value={form.watch("type")}
-                onChange={(e) =>
-                  form.setValue("type", e.target.value as ProductPayload["type"], {
-                    shouldDirty: true,
-                  })
-                }
-              >
-                <option value="fresh_produce">Fresh Produce</option>
-                <option value="cooking_kit">Cooking Kit</option>
-              </select>
-            </div>
-
-            <div className="flex items-center justify-between rounded-md border p-3">
-              <label htmlFor="prod-active" className="text-sm font-medium text-gray-900">
-                Active on shop
-              </label>
-              <input
-                id="prod-active"
-                type="checkbox"
-                checked={form.watch("is_active")}
-                onChange={(e) =>
-                  form.setValue("is_active", e.target.checked, { shouldDirty: true })
-                }
-              />
-            </div>
-
-            <section className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-900">Size Variants</h3>
-                <button
-                  type="button"
-                  onClick={() => variants.append({ label: "", price_ngn: 0, is_default: false })}
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                >
-                  + Add variant
-                </button>
+              {/* Name */}
+              <div className="space-y-2">
+                <label htmlFor="prod-name" className={labelCls} style={{ fontFamily: "var(--font-lexend)" }}>
+                  Name
+                </label>
+                <input
+                  id="prod-name"
+                  className={inputCls}
+                  style={{ fontFamily: "var(--font-inter)" }}
+                  {...form.register("name")}
+                />
               </div>
-              <ul className="space-y-2">
-                {variants.fields.map((field, i) => (
-                  <li key={field.id} className="flex items-center gap-2">
-                    <input
-                      className="h-10 flex-1 rounded-md border px-3"
-                      placeholder="Label"
-                      {...form.register(`variants.${i}.label` as const)}
-                    />
-                    <input
-                      className="h-10 w-32 rounded-md border px-3"
-                      type="number"
-                      placeholder="Price (kobo)"
-                      {...form.register(`variants.${i}.price_ngn` as const, { valueAsNumber: true })}
-                    />
-                    <button
-                      type="button"
-                      aria-label="Remove variant"
-                      className="rounded-md px-2 py-2 text-gray-400 hover:text-red-600"
-                      onClick={() => variants.remove(i)}
-                    >
-                      ×
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
 
-            <section className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-900">Prep Options</h3>
-                <button
-                  type="button"
-                  onClick={() => prepOptions.append({ label: "", extra_cost_ngn: 0 })}
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                >
-                  + Add prep option
-                </button>
+              {/* Description */}
+              <div className="space-y-2">
+                <label htmlFor="prod-desc" className={labelCls} style={{ fontFamily: "var(--font-lexend)" }}>
+                  Description
+                </label>
+                <textarea
+                  id="prod-desc"
+                  rows={3}
+                  className="w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-zinc-800 outline-none placeholder:text-stone-300 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                  {...form.register("description")}
+                />
               </div>
-              <ul className="space-y-2">
-                {prepOptions.fields.map((field, i) => (
-                  <li key={field.id} className="flex items-center gap-2">
-                    <input
-                      className="h-10 flex-1 rounded-md border px-3"
-                      placeholder="Label"
-                      {...form.register(`prep_options.${i}.label` as const)}
-                    />
-                    <input
-                      className="h-10 w-32 rounded-md border px-3"
-                      type="number"
-                      placeholder="Extra (kobo)"
-                      {...form.register(`prep_options.${i}.extra_cost_ngn` as const, {
-                        valueAsNumber: true,
-                      })}
-                    />
-                    <button
-                      type="button"
-                      aria-label="Remove prep option"
-                      className="rounded-md px-2 py-2 text-gray-400 hover:text-red-600"
-                      onClick={() => prepOptions.remove(i)}
-                    >
-                      ×
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
 
-            {product ? (
-              <section className="rounded-md border border-red-200 p-3">
-                {confirmingDelete ? (
-                  <div className="space-y-2">
-                    <p className="text-sm text-red-700" id="delete-confirm-text">
-                      Are you sure? This cannot be undone.
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700"
-                        aria-describedby="delete-confirm-text"
-                        onClick={handleDelete}
-                      >
-                        Confirm Delete
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded-md px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                        onClick={() => setConfirmingDelete(false)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
+              {/* Type */}
+              <div className="space-y-2">
+                <label htmlFor="prod-type" className={labelCls} style={{ fontFamily: "var(--font-lexend)" }}>
+                  Type
+                </label>
+                <select
+                  id="prod-type"
+                  className={inputCls}
+                  style={{ fontFamily: "var(--font-inter)" }}
+                  value={form.watch("type")}
+                  onChange={(e) =>
+                    form.setValue("type", e.target.value as ProductPayload["type"], {
+                      shouldDirty: true,
+                    })
+                  }
+                >
+                  <option value="fresh_produce">Fresh Produce</option>
+                  <option value="cooking_kit">Cooking Kit</option>
+                </select>
+              </div>
+
+              {/* Active toggle */}
+              <div className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white px-4 py-3">
+                <label
+                  htmlFor="prod-active"
+                  className="text-sm font-bold text-zinc-800"
+                  style={{ fontFamily: "var(--font-lexend)" }}
+                >
+                  Active on shop
+                </label>
+                <input
+                  id="prod-active"
+                  type="checkbox"
+                  checked={form.watch("is_active")}
+                  onChange={(e) =>
+                    form.setValue("is_active", e.target.checked, { shouldDirty: true })
+                  }
+                  className="h-4 w-4 accent-red-600"
+                />
+              </div>
+
+              {/* Size Variants */}
+              <section className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3
+                    className="text-xs font-black uppercase tracking-wider text-stone-400"
+                    style={{ fontFamily: "var(--font-lexend)" }}
+                  >
+                    Size Variants
+                  </h3>
                   <button
                     type="button"
-                    className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700"
-                    onClick={() => setConfirmingDelete(true)}
+                    onClick={() => variants.append({ label: "", price_ngn: 0, is_default: false })}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-red-600 hover:text-red-700"
+                    style={{ fontFamily: "var(--font-lexend)" }}
                   >
-                    Delete Product
+                    <Plus className="h-3 w-3" />
+                    + Add variant
                   </button>
-                )}
+                </div>
+                <ul className="space-y-2">
+                  {variants.fields.map((field, i) => (
+                    <li key={field.id} className="flex items-center gap-2">
+                      <input
+                        className={`${inputCls} flex-1`}
+                        style={{ fontFamily: "var(--font-inter)" }}
+                        placeholder="Label"
+                        {...form.register(`variants.${i}.label` as const)}
+                      />
+                      <input
+                        className="h-10 w-28 rounded-xl border border-stone-200 bg-white px-3 text-sm text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                        style={{ fontFamily: "var(--font-inter)" }}
+                        type="number"
+                        placeholder="Price (₦)"
+                        {...form.register(`variants.${i}.price_ngn` as const, { valueAsNumber: true })}
+                      />
+                      <button
+                        type="button"
+                        aria-label="Remove variant"
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-stone-300 transition-colors hover:bg-red-50 hover:text-red-600"
+                        onClick={() => variants.remove(i)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </section>
-            ) : null}
 
-            <div className="flex items-center justify-end gap-2 border-t pt-4">
+              {/* Prep Options */}
+              <section className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3
+                    className="text-xs font-black uppercase tracking-wider text-stone-400"
+                    style={{ fontFamily: "var(--font-lexend)" }}
+                  >
+                    Prep Options
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => prepOptions.append({ label: "", extra_cost_ngn: 0 })}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-red-600 hover:text-red-700"
+                    style={{ fontFamily: "var(--font-lexend)" }}
+                  >
+                    <Plus className="h-3 w-3" />
+                    + Add prep option
+                  </button>
+                </div>
+                <ul className="space-y-2">
+                  {prepOptions.fields.map((field, i) => (
+                    <li key={field.id} className="flex items-center gap-2">
+                      <input
+                        className={`${inputCls} flex-1`}
+                        style={{ fontFamily: "var(--font-inter)" }}
+                        placeholder="Label"
+                        {...form.register(`prep_options.${i}.label` as const)}
+                      />
+                      <input
+                        className="h-10 w-28 rounded-xl border border-stone-200 bg-white px-3 text-sm text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                        style={{ fontFamily: "var(--font-inter)" }}
+                        type="number"
+                        placeholder="Extra (₦)"
+                        {...form.register(`prep_options.${i}.extra_cost_ngn` as const, {
+                          valueAsNumber: true,
+                        })}
+                      />
+                      <button
+                        type="button"
+                        aria-label="Remove prep option"
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-stone-300 transition-colors hover:bg-red-50 hover:text-red-600"
+                        onClick={() => prepOptions.remove(i)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {/* Delete zone */}
+              {product ? (
+                <section className="rounded-2xl border border-red-100 bg-red-50 p-4">
+                  {confirmingDelete ? (
+                    <div className="space-y-3">
+                      <p
+                        className="flex items-center gap-2 text-sm font-bold text-red-700"
+                        id="delete-confirm-text"
+                        style={{ fontFamily: "var(--font-lexend)" }}
+                      >
+                        <AlertTriangle className="h-4 w-4" />
+                        Are you sure? This cannot be undone.
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
+                          aria-describedby="delete-confirm-text"
+                          style={{ fontFamily: "var(--font-lexend)" }}
+                          onClick={handleDelete}
+                        >
+                          Confirm Delete
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded-full bg-white px-5 py-2 text-sm font-bold text-stone-500 transition-colors hover:bg-stone-100"
+                          style={{ fontFamily: "var(--font-lexend)" }}
+                          onClick={() => setConfirmingDelete(false)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 text-sm font-bold text-red-600 hover:text-red-700"
+                      style={{ fontFamily: "var(--font-lexend)" }}
+                      onClick={() => setConfirmingDelete(true)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete Product
+                    </button>
+                  )}
+                </section>
+              ) : null}
+            </div>
+
+            {/* Footer actions */}
+            <div className="flex items-center justify-end gap-3 border-t border-stone-200 bg-white px-6 py-4">
               <button
                 type="button"
-                className="rounded-md px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                className="rounded-full px-6 py-2.5 text-sm font-bold text-stone-500 transition-colors hover:bg-stone-100"
+                style={{ fontFamily: "var(--font-lexend)" }}
                 onClick={onClose}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+                className="rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-90"
+                style={{ fontFamily: "var(--font-lexend)" }}
               >
                 Save Product
               </button>
@@ -327,4 +395,3 @@ export function ProductDrawer({
     </div>
   );
 }
-

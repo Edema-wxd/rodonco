@@ -13,11 +13,29 @@ export default async function AdminAnalyticsPage() {
   const analytics = await getWeeklyAnalytics();
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-semibold text-gray-900">Analytics</h1>
-      <p className="mt-1 text-sm text-gray-500">Week of {analytics.week}</p>
+    <div className="min-h-screen bg-stone-100 p-8">
+      <div className="mb-8">
+        <p
+          className="text-sm font-black uppercase tracking-wider text-red-600"
+          style={{ fontFamily: "var(--font-lexend)" }}
+        >
+          Admin
+        </p>
+        <h1
+          className="mt-2 text-5xl font-black leading-[1.05] text-zinc-800"
+          style={{ fontFamily: "var(--font-quicksand)" }}
+        >
+          Analytics
+        </h1>
+        <p
+          className="mt-2 text-base text-stone-500"
+          style={{ fontFamily: "var(--font-inter)" }}
+        >
+          Week of {analytics.week}
+        </p>
+      </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <StatCard
           label="Total Orders"
           value={analytics.totalOrders}
@@ -48,4 +66,3 @@ export default async function AdminAnalyticsPage() {
     </div>
   );
 }
-

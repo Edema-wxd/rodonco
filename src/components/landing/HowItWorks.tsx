@@ -1,40 +1,88 @@
-import { Search, Settings2, Truck } from "lucide-react";
-
 const steps = [
   {
-    title: "Browse",
-    description: "Pick from fresh produce and weekly cooking kits.",
-    Icon: Search,
+    number: "01",
+    color: "text-red-700",
+    title: "Select Your Kits",
+    description:
+      "Choose from our rotating menu of Local-Global recipes. Every kit is pre-portioned for your household size.",
+    accent: "bg-red-700",
   },
   {
-    title: "Customise",
-    description: "Choose your prep options and quantities.",
-    Icon: Settings2,
+    number: "02",
+    color: "text-green-800",
+    title: "Receive Fresh",
+    description:
+      "We deliver chilled, insulated boxes right to your doorstep. Ingredients are washed, chopped, and ready for action.",
+    accent: "bg-green-800",
   },
   {
-    title: "Deliver",
-    description: "We deliver fresh every Saturday.",
-    Icon: Truck,
+    number: "03",
+    color: "text-red-400",
+    title: "Sizzle & Serve",
+    description:
+      "Follow our 4-step visual recipe cards. Heat the oil, toss in the rodo-base, and enjoy chef-quality dinner in minutes.",
+    accent: "bg-red-400",
   },
 ] as const;
 
 export function HowItWorks() {
   return (
-    <section className="bg-secondary">
-      <div className="mx-auto max-w-7xl px-4 py-16">
-        <h2 className="text-center text-xl font-bold">How It Works</h2>
-
-        <div className="mt-10 grid gap-8 md:grid-cols-3">
-          {steps.map(({ title, description, Icon }) => (
-            <div
-              key={title}
-              className="rounded-xl bg-background p-6 shadow-sm"
+    <section id="how-it-works" className="overflow-hidden bg-stone-100 py-32">
+      <div className="mx-auto max-w-7xl px-8">
+        {/* Header */}
+        <div className="mb-16 flex items-end justify-between">
+          <div className="flex flex-col gap-4">
+            <h2
+              className="text-4xl font-black uppercase text-zinc-800"
+              style={{ fontFamily: "var(--font-lexend)" }}
             >
-              <Icon aria-hidden="true" className="size-6 text-foreground" />
-              <h3 className="mt-4 text-xl font-bold">{title}</h3>
-              <p className="mt-2 text-base text-muted-foreground">
-                {description}
+              Dinner,{" "}
+              <span className="text-green-800">Decoded.</span>
+            </h2>
+            <p
+              className="max-w-sm text-base leading-6 text-stone-600"
+              style={{ fontFamily: "var(--font-inter)" }}
+            >
+              Three simple steps from box to bowl. No chopping, no shopping,
+              just flavor.
+            </p>
+          </div>
+        </div>
+
+        {/* Step cards */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {steps.map((step, i) => (
+            <div
+              key={step.number}
+              className="relative rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-white p-12 shadow-sm outline outline-1 outline-white/50"
+            >
+              <span
+                className={`text-6xl font-black leading-none opacity-20 ${step.color}`}
+                style={{ fontFamily: "var(--font-lexend)" }}
+              >
+                {step.number}
+              </span>
+              <h3
+                className="mt-12 text-2xl font-bold text-zinc-800"
+                style={{ fontFamily: "var(--font-lexend)" }}
+              >
+                {step.title}
+              </h3>
+              <p
+                className="mt-4 text-base leading-6 text-stone-600"
+                style={{ fontFamily: "var(--font-inter)" }}
+              >
+                {step.description}
               </p>
+              {/* Progress indicator */}
+              <div className="mt-10 flex items-center gap-2">
+                {steps.map((s, j) => (
+                  <div
+                    key={j}
+                    className={`rounded-full ${j === i ? `h-1 w-12 ${step.accent}` : "h-1 w-4 bg-stone-200"}`}
+                  />
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -42,4 +90,3 @@ export function HowItWorks() {
     </section>
   );
 }
-

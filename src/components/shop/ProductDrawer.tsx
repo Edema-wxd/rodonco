@@ -18,6 +18,7 @@ export type ProductDrawerProps = {
   isOrderingOpen: boolean;
   cutoffMessage?: string | null;
   nextDeliveryDate?: string | null;
+  onRequestClose?: () => void;
 };
 
 function formatNgn(kobo: number): string {
@@ -40,10 +41,12 @@ export function ProductDrawer({
   isOrderingOpen,
   cutoffMessage,
   nextDeliveryDate,
+  onRequestClose,
 }: ProductDrawerProps) {
   const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
   const autoOpenOnFirstAdd = useCartUiStore((s) => s.autoOpenOnFirstAdd);
+  const [isOpen, setIsOpen] = useState(true);
 
   const isKit = product.type === "cooking_kit";
   const isProduce = product.type === "fresh_produce";
@@ -78,7 +81,14 @@ export function ProductDrawer({
   const selectionSatisfied = (!needsVariant || !!selectedVariant) && (!needsPrep || !!selectedPrep);
   const canAddToCart = isOrderingOpen && selectionSatisfied && quantity >= 1 && unitPriceKobo > 0;
 
-  const close = () => router.back();
+  const close = () => {
+    // Trigger exit animation before navigating back (route change unmounts immediately otherwise).
+    setIsOpen(false);
+    window.setTimeout(() => {
+      if (onRequestClose) return onRequestClose();
+      router.back();
+    }, 220);
+  };
 
   const onAddToCart = () => {
     if (!canAddToCart) return;
@@ -101,38 +111,41 @@ export function ProductDrawer({
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-[70]">
-        <motion.button
-          type="button"
-          aria-label="Close product drawer"
-          className="absolute inset-0 bg-black/40"
-          onClick={close}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-        />
+    <AnimatePresence mode="wait">
+      {isOpen ? (
+        <div className="fixed inset-0 z-[70]">
+          <motion.button
+            type="button"
+            aria-label="Close product drawer"
+            className="absolute inset-0 bg-black/40"
+            onClick={close}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            style={{ willChange: "opacity" }}
+          />
 
-        <motion.aside
-          role="dialog"
-          aria-modal="true"
-          aria-label={product.name}
-          className={[
-            "absolute bottom-0 left-0 right-0 flex max-h-[92vh] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl",
-            "sm:bottom-auto sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[520px] sm:rounded-none",
-          ].join(" ")}
-          initial={{ y: 24, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 24, opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          drag="y"
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={0.05}
-          onDragEnd={(_, info) => {
-            if (info.offset.y > 120 || info.velocity.y > 800) close();
-          }}
-        >
+          <motion.aside
+            role="dialog"
+            aria-modal="true"
+            aria-label={product.name}
+            className={[
+              "absolute bottom-0 left-0 right-0 flex max-h-[92vh] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl",
+              "sm:bottom-auto sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[520px] sm:rounded-none",
+            ].join(" ")}
+            initial={{ y: 24, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 24, opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0.05}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 120 || info.velocity.y > 800) close();
+            }}
+            style={{ willChange: "transform, opacity" }}
+          >
           <div className="flex items-start justify-between gap-4 border-b px-4 py-4">
             <div className="min-w-0">
               <p className="text-xs font-semibold text-black/60">Product</p>
@@ -144,7 +157,6 @@ export function ProductDrawer({
 
             <Link
               href="/shop"
-              scroll={false}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-black/5"
               aria-label="Close"
             >
@@ -276,7 +288,7 @@ export function ProductDrawer({
             <button
               type="button"
               className={[
-                "w-full rounded-2xl px-4 py-3 text-center text-sm font-semibold",
+                "w-full rounded-2xl px-4 py-3 text-center text-sm font-semibold sm:py-3.5",
                 canAddToCart ? "bg-black text-white hover:bg-black/90" : "bg-gray-100 text-gray-500",
               ].join(" ")}
               onClick={onAddToCart}
@@ -300,8 +312,9 @@ export function ProductDrawer({
               </p>
             ) : null}
           </div>
-        </motion.aside>
-      </div>
+          </motion.aside>
+        </div>
+      ) : null}
     </AnimatePresence>
   );
 }

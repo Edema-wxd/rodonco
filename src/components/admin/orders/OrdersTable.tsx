@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Download, ShoppingBag } from "lucide-react";
 
 import type { AdminOrder } from "@/lib/admin/orders";
 import { serializeOrdersCsv } from "@/lib/admin/csv";
@@ -52,34 +53,45 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="space-y-1">
-          <label htmlFor="status-filter" className="text-sm font-medium text-gray-700">
+    <div className="space-y-6">
+      {/* Filters + Export */}
+      <div className="flex flex-wrap items-end gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="status-filter"
+            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            style={{ fontFamily: "var(--font-lexend)" }}
+          >
             Status
           </label>
           <select
             id="status-filter"
             aria-label="Status"
-            className="h-10 w-44 rounded-md border bg-white px-3 text-sm"
+            className="h-10 w-44 rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+            style={{ fontFamily: "var(--font-inter)" }}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="all">All</option>
+            <option value="all">All statuses</option>
             <option value="paid">Paid</option>
             <option value="processing">Processing</option>
             <option value="delivered">Delivered</option>
           </select>
         </div>
 
-        <div className="space-y-1">
-          <label htmlFor="week-filter" className="text-sm font-medium text-gray-700">
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="week-filter"
+            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            style={{ fontFamily: "var(--font-lexend)" }}
+          >
             Delivery week
           </label>
           <input
             id="week-filter"
             type="date"
-            className="h-10 w-44 rounded-md border bg-white px-3 text-sm"
+            className="h-10 w-44 rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+            style={{ fontFamily: "var(--font-inter)" }}
             value={weekFilter}
             onChange={(e) => setWeekFilter(e.target.value)}
           />
@@ -88,49 +100,64 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
         <div className="ml-auto">
           <button
             type="button"
-            className="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-800"
             onClick={exportCsv}
+            className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700"
+            style={{ fontFamily: "var(--font-lexend)" }}
           >
+            <Download className="h-4 w-4" />
             Export CSV
           </button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b bg-gray-50 text-left text-gray-700">
-            <tr>
-              <th className="px-4 py-3 font-semibold">Reference</th>
-              <th className="px-4 py-3 font-semibold">Customer</th>
-              <th className="px-4 py-3 font-semibold">Phone</th>
-              <th className="px-4 py-3 font-semibold">Date</th>
-              <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">Total (NGN)</th>
-              <th className="px-4 py-3 font-semibold" />
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrders.length === 0 ? (
-              <tr>
-                <td className="px-4 py-10 text-center text-gray-500" colSpan={7}>
-                  <div className="text-sm text-gray-500">No orders found</div>
-                  <div className="mt-1 text-sm text-gray-400">Try adjusting your filters.</div>
-                </td>
+      {/* Table */}
+      <div className="overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white shadow-sm outline outline-1 outline-stone-200/60">
+        {filteredOrders.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-20 text-center">
+            <ShoppingBag className="h-8 w-8 text-stone-300" />
+            <p
+              className="text-sm font-bold text-stone-400"
+              style={{ fontFamily: "var(--font-lexend)" }}
+            >
+              No orders found
+            </p>
+            <p
+              className="text-xs text-stone-300"
+              style={{ fontFamily: "var(--font-inter)" }}
+            >
+              Try adjusting your filters.
+            </p>
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-stone-100">
+                {["Reference", "Customer", "Phone", "Date", "Status", "Total (NGN)", ""].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400 last:text-right"
+                      style={{ fontFamily: "var(--font-lexend)" }}
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
               </tr>
-            ) : (
-              filteredOrders.map((o) => (
+            </thead>
+            <tbody className="divide-y divide-stone-50">
+              {filteredOrders.map((o) => (
                 <OrderRow
                   key={o.id}
                   order={o}
                   expanded={!!expanded.get(o.id)}
                   onToggle={() => toggleRow(o.id)}
                 />
-              ))
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
 }
-

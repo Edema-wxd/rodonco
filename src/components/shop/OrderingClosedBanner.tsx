@@ -29,11 +29,14 @@ export function OrderingClosedBanner({
       className="sticky top-[4.5rem] z-40 w-full border-y border-accent/30 bg-accent/10 mb-6"
     >
       <div className="mx-auto max-w-7xl px-4 py-2.5 text-center text-sm font-medium text-accent sm:px-6">
-        Ordering is currently closed.
+        Ordering is closed.
         {formattedNextDelivery && (
-          <span className="ml-1 text-accent/80">
+          <>
+            {" "}
+            <span className="text-accent/80">
             Next delivery: {formattedNextDelivery}.
-          </span>
+            </span>
+          </>
         )}
       </div>
     </div>

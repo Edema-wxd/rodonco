@@ -1,3 +1,5 @@
+import { ShopDrawerController } from "@/components/shop/ShopDrawerController";
+
 export default function ShopLayout({
   children,
   drawer,
@@ -8,6 +10,7 @@ export default function ShopLayout({
   return (
     <>
       {children}
+      <ShopDrawerController />
       {drawer}
     </>
   );

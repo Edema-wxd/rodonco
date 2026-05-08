@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MapPin, AlertTriangle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import type { AdminOrder } from "@/lib/admin/orders";
@@ -8,6 +8,16 @@ import { formatNgn } from "@/lib/admin/format";
 import { cn } from "@/lib/utils";
 
 import { OrderStatusSelect } from "./OrderStatusSelect";
+
+const STATUS_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
+  paid: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
+  processing: { bg: "bg-amber-100", text: "text-amber-800", dot: "bg-amber-500" },
+  delivered: { bg: "bg-stone-100", text: "text-stone-600", dot: "bg-stone-400" },
+};
+
+function statusStyle(s: string) {
+  return STATUS_STYLES[s] ?? { bg: "bg-gray-100", text: "text-gray-600", dot: "bg-gray-400" };
+}
 
 export function OrderRow({
   order,
@@ -18,31 +28,70 @@ export function OrderRow({
   expanded: boolean;
   onToggle: () => void;
 }) {
+  const st = statusStyle(order.status);
+
   return (
     <>
       <tr
         onClick={onToggle}
         aria-expanded={expanded}
-        className="cursor-pointer border-b last:border-b-0 hover:bg-gray-50"
+        className="cursor-pointer transition-colors hover:bg-stone-50/60"
       >
-        <td className="px-4 py-3 font-mono text-xs font-medium text-gray-900">{order.reference}</td>
-        <td className="px-4 py-3">
-          <div className="text-sm font-medium text-gray-900">{order.customer_name}</div>
-          <div className="text-xs text-gray-500">{order.customer_email}</div>
+        <td className="px-6 py-4">
+          <span
+            className="font-bold text-red-600"
+            style={{ fontFamily: "var(--font-lexend)" }}
+          >
+            {order.reference}
+          </span>
         </td>
-        <td className="px-4 py-3 text-gray-900">{order.customer_phone}</td>
-        <td className="px-4 py-3 text-gray-900">
+
+        <td className="px-6 py-4">
+          <p
+            className="font-semibold text-zinc-800"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            {order.customer_name}
+          </p>
+          <p className="text-xs text-stone-400">{order.customer_email}</p>
+        </td>
+
+        <td
+          className="px-6 py-4 text-sm text-stone-500"
+          style={{ fontFamily: "var(--font-inter)" }}
+        >
+          {order.customer_phone}
+        </td>
+
+        <td
+          className="px-6 py-4 text-sm text-stone-500"
+          style={{ fontFamily: "var(--font-inter)" }}
+        >
           {new Date(order.created_at).toLocaleDateString("en-NG")}
         </td>
-        <td className="px-4 py-3 text-gray-900" onClick={(e) => e.stopPropagation()}>
-          <div className="text-sm font-medium">{order.status}</div>
+
+        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+          <span
+            className={`mb-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold capitalize ${st.bg} ${st.text}`}
+            style={{ fontFamily: "var(--font-lexend)" }}
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
+            {order.status}
+          </span>
           <OrderStatusSelect orderId={order.id} initial={order.status} />
         </td>
-        <td className="px-4 py-3 text-gray-900 tabular-nums">{formatNgn(order.total_ngn)}</td>
-        <td className="px-4 py-3 text-right">
+
+        <td
+          className="px-6 py-4 font-bold tabular-nums text-zinc-800"
+          style={{ fontFamily: "var(--font-inter)" }}
+        >
+          {formatNgn(order.total_ngn)}
+        </td>
+
+        <td className="px-6 py-4 text-right">
           <ChevronDown
             className={cn(
-              "h-4 w-4 text-gray-400 transition-transform duration-150",
+              "ml-auto h-4 w-4 text-stone-300 transition-transform duration-150",
               expanded && "rotate-180",
             )}
           />
@@ -52,7 +101,7 @@ export function OrderRow({
       <AnimatePresence initial={false}>
         {expanded ? (
           <tr>
-            <td colSpan={7} className="bg-gray-50 px-4 pb-4 pt-0">
+            <td colSpan={7} className="px-6 pb-5 pt-0">
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
@@ -60,24 +109,54 @@ export function OrderRow({
                 transition={{ duration: 0.15, ease: "easeOut" }}
                 className="overflow-hidden"
               >
-                <ul className="space-y-1 pt-3">
-                  {order.items.map((item) => (
-                    <li key={item.id} className="text-sm text-gray-700">
-                      {item.product_name}
-                      {item.variant_label ? ` (${item.variant_label})` : ""}
-                      {" "}× {item.quantity}
-                      {item.prep_option ? ` — ${item.prep_option}` : ""}
-                    </li>
-                  ))}
-                </ul>
+                <div className="rounded-2xl bg-stone-50 p-5 outline outline-1 outline-stone-100">
+                  {/* Line items */}
+                  <ul className="space-y-2">
+                    {order.items.map((item) => (
+                      <li
+                        key={item.id}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span
+                          className="font-medium text-zinc-800"
+                          style={{ fontFamily: "var(--font-inter)" }}
+                        >
+                          {item.product_name}
+                          {item.variant_label ? ` (${item.variant_label})` : ""}
+                          {item.prep_option ? (
+                            <span className="ml-1 text-stone-400">— {item.prep_option}</span>
+                          ) : null}
+                        </span>
+                        <span
+                          className="ml-4 tabular-nums text-stone-500"
+                          style={{ fontFamily: "var(--font-inter)" }}
+                        >
+                          ×{item.quantity}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
 
-                {order.allergy_notes ? (
-                  <p className="mt-2 text-sm italic text-gray-500">
-                    Allergy notes: {order.allergy_notes}
-                  </p>
-                ) : null}
+                  <div className="mt-4 space-y-2 border-t border-stone-100 pt-4">
+                    <p
+                      className="flex items-start gap-1.5 text-xs text-stone-500"
+                      style={{ fontFamily: "var(--font-inter)" }}
+                    >
+                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-stone-400" />
+                      Delivers to: {order.delivery_address}
+                    </p>
 
-                <p className="mt-2 text-sm text-gray-600">Delivers to: {order.delivery_address}</p>
+                    {order.allergy_notes ? (
+                      <p
+                        className="flex items-start gap-1.5 text-xs text-amber-700"
+                        style={{ fontFamily: "var(--font-inter)" }}
+                      >
+                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                        Allergy notes: {order.allergy_notes}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
               </motion.div>
             </td>
           </tr>
@@ -86,4 +165,3 @@ export function OrderRow({
     </>
   );
 }
-

@@ -13,56 +13,107 @@ export default async function ShopGrid() {
   const cookingKits = products.filter((p) => p.type === "cooking_kit");
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+    <section className="bg-stone-100 py-24 sm:py-28">
       <OrderingClosedBanner
         isOpen={ordering.is_ordering_open}
         cutoffMessage={ordering.cutoff_message}
         nextDeliveryDate={ordering.next_delivery_date}
       />
 
-      <div className="space-y-14">
-        <section>
-          <div className="flex items-baseline gap-3 pb-5 border-b border-border">
-            <h2 className="font-heading text-3xl italic text-foreground">Fresh Produce</h2>
-            <span className="text-sm text-muted-foreground">{freshProduce.length} items</span>
-          </div>
+      <div className="mx-auto max-w-7xl px-8">
+        <div className="mx-auto mb-14 max-w-2xl text-center">
+          <p
+            className="inline-flex items-center rounded-full bg-green-300 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-green-900"
+            style={{ fontFamily: "var(--font-lexend)" }}
+          >
+            Freshly prepped, never frozen
+          </p>
+          <h1
+            className="mt-6 text-5xl font-black text-zinc-800 sm:text-6xl"
+            style={{ fontFamily: "var(--font-lexend)" }}
+          >
+            The Local-Global Menu
+          </h1>
+          <p
+            className="mt-4 text-base leading-6 text-stone-600"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Choose your kits and produce for the week. Tap any item to select options, then add it to your order.
+          </p>
+        </div>
 
-          {freshProduce.length ? (
-            <div className="mt-7 grid grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {freshProduce.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  startingPriceNgn={product.starting_price_ngn}
-                />
-              ))}
+        <div className="space-y-20">
+          <section>
+            <div className="flex items-end justify-between gap-6 pb-6">
+              <div>
+                <h2
+                  className="text-4xl font-black uppercase leading-10 text-zinc-800"
+                  style={{ fontFamily: "var(--font-lexend)" }}
+                >
+                  Fresh <span className="text-green-800">Produce</span>
+                </h2>
+                <p
+                  className="mt-2 text-sm text-stone-600"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                >
+                  {freshProduce.length} items
+                </p>
+              </div>
             </div>
-          ) : (
-            <p className="mt-5 text-sm text-muted-foreground">No products available yet.</p>
-          )}
-        </section>
 
-        <section>
-          <div className="flex items-baseline gap-3 pb-5 border-b border-border">
-            <h2 className="font-heading text-3xl italic text-foreground">Cooking Kits</h2>
-            <span className="text-sm text-muted-foreground">{cookingKits.length} items</span>
-          </div>
+            {freshProduce.length ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {freshProduce.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    startingPriceNgn={product.starting_price_ngn}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-stone-600" style={{ fontFamily: "var(--font-inter)" }}>
+                No products available yet.
+              </p>
+            )}
+          </section>
 
-          {cookingKits.length ? (
-            <div className="mt-7 grid grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {cookingKits.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  startingPriceNgn={product.starting_price_ngn}
-                />
-              ))}
+          <section>
+            <div className="flex items-end justify-between gap-6 pb-6">
+              <div>
+                <h2
+                  className="text-4xl font-black uppercase leading-10 text-zinc-800"
+                  style={{ fontFamily: "var(--font-lexend)" }}
+                >
+                  Cooking <span className="text-red-700">Kits</span>
+                </h2>
+                <p
+                  className="mt-2 text-sm text-stone-600"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                >
+                  {cookingKits.length} items
+                </p>
+              </div>
             </div>
-          ) : (
-            <p className="mt-5 text-sm text-muted-foreground">No products available yet.</p>
-          )}
-        </section>
+
+            {cookingKits.length ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {cookingKits.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    startingPriceNgn={product.starting_price_ngn}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-stone-600" style={{ fontFamily: "var(--font-inter)" }}>
+                No products available yet.
+              </p>
+            )}
+          </section>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

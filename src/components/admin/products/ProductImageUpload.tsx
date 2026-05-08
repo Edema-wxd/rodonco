@@ -18,11 +18,11 @@ export function ProductImageUpload() {
           <img
             src={url}
             alt="Product image preview"
-            className="h-20 w-20 rounded-md border object-cover"
+            className="h-20 w-20 rounded-2xl border border-stone-100 object-cover"
           />
         ) : (
           <div
-            className="h-20 w-20 rounded-md border border-dashed bg-gray-50"
+            className="h-20 w-20 rounded-2xl border border-dashed border-stone-200 bg-stone-50"
             aria-label="No image yet"
           />
         )}

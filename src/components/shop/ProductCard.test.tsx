@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import type { Product } from "@/types";
 
@@ -23,6 +23,14 @@ vi.mock("next/link", () => ({
   },
 }));
 
+const mockReplace = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: mockReplace }),
+  usePathname: () => "/shop",
+  useSearchParams: () => new URLSearchParams(""),
+}));
+
 import { ProductCard } from "./ProductCard";
 
 function makeProduct(partial: Partial<Product> & Pick<Product, "id" | "name">): Product {
@@ -38,20 +46,21 @@ function makeProduct(partial: Partial<Product> & Pick<Product, "id" | "name">): 
 }
 
 describe("ProductCard", () => {
-  it("renders 'From ₦' formatting, CTA copy, and links to /shop/{product.id}", () => {
+  it("renders price formatting, routes card click to product page, and opens drawer via query param", () => {
     const product = makeProduct({ id: "p1", name: "Tomatoes" });
     const startingPriceNgnKobo = 250_000; // ₦2,500 in kobo
 
     render(<ProductCard product={product} startingPriceNgn={startingPriceNgnKobo} />);
 
     expect(screen.getByText("From ₦2,500")).toBeTruthy();
-    expect(screen.getByText("Add to Order")).toBeTruthy();
-
-    const ctaLink = screen.getByText("Add to Order").closest("a");
-    expect(ctaLink?.getAttribute("href")).toBe(`/shop/${product.id}`);
+    const ctaButton = screen.getByRole("button", { name: "Add to Order" });
+    expect(ctaButton).toBeTruthy();
 
     const links = screen.getAllByRole("link");
-    expect(links.some((l) => l.getAttribute("href") === `/shop/${product.id}`)).toBe(true);
+    expect(links.some((l) => l.getAttribute("href") === `/shop/products/${product.id}`)).toBe(true);
+
+    fireEvent.click(ctaButton);
+    expect(mockReplace).toHaveBeenCalledWith(`/shop?drawer=${product.id}`, { scroll: false });
   });
 });
 

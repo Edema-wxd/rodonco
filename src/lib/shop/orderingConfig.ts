@@ -1,7 +1,7 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
-import { unstable_noStore } from "next/cache";
+import { unstable_cache } from "next/cache";
 
 import { db, schema } from "@/lib/db";
 
@@ -19,10 +19,7 @@ const SAFE_DEFAULT: OrderingConfig = {
   next_delivery_date: null,
 };
 
-export async function getOrderingConfig(): Promise<OrderingConfig> {
-  // Force per-request execution; ordering state is the single source of truth.
-  unstable_noStore();
-
+async function readOrderingConfigFromDb(): Promise<OrderingConfig> {
   try {
     const [row] = await db
       .select()
@@ -46,5 +43,18 @@ export async function getOrderingConfig(): Promise<OrderingConfig> {
     console.warn("[getOrderingConfig] DB unavailable (likely cold start); defaulting ordering to OPEN");
     return SAFE_DEFAULT;
   }
+}
+
+const getOrderingConfigCached = unstable_cache(
+  async () => readOrderingConfigFromDb(),
+  ["shop-ordering-config-v1"],
+  {
+    // Keep UI snappy, while still reflecting admin changes quickly.
+    revalidate: 15,
+  }
+);
+
+export async function getOrderingConfig(): Promise<OrderingConfig> {
+  return getOrderingConfigCached();
 }
 

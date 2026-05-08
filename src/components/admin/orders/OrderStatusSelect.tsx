@@ -42,7 +42,8 @@ export function OrderStatusSelect({
       value={value}
       onChange={(e) => void handleChange(e.target.value)}
       onClick={(e) => e.stopPropagation()}
-      className="mt-1 h-9 w-36 rounded-md border bg-white px-2 text-sm text-gray-900"
+      className="mt-1 h-8 w-36 rounded-lg border border-stone-200 bg-white px-2 text-xs font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+      style={{ fontFamily: "var(--font-inter)" }}
     >
       {STATUS_OPTIONS.map((s) => (
         <option key={s} value={s}>
@@ -52,4 +53,3 @@ export function OrderStatusSelect({
     </select>
   );
 }
-
