@@ -6,6 +6,8 @@ import {
   productPayloadSchema,
 } from "./schemas";
 
+// NOTE: bulkStatusTransitionSchema is imported only in todo stubs below — it does not exist yet.
+
 describe("admin schemas", () => {
   it("orderStatusPatchSchema is strict and rejects invalid status", () => {
     const bad = orderStatusPatchSchema.safeParse({ status: "pending" });
@@ -48,5 +50,37 @@ describe("admin schemas", () => {
     });
     expect(res.success).toBe(false);
   });
+});
+
+// --- Phase 8 additions ---
+describe("orderingConfigPatchSchema (extended — OPS-05)", () => {
+  it.skip("accepts next_delivery_date and cutoff_message", () => {
+    // This test is SKIPPED until schemas.ts is updated in Wave 1 (expected RED pre-implementation)
+    const ok = orderingConfigPatchSchema.safeParse({
+      next_delivery_date: "2026-05-10",
+      cutoff_message: "Closed for the week",
+    });
+    expect(ok.success).toBe(true);
+  });
+
+  it.skip("rejects payload with no fields set (at-least-one refine)", () => {
+    // This test is SKIPPED until schemas.ts is updated in Wave 1 (expected RED pre-implementation)
+    const bad = orderingConfigPatchSchema.safeParse({});
+    expect(bad.success).toBe(false);
+  });
+
+  it("still accepts is_ordering_open alone", () => {
+    // CAUTION: this CURRENTLY passes. After schema update it must still pass.
+    const ok = orderingConfigPatchSchema.safeParse({ is_ordering_open: false });
+    expect(ok.success).toBe(true);
+  });
+});
+
+describe("bulkStatusTransitionSchema (OPS-07)", () => {
+  // Import will fail until schemas.ts exports this — mark as todo for now
+  it.todo("accepts paid → processing transition");
+  it.todo("accepts processing → delivered transition");
+  it.todo("rejects paid → delivered (invalid hop)");
+  it.todo("rejects missing week_of field");
 });
 

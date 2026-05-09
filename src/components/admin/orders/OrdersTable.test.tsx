@@ -95,5 +95,11 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
 
     expect(fetchMock).toHaveBeenCalled();
   });
+
+  // OPS-03: search field — implementation pending in Wave 1
+  it.todo("OPS-03: search field filters by customer_name");
+  it.todo("OPS-03: search field filters by customer_phone");
+  it.todo("OPS-03: search field filters by customer_email");
+  it.todo("OPS-03: search clears when input is empty");
 });
 
