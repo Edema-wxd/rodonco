@@ -2,15 +2,21 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { StatCard } from "@/components/admin/analytics/StatCard";
+import { WeekPickerBar } from "@/components/admin/analytics/WeekPickerBar";
 import { getWeeklyAnalytics } from "@/lib/admin/analytics";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminAnalyticsPage() {
+export default async function AdminAnalyticsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ week?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/admin");
 
-  const analytics = await getWeeklyAnalytics();
+  const { week } = await searchParams;
+  const analytics = await getWeeklyAnalytics(week);
 
   return (
     <div className="min-h-screen bg-stone-100 p-8">
@@ -33,6 +39,10 @@ export default async function AdminAnalyticsPage() {
         >
           Week of {analytics.week}
         </p>
+      </div>
+
+      <div className="mb-6">
+        <WeekPickerBar currentWeek={analytics.week} />
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

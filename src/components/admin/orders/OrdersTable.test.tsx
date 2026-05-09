@@ -101,8 +101,8 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
     render(
       <OrdersTable
         initialOrders={[
-          makeOrder({ id: "o1", reference: "REF-001", customer_name: "Ada Lovelace" }),
-          makeOrder({ id: "o2", reference: "REF-002", customer_name: "Charles Babbage" }),
+          makeOrder({ id: "o1", reference: "REF-001", customer_name: "Ada Lovelace", customer_email: "ada@test.com", customer_phone: "+2341111111111" }),
+          makeOrder({ id: "o2", reference: "REF-002", customer_name: "Charles Babbage", customer_email: "charles@test.com", customer_phone: "+2342222222222" }),
         ]}
       />,
     );
@@ -149,8 +149,8 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
     render(
       <OrdersTable
         initialOrders={[
-          makeOrder({ id: "o1", reference: "REF-001", customer_name: "Ada Lovelace" }),
-          makeOrder({ id: "o2", reference: "REF-002", customer_name: "Charles Babbage" }),
+          makeOrder({ id: "o1", reference: "REF-001", customer_name: "Ada Lovelace", customer_email: "ada@test.com", customer_phone: "+2341111111111" }),
+          makeOrder({ id: "o2", reference: "REF-002", customer_name: "Charles Babbage", customer_email: "charles@test.com", customer_phone: "+2342222222222" }),
         ]}
       />,
     );
