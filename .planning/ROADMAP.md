@@ -205,7 +205,7 @@ Plans:
 Plans:
 
 **Wave 0** *(must complete before Wave 1)*
-- [ ] 08-01-PLAN.md — Test stubs: prepList, manifest, pendingOrders, bulkTransition, analytics; extend schemas.test.ts + OrdersTable.test.tsx (OPS-01–OPS-07)
+- [x] 08-01-PLAN.md — Test stubs: prepList, manifest, pendingOrders, bulkTransition, analytics; extend schemas.test.ts + OrdersTable.test.tsx (OPS-01–OPS-07)
 
 **Wave 1** *(blocked on Wave 0 — 08-02 and 08-03 run in parallel)*
 - [ ] 08-02-PLAN.md — schemas.ts extension + DeliveryConfigForm + OrdersTable search + analytics week picker (OPS-02, OPS-03, OPS-05)
