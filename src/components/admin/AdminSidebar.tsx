@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as Lucide from "lucide-react";
@@ -8,19 +9,36 @@ import { cn } from "@/lib/utils";
 
 import { AdminSignOut } from "./AdminSignOut";
 
-const NAV_ITEMS = [
+type NavItem = {
+  href: string;
+  label: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  exact?: boolean;
+  badge?: number;
+};
+
+const buildNavItems = (pendingCount: number): NavItem[] => [
   { href: "/admin", label: "Dashboard", Icon: Lucide.LayoutDashboard, exact: true },
   { href: "/admin/orders", label: "Orders", Icon: Lucide.ShoppingBag },
   { href: "/admin/products", label: "Products", Icon: Lucide.Package },
   { href: "/admin/analytics", label: "Analytics", Icon: Lucide.BarChart2 },
   { href: "/admin/settings", label: "Settings", Icon: Lucide.Settings2 },
-] as const;
+  { href: "/admin/prep-list", label: "Prep List", Icon: Lucide.ClipboardList },
+  { href: "/admin/manifest", label: "Manifest", Icon: Lucide.Truck },
+  { href: "/admin/pending", label: "Pending Orders", Icon: Lucide.Clock, badge: pendingCount },
+];
 
-export function AdminSidebar({ adminEmail }: { adminEmail: string | null }) {
+export function AdminSidebar({
+  adminEmail,
+  pendingCount,
+}: {
+  adminEmail: string | null;
+  pendingCount: number;
+}) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex min-h-screen w-60 shrink-0 flex-col border-r border-stone-200 bg-white">
+    <aside className="flex min-h-screen w-60 shrink-0 flex-col border-r border-stone-200 bg-white print:hidden">
       {/* Brand mark */}
       <div className="px-5 py-6">
         <p
@@ -40,8 +58,7 @@ export function AdminSidebar({ adminEmail }: { adminEmail: string | null }) {
       <div className="mx-4 h-px bg-stone-100" />
 
       <nav className="flex-1 space-y-0.5 px-3 py-3">
-        {NAV_ITEMS.map(({ href, label, Icon, ...rest }) => {
-          const exact = "exact" in rest && rest.exact;
+        {buildNavItems(pendingCount).map(({ href, label, Icon, exact, badge }) => {
           const active = exact ? pathname === href : (pathname === href || pathname.startsWith(href + "/"));
           return (
             <Link
@@ -58,6 +75,11 @@ export function AdminSidebar({ adminEmail }: { adminEmail: string | null }) {
             >
               <Icon className="h-4 w-4 shrink-0" />
               {label}
+              {badge != null && badge > 0 ? (
+                <span className="ml-auto rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+                  {badge}
+                </span>
+              ) : null}
             </Link>
           );
         })}
