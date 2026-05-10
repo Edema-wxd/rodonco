@@ -48,9 +48,35 @@ export const orderStatusPatchSchema = z
 
 export const orderingConfigPatchSchema = z
   .object({
-    is_ordering_open: z.boolean(),
+    is_ordering_open: z.boolean().optional(),
+    next_delivery_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "next_delivery_date must be YYYY-MM-DD")
+      .nullable()
+      .optional(),
+    cutoff_message: z.string().max(300).nullable().optional(),
   })
-  .strict();
+  .strict()
+  .refine(
+    (d) => Object.values(d).some((v) => v !== undefined),
+    { message: "At least one field required" }
+  );
+
+export const bulkStatusTransitionSchema = z
+  .object({
+    week_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "week_of must be YYYY-MM-DD"),
+    from_status: z.enum(["paid", "processing"]),
+    to_status: z.enum(["processing", "delivered"]),
+  })
+  .strict()
+  .refine(
+    (d) =>
+      (d.from_status === "paid" && d.to_status === "processing") ||
+      (d.from_status === "processing" && d.to_status === "delivered"),
+    { message: "Invalid status transition: only paid→processing and processing→delivered are allowed" }
+  );
+
+export type BulkStatusTransition = z.infer<typeof bulkStatusTransitionSchema>;
 
 export type OrderStatusPatch = z.infer<typeof orderStatusPatchSchema>;
 export type OrderingConfigPatch = z.infer<typeof orderingConfigPatchSchema>;

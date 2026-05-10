@@ -4,6 +4,7 @@ import {
   orderStatusPatchSchema,
   orderingConfigPatchSchema,
   productPayloadSchema,
+  bulkStatusTransitionSchema,
 } from "./schemas";
 
 // NOTE: bulkStatusTransitionSchema is imported only in todo stubs below — it does not exist yet.
@@ -17,13 +18,13 @@ describe("admin schemas", () => {
     expect(extra.success).toBe(false);
   });
 
-  it("orderingConfigPatchSchema is strict", () => {
+  it("orderingConfigPatchSchema rejects extra keys", () => {
     const ok = orderingConfigPatchSchema.safeParse({ is_ordering_open: true });
     expect(ok.success).toBe(true);
 
     const extra = orderingConfigPatchSchema.safeParse({
       is_ordering_open: true,
-      cutoff_message: "nope",
+      unknown_field: "nope",
     });
     expect(extra.success).toBe(false);
   });
@@ -54,8 +55,7 @@ describe("admin schemas", () => {
 
 // --- Phase 8 additions ---
 describe("orderingConfigPatchSchema (extended — OPS-05)", () => {
-  it.skip("accepts next_delivery_date and cutoff_message", () => {
-    // This test is SKIPPED until schemas.ts is updated in Wave 1 (expected RED pre-implementation)
+  it("accepts next_delivery_date and cutoff_message", () => {
     const ok = orderingConfigPatchSchema.safeParse({
       next_delivery_date: "2026-05-10",
       cutoff_message: "Closed for the week",
@@ -63,8 +63,7 @@ describe("orderingConfigPatchSchema (extended — OPS-05)", () => {
     expect(ok.success).toBe(true);
   });
 
-  it.skip("rejects payload with no fields set (at-least-one refine)", () => {
-    // This test is SKIPPED until schemas.ts is updated in Wave 1 (expected RED pre-implementation)
+  it("rejects payload with no fields set (at-least-one refine)", () => {
     const bad = orderingConfigPatchSchema.safeParse({});
     expect(bad.success).toBe(false);
   });
@@ -77,10 +76,39 @@ describe("orderingConfigPatchSchema (extended — OPS-05)", () => {
 });
 
 describe("bulkStatusTransitionSchema (OPS-07)", () => {
-  // Import will fail until schemas.ts exports this — mark as todo for now
-  it.todo("accepts paid → processing transition");
-  it.todo("accepts processing → delivered transition");
-  it.todo("rejects paid → delivered (invalid hop)");
-  it.todo("rejects missing week_of field");
+  it("accepts paid → processing transition", () => {
+    const ok = bulkStatusTransitionSchema.safeParse({
+      week_of: "2026-05-03",
+      from_status: "paid",
+      to_status: "processing",
+    });
+    expect(ok.success).toBe(true);
+  });
+
+  it("accepts processing → delivered transition", () => {
+    const ok = bulkStatusTransitionSchema.safeParse({
+      week_of: "2026-05-03",
+      from_status: "processing",
+      to_status: "delivered",
+    });
+    expect(ok.success).toBe(true);
+  });
+
+  it("rejects paid → delivered (invalid hop)", () => {
+    const bad = bulkStatusTransitionSchema.safeParse({
+      week_of: "2026-05-03",
+      from_status: "paid",
+      to_status: "delivered",
+    });
+    expect(bad.success).toBe(false);
+  });
+
+  it("rejects missing week_of field", () => {
+    const bad = bulkStatusTransitionSchema.safeParse({
+      from_status: "paid",
+      to_status: "processing",
+    });
+    expect(bad.success).toBe(false);
+  });
 });
 

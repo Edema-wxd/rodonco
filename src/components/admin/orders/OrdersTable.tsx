@@ -11,15 +11,22 @@ import { OrderRow } from "./OrderRow";
 export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [weekFilter, setWeekFilter] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [expanded, setExpanded] = useState<Map<string, boolean>>(new Map());
 
   const filteredOrders = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
     return initialOrders.filter((o) => {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (weekFilter && o.week_of !== weekFilter) return false;
+      if (q) {
+        const haystack =
+          `${o.customer_name} ${o.customer_phone} ${o.customer_email}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
       return true;
     });
-  }, [initialOrders, statusFilter, weekFilter]);
+  }, [initialOrders, statusFilter, weekFilter, searchQuery]);
 
   function toggleRow(id: string) {
     setExpanded((prev) => {
@@ -56,6 +63,25 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
     <div className="space-y-6">
       {/* Filters + Export */}
       <div className="flex flex-wrap items-end gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="customer-search"
+            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            style={{ fontFamily: "var(--font-lexend)" }}
+          >
+            Search
+          </label>
+          <input
+            id="customer-search"
+            type="search"
+            placeholder="Name, phone, or email"
+            className="h-10 w-56 rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+            style={{ fontFamily: "var(--font-inter)" }}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="status-filter"

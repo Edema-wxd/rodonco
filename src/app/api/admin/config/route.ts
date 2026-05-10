@@ -26,12 +26,17 @@ export async function PATCH(req: Request) {
     );
   }
 
+  const updateFields: Record<string, unknown> = { updated_at: new Date() };
+  if (parsed.data.is_ordering_open !== undefined)
+    updateFields.is_ordering_open = parsed.data.is_ordering_open;
+  if (parsed.data.next_delivery_date !== undefined)
+    updateFields.next_delivery_date = parsed.data.next_delivery_date;
+  if (parsed.data.cutoff_message !== undefined)
+    updateFields.cutoff_message = parsed.data.cutoff_message;
+
   await db
     .update(schema.ordering_config)
-    .set({
-      is_ordering_open: parsed.data.is_ordering_open,
-      updated_at: new Date(),
-    })
+    .set(updateFields)
     .where(eq(schema.ordering_config.id, 1));
 
   return NextResponse.json({ ok: true });

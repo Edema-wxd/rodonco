@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { DeliveryConfigForm } from "@/components/admin/settings/DeliveryConfigForm";
 import { OrderingToggle } from "@/components/admin/settings/OrderingToggle";
 import { ReminderForm } from "@/components/admin/settings/ReminderForm";
 import { getOrderingConfig } from "@/lib/admin/config";
@@ -33,6 +34,10 @@ export default async function AdminSettingsPage() {
       <div className="max-w-lg space-y-6">
         <OrderingToggle initialIsOpen={config.is_ordering_open} />
         <ReminderForm />
+        <DeliveryConfigForm
+          initialNextDeliveryDate={config.next_delivery_date}
+          initialCutoffMessage={config.cutoff_message}
+        />
       </div>
     </div>
   );

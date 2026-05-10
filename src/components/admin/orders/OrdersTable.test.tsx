@@ -96,10 +96,72 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
     expect(fetchMock).toHaveBeenCalled();
   });
 
-  // OPS-03: search field — implementation pending in Wave 1
-  it.todo("OPS-03: search field filters by customer_name");
-  it.todo("OPS-03: search field filters by customer_phone");
-  it.todo("OPS-03: search field filters by customer_email");
-  it.todo("OPS-03: search clears when input is empty");
+  // OPS-03: search field
+  it("OPS-03: search field filters by customer_name", () => {
+    render(
+      <OrdersTable
+        initialOrders={[
+          makeOrder({ id: "o1", reference: "REF-001", customer_name: "Ada Lovelace", customer_email: "ada@test.com", customer_phone: "+2341111111111" }),
+          makeOrder({ id: "o2", reference: "REF-002", customer_name: "Charles Babbage", customer_email: "charles@test.com", customer_phone: "+2342222222222" }),
+        ]}
+      />,
+    );
+
+    const searchInput = screen.getByPlaceholderText("Name, phone, or email");
+    fireEvent.change(searchInput, { target: { value: "ada" } });
+    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
+    expect(screen.queryAllByText("REF-002").length).toBe(0);
+  });
+
+  it("OPS-03: search field filters by customer_phone", () => {
+    render(
+      <OrdersTable
+        initialOrders={[
+          makeOrder({ id: "o1", reference: "REF-001", customer_phone: "+2348012345678" }),
+          makeOrder({ id: "o2", reference: "REF-002", customer_phone: "+2349087654321" }),
+        ]}
+      />,
+    );
+
+    const searchInput = screen.getByPlaceholderText("Name, phone, or email");
+    fireEvent.change(searchInput, { target: { value: "8012345" } });
+    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
+    expect(screen.queryAllByText("REF-002").length).toBe(0);
+  });
+
+  it("OPS-03: search field filters by customer_email", () => {
+    render(
+      <OrdersTable
+        initialOrders={[
+          makeOrder({ id: "o1", reference: "REF-001", customer_email: "ada@example.com" }),
+          makeOrder({ id: "o2", reference: "REF-002", customer_email: "charles@other.com" }),
+        ]}
+      />,
+    );
+
+    const searchInput = screen.getByPlaceholderText("Name, phone, or email");
+    fireEvent.change(searchInput, { target: { value: "ada@example" } });
+    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
+    expect(screen.queryAllByText("REF-002").length).toBe(0);
+  });
+
+  it("OPS-03: search clears when input is empty — shows all orders", () => {
+    render(
+      <OrdersTable
+        initialOrders={[
+          makeOrder({ id: "o1", reference: "REF-001", customer_name: "Ada Lovelace", customer_email: "ada@test.com", customer_phone: "+2341111111111" }),
+          makeOrder({ id: "o2", reference: "REF-002", customer_name: "Charles Babbage", customer_email: "charles@test.com", customer_phone: "+2342222222222" }),
+        ]}
+      />,
+    );
+
+    const searchInput = screen.getByPlaceholderText("Name, phone, or email");
+    fireEvent.change(searchInput, { target: { value: "ada" } });
+    expect(screen.queryAllByText("REF-002").length).toBe(0);
+
+    fireEvent.change(searchInput, { target: { value: "" } });
+    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
+    expect(screen.queryAllByText("REF-002").length).toBeGreaterThan(0);
+  });
 });
 
