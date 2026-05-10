@@ -208,7 +208,7 @@ Plans:
 - [x] 08-01-PLAN.md — Test stubs: prepList, manifest, pendingOrders, bulkTransition, analytics; extend schemas.test.ts + OrdersTable.test.tsx (OPS-01–OPS-07)
 
 **Wave 1** *(blocked on Wave 0 — 08-02 and 08-03 run in parallel)*
-- [ ] 08-02-PLAN.md — schemas.ts extension + DeliveryConfigForm + OrdersTable search + analytics week picker (OPS-02, OPS-03, OPS-05)
+- [x] 08-02-PLAN.md — schemas.ts extension + DeliveryConfigForm + OrdersTable search + analytics week picker (OPS-02, OPS-03, OPS-05)
 - [ ] 08-03-PLAN.md — pendingOrders lib + AdminLayout badge + AdminSidebar 3 new nav items (OPS-06 prep)
 
 **Wave 2** *(blocked on Wave 1 — 08-04 and 08-05 run in parallel)*
@@ -232,4 +232,4 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 | 5. Payments + Email | 0/5 | Planning complete | - |
 | 6. Automation + Launch | 4/4 | Complete | 2026-05-04 |
 | 7. Missing Pages + Route Completeness | 3/3 | Complete | 2026-05-07 |
-| 8. Missing Admin Structures | 0/5 | Planning complete | - |
+| 8. Missing Admin Structures | 2/5 | In Progress | - |
