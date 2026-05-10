@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 8 — Executing (started 2026-05-09)
-Plan: 2/5 done
-Status: Wave 1 partial — 08-02 complete (OPS-02/03/05); 08-03 pending (OPS-06 prep)
-Last activity: 2026-05-09
+Plan: 3/5 done
+Status: Wave 2 starting — prep list + manifest + pending page + bulk transition
+Last activity: 2026-05-10
 
 Progress: [░░░░░░░░░░] 0%
 

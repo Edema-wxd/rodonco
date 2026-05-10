@@ -209,7 +209,7 @@ Plans:
 
 **Wave 1** *(blocked on Wave 0 — 08-02 and 08-03 run in parallel)*
 - [x] 08-02-PLAN.md — schemas.ts extension + DeliveryConfigForm + OrdersTable search + analytics week picker (OPS-02, OPS-03, OPS-05)
-- [ ] 08-03-PLAN.md — pendingOrders lib + AdminLayout badge + AdminSidebar 3 new nav items (OPS-06 prep)
+- [x] 08-03-PLAN.md — pendingOrders lib + AdminLayout badge + AdminSidebar 3 new nav items (OPS-06 prep)
 
 **Wave 2** *(blocked on Wave 1 — 08-04 and 08-05 run in parallel)*
 - [ ] 08-04-PLAN.md — prepList lib + RSC page + PrepListTable; manifest lib + RSC page + ManifestTable with print (OPS-01, OPS-04)
