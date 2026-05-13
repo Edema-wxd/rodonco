@@ -35,6 +35,7 @@ The project is in late-stage MVP completion and operational hardening, with majo
    - `npm install`
 2. Copy env template:
    - `.env.local.example` → `.env.local`
+   - fill all required variables in `.env.local` with real values before running the app
 3. Start development server:
    - `npm run dev`
 
@@ -52,4 +53,3 @@ For a full project review (scope, architecture, data model, setup, deployment, a
 - [`LAUNCH-CHECKLIST.md`](./LAUNCH-CHECKLIST.md)
 - [`.planning/PROJECT.md`](./.planning/PROJECT.md)
 - [`.planning/ROADMAP.md`](./.planning/ROADMAP.md)
-

@@ -101,7 +101,7 @@ Use `.env.local.example` as the source template. Required groups include:
 ## Deployment Notes
 
 - Hosting: Vercel
-- Scheduled cutoff: `vercel.json` cron calls `/api/cutoff` at `59 22 * * 4`
+- Scheduled cutoff: `vercel.json` cron calls `/api/cutoff` at `59 22 * * 4` (Thursday 22:59 UTC; 23:59 WAT)
 - Security posture includes secret-only server values, webhook verification, and production env checks.
 - Go-live runbook exists in `LAUNCH-CHECKLIST.md`.
 
@@ -112,4 +112,3 @@ At the time of this documentation update:
 - `npm run build` fails in local environment when production Paystack key validation is not satisfied
 
 These issues were observed before documentation-only changes and are not introduced by this update.
-
