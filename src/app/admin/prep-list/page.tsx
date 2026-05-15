@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { BulkTransitionPanel } from "@/components/admin/prep-list/BulkTransitionPanel";
 import { PrepListTable, PrepListWeekInput } from "@/components/admin/prep-list/PrepListTable";
 import { getPrepList } from "@/lib/admin/prepList";
 import { currentWeekOf } from "@/lib/admin/week";
@@ -55,6 +56,8 @@ export default async function AdminPrepListPage({
       </div>
 
       <PrepListTable rows={rows} />
+
+      <BulkTransitionPanel currentWeek={weekOf} />
     </div>
   );
 }
