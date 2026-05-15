@@ -212,8 +212,8 @@ Plans:
 - [x] 08-03-PLAN.md — pendingOrders lib + AdminLayout badge + AdminSidebar 3 new nav items (OPS-06 prep)
 
 **Wave 2** *(blocked on Wave 1 — 08-04 and 08-05 run in parallel)*
-- [ ] 08-04-PLAN.md — prepList lib + RSC page + PrepListTable; manifest lib + RSC page + ManifestTable with print (OPS-01, OPS-04)
-- [ ] 08-05-PLAN.md — pending orders page + DELETE handler; bulkTransition lib + bulk-status API + BulkTransitionPanel (OPS-06, OPS-07)
+- [x] 08-04-PLAN.md — prepList lib + RSC page + PrepListTable; manifest lib + RSC page + ManifestTable with print (OPS-01, OPS-04)
+- [x] 08-05-PLAN.md — pending orders page + DELETE handler; bulkTransition lib + bulk-status API + BulkTransitionPanel (OPS-06, OPS-07)
 
 ## Progress
 
