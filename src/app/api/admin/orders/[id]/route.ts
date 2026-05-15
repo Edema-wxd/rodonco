@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { orders } from "../../../../../../drizzle/schema";
 
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user) {
@@ -29,6 +30,21 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   const { id } = await params;
   await db.update(orders).set({ status: parsed.data.status }).where(eq(orders.id, id));
+
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  await db.delete(orders).where(eq(orders.id, id));
 
   return NextResponse.json({ ok: true });
 }
