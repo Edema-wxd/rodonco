@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
-import { useMemo } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { OrderingClosedBanner } from "@/components/shop/OrderingClosedBanner";
 import { useCartStore } from "@/store/cart";
 import { useCartUiStore } from "@/store/cartUi";
@@ -40,26 +41,48 @@ export function CartSidebar({
 
   const isViewOnly = !isOrderingOpen;
 
-  if (!isOpen) return null;
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const drawerInitial = isDesktop ? { x: "100%" } : { y: "100%" };
+  const drawerAnimate = isDesktop ? { x: 0 } : { y: 0 };
+  const drawerExit = isDesktop ? { x: "100%" } : { y: "100%" };
 
   return (
-    <div className="fixed inset-0 z-[60]">
-      <button
-        type="button"
-        aria-label="Close cart"
-        className="absolute inset-0 bg-black/40"
-        onClick={closeCart}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[60]">
+          <motion.button
+            type="button"
+            aria-label="Close cart"
+            className="absolute inset-0 bg-black/40"
+            onClick={closeCart}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.12, ease: "easeOut" }}
+          />
 
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-label="Cart"
-        className={[
-          "absolute bottom-0 left-0 right-0 flex max-h-[85vh] flex-col overflow-hidden rounded-t-2xl bg-card shadow-2xl",
-          "sm:bottom-auto sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[420px] sm:rounded-none",
-        ].join(" ")}
-      >
+          <motion.aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="Cart"
+            className={[
+              "absolute bottom-0 left-0 right-0 flex max-h-[85vh] flex-col overflow-hidden rounded-t-2xl bg-card shadow-2xl",
+              "sm:bottom-auto sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[420px] sm:rounded-none",
+            ].join(" ")}
+            initial={drawerInitial}
+            animate={drawerAnimate}
+            exit={drawerExit}
+            transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
+            style={{ willChange: "transform" }}
+          >
         <div className="flex items-center justify-between border-b border-border px-4 py-4">
           <div>
             <p className="font-heading text-lg italic text-foreground">Your cart</p>
@@ -178,8 +201,10 @@ export function CartSidebar({
           </div>
           <p className="mt-1 text-xs text-black/60">Free delivery on Saturdays</p>
         </div>
-      </aside>
-    </div>
+          </motion.aside>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }
 

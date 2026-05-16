@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -19,6 +18,8 @@ export type ProductDrawerProps = {
   cutoffMessage?: string | null;
   nextDeliveryDate?: string | null;
   onRequestClose?: () => void;
+  /** Skip the slide-in entrance animation (e.g. when a skeleton was already in place). */
+  skipEnterAnimation?: boolean;
 };
 
 function formatNgn(kobo: number): string {
@@ -42,11 +43,21 @@ export function ProductDrawer({
   cutoffMessage,
   nextDeliveryDate,
   onRequestClose,
+  skipEnterAnimation = false,
 }: ProductDrawerProps) {
   const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
   const autoOpenOnFirstAdd = useCartUiStore((s) => s.autoOpenOnFirstAdd);
   const [isOpen, setIsOpen] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const isKit = product.type === "cooking_kit";
   const isProduce = product.type === "fresh_produce";
@@ -81,13 +92,14 @@ export function ProductDrawer({
   const selectionSatisfied = (!needsVariant || !!selectedVariant) && (!needsPrep || !!selectedPrep);
   const canAddToCart = isOrderingOpen && selectionSatisfied && quantity >= 1 && unitPriceKobo > 0;
 
+  const CLOSE_DELAY = 150;
+
   const close = () => {
-    // Trigger exit animation before navigating back (route change unmounts immediately otherwise).
     setIsOpen(false);
     window.setTimeout(() => {
       if (onRequestClose) return onRequestClose();
       router.back();
-    }, 220);
+    }, CLOSE_DELAY);
   };
 
   const onAddToCart = () => {
@@ -110,6 +122,14 @@ export function ProductDrawer({
     close();
   };
 
+  const drawerInitial = skipEnterAnimation
+    ? {}
+    : isDesktop
+      ? { x: "100%" }
+      : { y: "100%" };
+  const drawerAnimate = isDesktop ? { x: 0 } : { y: 0 };
+  const drawerExit = isDesktop ? { x: "100%" } : { y: "100%" };
+
   return (
     <AnimatePresence mode="wait">
       {isOpen ? (
@@ -122,7 +142,7 @@ export function ProductDrawer({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
+            transition={{ duration: 0.12, ease: "easeOut" }}
             style={{ willChange: "opacity" }}
           />
 
@@ -134,17 +154,17 @@ export function ProductDrawer({
               "absolute bottom-0 left-0 right-0 flex max-h-[92vh] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl",
               "sm:bottom-auto sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[520px] sm:rounded-none",
             ].join(" ")}
-            initial={{ y: 24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 24, opacity: 0 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
+            initial={drawerInitial}
+            animate={drawerAnimate}
+            exit={drawerExit}
+            transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
             drag="y"
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={0.05}
             onDragEnd={(_, info) => {
               if (info.offset.y > 120 || info.velocity.y > 800) close();
             }}
-            style={{ willChange: "transform, opacity" }}
+            style={{ willChange: "transform" }}
           >
           <div className="flex items-start justify-between gap-4 border-b px-4 py-4">
             <div className="min-w-0">
@@ -155,13 +175,14 @@ export function ProductDrawer({
               ) : null}
             </div>
 
-            <Link
-              href="/shop"
+            <button
+              type="button"
+              onClick={close}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-black/5"
               aria-label="Close"
             >
               <X className="h-4 w-4" />
-            </Link>
+            </button>
           </div>
 
           <OrderingClosedBanner
