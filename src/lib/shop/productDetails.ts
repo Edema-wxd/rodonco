@@ -50,6 +50,7 @@ export async function getProductDetailsById(productId: string): Promise<ProductD
       name: productRow.name,
       description: productRow.description ?? null,
       type: productRow.type as Product["type"],
+      category: (productRow.category as Product["category"]) ?? null,
       image_url: productRow.image_url ?? null,
       images: imageRows.map((r) => ({ url: r.url })),
       is_active: productRow.is_active,

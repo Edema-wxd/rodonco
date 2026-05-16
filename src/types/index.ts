@@ -9,11 +9,14 @@ export interface ProductImage {
   url: string;
 }
 
+export type ProduceCategory = "vegetable" | "tuber" | "herb_spice" | "legume";
+
 export interface Product {
   id: string;
   name: string;
   description: string | null;
   type: ProductType;
+  category: ProduceCategory | null;
   image_url: string | null;
   images: ProductImage[];
   is_active: boolean;

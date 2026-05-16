@@ -39,6 +39,7 @@ function makeProduct(partial: Partial<Product> & Pick<Product, "id" | "name">): 
     name: partial.name,
     description: partial.description ?? null,
     type: partial.type ?? "fresh_produce",
+    category: partial.category ?? null,
     image_url: partial.image_url ?? null,
     images: partial.images ?? [],
     is_active: partial.is_active ?? true,
@@ -58,7 +59,7 @@ describe("ProductCard", () => {
     expect(ctaButton).toBeTruthy();
 
     const links = screen.getAllByRole("link");
-    expect(links.some((l) => l.getAttribute("href") === `/shop/products/${product.id}`)).toBe(true);
+    expect(links.some((l) => l.getAttribute("href") === `/shop/${product.id}`)).toBe(true);
 
     fireEvent.click(ctaButton);
     expect(mockReplace).toHaveBeenCalledWith(`/shop?drawer=${product.id}`, { scroll: false });

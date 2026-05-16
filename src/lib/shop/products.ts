@@ -23,6 +23,7 @@ export async function getActiveProductsForShop(): Promise<Product[]> {
     name: row.name,
     description: row.description ?? null,
     type: row.type as Product["type"],
+    category: (row.category as Product["category"]) ?? null,
     image_url: row.image_url ?? null,
     images: [],
     is_active: row.is_active,

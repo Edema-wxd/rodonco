@@ -27,7 +27,7 @@ export function ProductCard({
 
   return (
     <div className="group overflow-hidden rounded-[32px] bg-white outline outline-1 outline-stone-200/50 transition-shadow hover:shadow-md">
-      <Link href={`/shop/products/${product.id}`} className="block overflow-hidden">
+      <Link href={`/shop/${product.id}`} scroll={false} className="block overflow-hidden">
         <div className="relative h-64 overflow-hidden bg-stone-100">
           {primaryImage ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -57,7 +57,7 @@ export function ProductCard({
 
       <div className="flex flex-col gap-4 p-8">
         <div className="flex items-start justify-between gap-4">
-          <Link href={`/shop/products/${product.id}`} className="min-w-0 flex-1 pr-4">
+          <Link href={`/shop/${product.id}`} scroll={false} className="min-w-0 flex-1 pr-4">
             <h3
               className="truncate text-2xl font-bold leading-8 text-zinc-800"
               style={{ fontFamily: "var(--font-quicksand)" }}

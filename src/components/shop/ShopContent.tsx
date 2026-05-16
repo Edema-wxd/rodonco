@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
+import type { ProduceCategory } from "@/types";
 import type { ActiveProductWithStartingPrice } from "@/lib/shop/products";
 import { ProductCard } from "@/components/shop/ProductCard";
 
@@ -10,17 +11,32 @@ const sections = [
   { id: "cooking-kits", label: "Cooking Kits", accent: "text-red-700" },
 ] as const;
 
+const categoryFilters: { value: ProduceCategory | "all"; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "vegetable", label: "Vegetables" },
+  { value: "tuber", label: "Tubers" },
+  { value: "herb_spice", label: "Herbs & Spices" },
+  { value: "legume", label: "Legumes" },
+];
+
 function filterProducts(
   products: ActiveProductWithStartingPrice[],
-  query: string
+  query: string,
+  category: ProduceCategory | "all"
 ) {
-  if (!query.trim()) return products;
-  const q = query.toLowerCase();
-  return products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(q) ||
-      p.description?.toLowerCase().includes(q)
-  );
+  let result = products;
+  if (category !== "all") {
+    result = result.filter((p) => p.category === category);
+  }
+  if (query.trim()) {
+    const q = query.toLowerCase();
+    result = result.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q)
+    );
+  }
+  return result;
 }
 
 export function ShopContent({
@@ -31,10 +47,11 @@ export function ShopContent({
   cookingKits: ActiveProductWithStartingPrice[];
 }) {
   const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<ProduceCategory | "all">("all");
   const [activeSection, setActiveSection] = useState<string>("fresh-produce");
 
-  const filteredFresh = filterProducts(freshProduce, query);
-  const filteredKits = filterProducts(cookingKits, query);
+  const filteredFresh = filterProducts(freshProduce, query, activeCategory);
+  const filteredKits = filterProducts(cookingKits, query, "all");
   const isSearching = query.trim().length > 0;
   const hasAnyResults = filteredFresh.length > 0 || filteredKits.length > 0;
 
@@ -160,19 +177,43 @@ export function ShopContent({
           {(!isSearching || filteredFresh.length > 0) && (
             <section id="fresh-produce">
               <div className="pb-6">
-                <h2
-                  className="text-4xl font-black uppercase leading-10 text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
-                >
-                  Fresh{" "}
-                  <span className="text-green-800">Produce</span>
-                </h2>
-                <p
-                  className="mt-2 text-sm text-stone-600"
-                  style={{ fontFamily: "var(--font-inter)" }}
-                >
-                  {filteredFresh.length} items
-                </p>
+                <div className="flex flex-wrap items-end justify-between gap-4">
+                  <div>
+                    <h2
+                      className="text-4xl font-black uppercase leading-10 text-zinc-800"
+                      style={{ fontFamily: "var(--font-lexend)" }}
+                    >
+                      Fresh{" "}
+                      <span className="text-green-800">Produce</span>
+                    </h2>
+                    <p
+                      className="mt-2 text-sm text-stone-600"
+                      style={{ fontFamily: "var(--font-inter)" }}
+                    >
+                      {filteredFresh.length} items
+                    </p>
+                  </div>
+
+                  {/* Category filter pills */}
+                  <div className="flex flex-wrap gap-2">
+                    {categoryFilters.map(({ value, label }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setActiveCategory(value)}
+                        className={[
+                          "rounded-full px-4 py-1.5 text-xs font-bold transition-colors",
+                          activeCategory === value
+                            ? "bg-green-800 text-white"
+                            : "bg-white text-stone-600 hover:bg-stone-200 outline outline-1 outline-stone-200",
+                        ].join(" ")}
+                        style={{ fontFamily: "var(--font-lexend)" }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
               {filteredFresh.length ? (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
