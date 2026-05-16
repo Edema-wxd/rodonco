@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 8 executing — Wave 0 in progress
-last_updated: "2026-05-09T00:00:00.000Z"
-last_activity: 2026-05-09
+stopped_at: Phase 8 complete — all 5 plans done, verified, human UAT pending
+last_updated: "2026-05-16T00:00:00.000Z"
+last_activity: 2026-05-16
 progress:
   total_phases: 9
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 41
-  completed_plans: 29
-  percent: 78
+  completed_plans: 34
+  percent: 89
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** Customers can browse, configure, and pay for weekly food prep orders in one smooth flow — with zero friction between browsing and checkout.
-**Current focus:** Phase 08 — missing-admin-structures
+**Current focus:** Phase 09 — next phase
 
 ## Current Position
 
-Phase: 8 — Executing (started 2026-05-09)
-Plan: 3/5 done
-Status: Wave 2 starting — prep list + manifest + pending page + bulk transition
-Last activity: 2026-05-10
+Phase: 8 — Complete (2026-05-16)
+Plan: 5/5 done
+Status: All waves complete — human UAT saved, code review filed
+Last activity: 2026-05-16
 
 Progress: [░░░░░░░░░░] 0%
 
