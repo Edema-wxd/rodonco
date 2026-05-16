@@ -2,25 +2,23 @@ const steps = [
   {
     number: "01",
     color: "text-red-700",
-    title: "Select Your Kits",
-    description:
-      "Choose from our rotating menu of Local-Global recipes. Every kit is pre-portioned for your household size.",
+    title: "Choose Your Ingredients",
+    description: "Browse fresh produce or ready-to-cook kits.",
     accent: "bg-red-700",
   },
   {
     number: "02",
     color: "text-green-800",
-    title: "Receive Fresh",
+    title: "Freshly Prepped",
     description:
-      "We deliver chilled, insulated boxes right to your doorstep. Ingredients are washed, chopped, and ready for action.",
+      "Your ingredients arrive cleaned, sorted, and ready for your selected prep style.",
     accent: "bg-green-800",
   },
   {
     number: "03",
     color: "text-red-400",
-    title: "Sizzle & Serve",
-    description:
-      "Follow our 4-step visual recipe cards. Heat the oil, toss in the rodo-base, and enjoy chef-quality dinner in minutes.",
+    title: "Cook Your Way",
+    description: "Spend less time prepping and more time actually cooking.",
     accent: "bg-red-400",
   },
 ] as const;
@@ -36,15 +34,14 @@ export function HowItWorks() {
               className="text-4xl font-black uppercase text-zinc-800"
               style={{ fontFamily: "var(--font-lexend)" }}
             >
-              Dinner,{" "}
-              <span className="text-green-800">Decoded.</span>
+              How It{" "}
+              <span className="text-green-800">Works</span>
             </h2>
             <p
               className="max-w-sm text-base leading-6 text-stone-600"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              Three simple steps from box to bowl. No chopping, no shopping,
-              just flavor.
+              Three simple steps to cut away the stress.
             </p>
           </div>
         </div>

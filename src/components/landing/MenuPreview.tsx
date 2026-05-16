@@ -41,14 +41,13 @@ export function MenuPreview() {
             className="text-5xl font-black text-zinc-800"
             style={{ fontFamily: "var(--font-lexend)" }}
           >
-            The Local-Global Menu
+            Ready for the Pot
           </h2>
           <p
             className="mt-4 text-base leading-6 text-stone-600"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Our chefs bridge the gap between traditional Nigerian soul food and
-            modern global convenience.
+            Check out our curated kits, prepped to make cooking easier.
           </p>
         </div>
 
@@ -119,14 +118,18 @@ export function MenuPreview() {
           ))}
         </div>
 
-        {/* Explore link */}
+        {/* CTA */}
         <div className="mt-16 flex justify-center">
           <Link
             href="/shop"
-            className="border-b-2 border-red-700 pb-0.5 text-sm font-black uppercase tracking-wider text-red-700"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            className="inline-flex items-center justify-center rounded-full bg-red-600 px-10 py-5 shadow-[0px_20px_25px_-5px_rgba(236,45,1,0.30)] transition-opacity hover:opacity-90"
           >
-            Explore Full 24-Meal Menu
+            <span
+              className="text-lg font-bold text-rose-50"
+              style={{ fontFamily: "var(--font-lexend)" }}
+            >
+              View All Products
+            </span>
           </Link>
         </div>
       </div>

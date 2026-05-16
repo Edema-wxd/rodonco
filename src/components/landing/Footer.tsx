@@ -42,7 +42,7 @@ export function Footer() {
               className="text-sm leading-6 text-zinc-500"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              &copy; 2024 rodo&amp;co. The Culinary Pulse of Nigeria.
+              &copy; 2025 rodo&amp;co. Your demure kitchen assistant.
             </p>
             {/* Social icons placeholder */}
             <div className="flex gap-4">

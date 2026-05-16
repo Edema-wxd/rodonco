@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 
 export function CleanPromise() {
   return (
@@ -38,54 +37,8 @@ export function CleanPromise() {
               className="max-w-lg text-xl leading-8 text-green-300/80"
               style={{ fontFamily: "var(--font-inter)" }}
             >
-              We partner with local farmers in Jos and Epe to bring you
-              pesticide-free produce harvested within 24 hours of delivery. No
-              preservatives, no MSG, no shortcuts.
+              Fresh ingredients. No preservatives. No MSG. No shortcuts. Just properly prepared ingredients ready for your kitchen.
             </p>
-
-            {/* Stats */}
-            <div className="flex gap-16 pt-4">
-              <div>
-                <p
-                  className="text-4xl font-black leading-10 text-lime-100"
-                  style={{ fontFamily: "var(--font-lexend)" }}
-                >
-                  100%
-                </p>
-                <p
-                  className="mt-2 text-sm font-normal uppercase tracking-wider text-lime-100/70"
-                  style={{ fontFamily: "var(--font-lexend)" }}
-                >
-                  Locally Sourced
-                </p>
-              </div>
-              <div>
-                <p
-                  className="text-4xl font-black leading-10 text-lime-100"
-                  style={{ fontFamily: "var(--font-lexend)" }}
-                >
-                  0
-                </p>
-                <p
-                  className="mt-2 text-sm font-normal uppercase tracking-wider text-lime-100/70"
-                  style={{ fontFamily: "var(--font-lexend)" }}
-                >
-                  Hidden Junk
-                </p>
-              </div>
-            </div>
-
-            <Link
-              href="/shop"
-              className="inline-flex w-fit items-center justify-center rounded-full bg-white px-10 py-5 transition-opacity hover:opacity-90"
-            >
-              <span
-                className="text-lg font-bold text-green-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
-              >
-                Read Our Sourcing Story
-              </span>
-            </Link>
           </div>
         </div>
       </div>

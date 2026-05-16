@@ -84,8 +84,7 @@ export function CartSidebar({
         <div className="flex-1 overflow-auto px-4 py-4">
           {items.length === 0 ? (
             <div className="rounded-xl border bg-white p-4">
-              <p className="text-sm font-medium text-black">Your cart is empty</p>
-              <p className="mt-1 text-sm text-black/70">Add items from the shop to get started.</p>
+              <p className="text-sm font-medium text-black">Let&apos;s fix your next meal together.</p>
             </div>
           ) : (
             <ul className="space-y-3">

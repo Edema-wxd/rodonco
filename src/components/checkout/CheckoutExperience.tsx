@@ -210,7 +210,7 @@ export function CheckoutExperience() {
           <Textarea
             id="allergy_notes"
             rows={2}
-            placeholder="Any allergies or special prep instructions?"
+            placeholder="No garlic? Less pepper? Tell us."
             {...register("allergy_notes")}
           />
         </div>
