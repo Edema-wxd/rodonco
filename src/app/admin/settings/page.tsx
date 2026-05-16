@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { ContactSettingsForm } from "@/components/admin/settings/ContactSettingsForm";
 import { DeliveryConfigForm } from "@/components/admin/settings/DeliveryConfigForm";
 import { OrderingToggle } from "@/components/admin/settings/OrderingToggle";
 import { ReminderForm } from "@/components/admin/settings/ReminderForm";
-import { getOrderingConfig } from "@/lib/admin/config";
+import { getOrderingConfig, getSiteSettings } from "@/lib/admin/config";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,10 @@ export default async function AdminSettingsPage() {
   const session = await auth();
   if (!session?.user) redirect("/admin");
 
-  const config = await getOrderingConfig();
+  const [config, siteSettings] = await Promise.all([
+    getOrderingConfig(),
+    getSiteSettings(),
+  ]);
 
   return (
     <div className="min-h-screen bg-stone-100 p-8">
@@ -38,6 +42,7 @@ export default async function AdminSettingsPage() {
           initialNextDeliveryDate={config.next_delivery_date}
           initialCutoffMessage={config.cutoff_message}
         />
+        <ContactSettingsForm initialSettings={siteSettings} />
       </div>
     </div>
   );

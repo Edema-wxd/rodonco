@@ -12,6 +12,24 @@ export type OrderingConfigRow = {
   updated_at: Date;
 };
 
+export type SiteSettingsRow = {
+  id: number;
+  whatsapp_number: string | null;
+  contact_email: string | null;
+  instagram_handle: string | null;
+  updated_at: Date;
+};
+
+export async function getSiteSettings(): Promise<SiteSettingsRow | null> {
+  const [row] = await db
+    .select()
+    .from(schema.site_settings)
+    .where(eq(schema.site_settings.id, 1))
+    .limit(1);
+
+  return row ?? null;
+}
+
 export async function getOrderingConfig(): Promise<OrderingConfigRow> {
   const [row] = await db
     .select()

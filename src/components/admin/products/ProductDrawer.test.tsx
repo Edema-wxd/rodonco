@@ -4,6 +4,10 @@ import { render, screen } from "@testing-library/react";
 
 vi.mock("@/utils/uploadthing", () => ({
   UploadButton: () => <button type="button">Upload</button>,
+  useUploadThing: () => ({
+    startUpload: vi.fn().mockResolvedValue([]),
+    isUploading: false,
+  }),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -19,8 +23,8 @@ function makeProduct(partial: Partial<AdminProduct> & Pick<AdminProduct, "id" | 
     name: partial.name,
     description: partial.description ?? null,
     type: partial.type ?? "fresh_produce",
-    image_url: partial.image_url ?? null,
     is_active: partial.is_active ?? true,
+    images: partial.images ?? [],
     variants: partial.variants ?? [],
     prep_options: partial.prep_options ?? [],
   };
@@ -35,10 +39,10 @@ describe("Admin products drawer (PROD-01..PROD-05)", () => {
     expect(screen.getByText("Active")).toBeTruthy();
   });
 
-  it("PROD-02: drawer renders image upload button wrapper", async () => {
+  it("PROD-02: drawer renders image upload section", async () => {
     render(<ProductsList initialProducts={[]} />);
     screen.getAllByText("+ New Product")[0]?.click();
-    expect(await screen.findByTestId("upload-button")).toBeTruthy();
+    expect(await screen.findByTestId("image-upload")).toBeTruthy();
   });
 
   it("PROD-03: variants useFieldArray add/remove controls render", async () => {
@@ -59,4 +63,3 @@ describe("Admin products drawer (PROD-01..PROD-05)", () => {
     expect(await screen.findByText("Active on shop")).toBeTruthy();
   });
 });
-

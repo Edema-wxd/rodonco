@@ -3,7 +3,12 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { productPayloadSchema } from "@/lib/admin/schemas";
 import { db } from "@/lib/db";
-import { product_prep_options, product_variants, products } from "../../../../../drizzle/schema";
+import {
+  product_images,
+  product_prep_options,
+  product_variants,
+  products,
+} from "../../../../../drizzle/schema";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -26,19 +31,24 @@ export async function POST(req: Request) {
     );
   }
 
-  const { name, description, type, image_url, is_active, variants, prep_options } = parsed.data;
+  const { name, description, type, is_active, images, variants, prep_options } = parsed.data;
+  const primaryImageUrl = images[0]?.url ?? null;
 
-  // neon-http transaction support is uncertain for interactive tx; use sequential statements.
   const [created] = await db
     .insert(products)
-    .values({
-      name,
-      description: description ?? null,
-      type,
-      image_url: image_url ?? null,
-      is_active,
-    })
+    .values({ name, description: description ?? null, type, image_url: primaryImageUrl, is_active })
     .returning({ id: products.id });
+
+  if (images.length > 0) {
+    await db.insert(product_images).values(
+      images.map((img, i) => ({
+        product_id: created.id,
+        url: img.url,
+        key: img.key,
+        sort_order: i,
+      })),
+    );
+  }
 
   if (variants.length > 0) {
     await db.insert(product_variants).values(
@@ -63,4 +73,3 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ id: created.id }, { status: 201 });
 }
-

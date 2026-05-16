@@ -63,6 +63,7 @@ export function Hero() {
               alt="Freshly prepped meal kit"
               width={584}
               height={584}
+              priority
               className="relative w-full max-w-[584px] rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] shadow-2xl object-cover"
               unoptimized
             />

@@ -20,6 +20,15 @@ const prepOptionSchema = z
   })
   .strict();
 
+const productImageSchema = z
+  .object({
+    id: z.string().uuid().optional(), // present for images already saved in DB
+    url: z.string().url(),
+    key: z.string().min(1), // UploadThing file key
+    sort_order: z.number().int().nonnegative(),
+  })
+  .strict();
+
 export const productPayloadSchema = z
   .object({
     name: z.string().min(1).max(120),
@@ -28,11 +37,8 @@ export const productPayloadSchema = z
       .nullable()
       .optional(),
     type: z.enum(["fresh_produce", "cooking_kit"]),
-    image_url: z
-      .preprocess(emptyStringToUndefined, z.string().url())
-      .nullable()
-      .optional(),
     is_active: z.boolean(),
+    images: z.array(productImageSchema).max(5).default([]),
     variants: z.array(variantSchema).max(20),
     prep_options: z.array(prepOptionSchema).max(20),
   })
@@ -61,6 +67,23 @@ export const orderingConfigPatchSchema = z
     (d) => Object.values(d).some((v) => v !== undefined),
     { message: "At least one field required" }
   );
+
+export const siteSettingsPatchSchema = z
+  .object({
+    whatsapp_number: z.string().max(20).nullable().optional(),
+    contact_email: z.preprocess(
+      emptyStringToUndefined,
+      z.string().email("Must be a valid email").nullable().optional(),
+    ),
+    instagram_handle: z.string().max(50).nullable().optional(),
+  })
+  .strict()
+  .refine(
+    (d) => Object.values(d).some((v) => v !== undefined),
+    { message: "At least one field required" },
+  );
+
+export type SiteSettingsPatch = z.infer<typeof siteSettingsPatchSchema>;
 
 export const bulkStatusTransitionSchema = z
   .object({

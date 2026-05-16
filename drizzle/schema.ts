@@ -20,6 +20,7 @@ export const products = pgTable("products", {
   name: text("name").notNull(),
   description: text("description"),
   type: text("type").notNull(), // 'fresh_produce' | 'cooking_kit'
+  category: text("category"), // 'vegetable' | 'tuber' | 'herb_spice' | 'legume' — null for kits
   image_url: text("image_url"),
   is_active: boolean("is_active").notNull().default(true),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -95,6 +96,31 @@ export const ordering_config = pgTable("ordering_config", {
   is_ordering_open: boolean("is_ordering_open").notNull().default(true),
   cutoff_message: text("cutoff_message"),
   next_delivery_date: date("next_delivery_date"),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ============================================================
+// PRODUCT IMAGES
+// ============================================================
+export const product_images = pgTable("product_images", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  product_id: uuid("product_id")
+    .notNull()
+    .references(() => products.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  key: text("key").notNull(), // UploadThing file key — needed to delete from bucket
+  sort_order: integer("sort_order").notNull().default(0),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ============================================================
+// SITE SETTINGS (single-row table — id always 1)
+// ============================================================
+export const site_settings = pgTable("site_settings", {
+  id: integer("id").primaryKey().default(1),
+  whatsapp_number: text("whatsapp_number"),
+  contact_email: text("contact_email"),
+  instagram_handle: text("instagram_handle"),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

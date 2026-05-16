@@ -9,7 +9,7 @@ export function CleanPromise() {
           <div className="flex justify-center lg:justify-start">
             <div className="relative">
               <Image
-                src="https://placehold.co/634x560"
+                src="/images/Our Farm.jpg"
                 alt="Locally sourced fresh produce"
                 width={634}
                 height={560}

@@ -54,7 +54,7 @@ describe("getActiveProductsWithStartingPriceForShop", () => {
     const from = vi.fn().mockReturnValue({ where });
     selectMock.mockReturnValueOnce({ from });
 
-    // 2) min-price aggregate query chain
+    // 2) min-price aggregate query chain (Promise.all slot 0)
     const groupBy = vi.fn().mockResolvedValue([
       { product_id: "p1", starting_price_ngn: 12_500 },
       { product_id: "p2", starting_price_ngn: 20_000 },
@@ -62,6 +62,12 @@ describe("getActiveProductsWithStartingPriceForShop", () => {
     const where2 = vi.fn().mockReturnValue({ groupBy });
     const from2 = vi.fn().mockReturnValue({ where: where2 });
     selectMock.mockReturnValueOnce({ from: from2 });
+
+    // 3) product images query chain (Promise.all slot 1)
+    const orderBy3 = vi.fn().mockResolvedValue([]);
+    const where3 = vi.fn().mockReturnValue({ orderBy: orderBy3 });
+    const from3 = vi.fn().mockReturnValue({ where: where3 });
+    selectMock.mockReturnValueOnce({ from: from3 });
 
     const rows = await getActiveProductsWithStartingPriceForShop();
     expect(rows).toHaveLength(2);
@@ -101,6 +107,12 @@ describe("getActiveProductsWithStartingPriceForShop", () => {
     const where2 = vi.fn().mockReturnValue({ groupBy });
     const from2 = vi.fn().mockReturnValue({ where: where2 });
     selectMock.mockReturnValueOnce({ from: from2 });
+
+    // images query (Promise.all slot 1)
+    const orderBy3 = vi.fn().mockResolvedValue([]);
+    const where3 = vi.fn().mockReturnValue({ orderBy: orderBy3 });
+    const from3 = vi.fn().mockReturnValue({ where: where3 });
+    selectMock.mockReturnValueOnce({ from: from3 });
 
     const rows = await getActiveProductsWithStartingPriceForShop();
     expect(rows.find((p) => p.id === "p1")?.starting_price_ngn).toBe(12_500);

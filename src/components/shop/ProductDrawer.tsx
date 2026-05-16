@@ -172,6 +172,17 @@ export function ProductDrawer({
 
           <div className="flex-1 overflow-auto px-4 py-4">
             <div className="space-y-6">
+              {product.images.length > 0 && (
+                <div className="overflow-hidden rounded-2xl bg-stone-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={product.images[0].url}
+                    alt={product.name}
+                    loading="lazy"
+                    className="h-52 w-full object-cover"
+                  />
+                </div>
+              )}
               {isKit ? (
                 <section>
                   <h3 className="text-sm font-semibold text-black">Choose a size</h3>

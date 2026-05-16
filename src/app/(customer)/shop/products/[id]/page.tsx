@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ProductImageCarousel } from "@/components/shop/ProductImageCarousel";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { getProductDetailsById } from "@/lib/shop/productDetails";
 
@@ -43,7 +44,6 @@ export default async function ProductPage({
     );
   }
 
-  const imageSrc = details.product.image_url ?? "/logo.svg";
   const hasChoices = details.variants.length > 0 || details.prepOptions.length > 0;
 
   return (
@@ -61,8 +61,11 @@ export default async function ProductPage({
 
         <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
           <div className="overflow-hidden rounded-[32px] bg-white outline outline-1 outline-stone-200/50">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imageSrc} alt={details.product.name} className="h-[420px] w-full object-cover" />
+            <ProductImageCarousel
+              images={details.product.images}
+              alt={details.product.name}
+              className="h-[420px] w-full"
+            />
           </div>
 
           <div>

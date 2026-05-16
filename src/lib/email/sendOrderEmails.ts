@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { render } from "@react-email/components";
+import { render } from "react-email";
 import React from "react";
 
 import { resend } from "./resendClient";

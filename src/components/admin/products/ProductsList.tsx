@@ -81,11 +81,12 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
                   onClick={() => setEditing(p)}
                 >
                   <td className="px-6 py-4">
-                    {p.image_url ? (
+                    {p.images[0] ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={p.image_url}
+                        src={p.images[0].url}
                         alt=""
+                        loading="lazy"
                         className="h-12 w-12 rounded-2xl border border-stone-100 object-cover"
                       />
                     ) : (

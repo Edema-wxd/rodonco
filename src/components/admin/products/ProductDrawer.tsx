@@ -16,8 +16,8 @@ const EMPTY_DEFAULTS: ProductPayload = {
   name: "",
   description: null,
   type: "fresh_produce",
-  image_url: null,
   is_active: true,
+  images: [],
   variants: [],
   prep_options: [],
 };
@@ -58,8 +58,13 @@ export function ProductDrawer({
             name: product.name,
             description: product.description ?? null,
             type: product.type as ProductPayload["type"],
-            image_url: product.image_url ?? null,
             is_active: product.is_active,
+            images: product.images.map((img) => ({
+              id: img.id,
+              url: img.url,
+              key: img.key,
+              sort_order: img.sort_order,
+            })),
             variants: product.variants.map((v) => ({
               id: v.id,
               label: v.label,

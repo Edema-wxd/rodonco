@@ -22,20 +22,27 @@ export function ProductCard({
   product: Product;
   startingPriceNgn: number;
 }) {
-  const imageSrc = product.image_url ?? "/logo.svg";
+  const primaryImage = product.images[0]?.url ?? product.image_url;
   const typeBadge = productTypeLabel(product.type);
 
   return (
     <div className="group overflow-hidden rounded-[32px] bg-white outline outline-1 outline-stone-200/50 transition-shadow hover:shadow-md">
       <Link href={`/shop/products/${product.id}`} className="block overflow-hidden">
-        <div className="relative h-64 overflow-hidden bg-stone-200">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={imageSrc}
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
+        <div className="relative h-64 overflow-hidden bg-stone-100">
+          {primaryImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={primaryImage}
+              alt={product.name}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.svg" alt="" className="h-16 w-auto opacity-15" />
+            </div>
+          )}
 
           <div className="absolute left-4 top-4 flex gap-2">
             <span

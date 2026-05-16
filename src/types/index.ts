@@ -5,12 +5,17 @@
 // ── Products ──
 export type ProductType = "fresh_produce" | "cooking_kit";
 
+export interface ProductImage {
+  url: string;
+}
+
 export interface Product {
   id: string;
   name: string;
   description: string | null;
   type: ProductType;
   image_url: string | null;
+  images: ProductImage[];
   is_active: boolean;
   created_at: string;
 }

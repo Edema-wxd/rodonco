@@ -29,6 +29,7 @@ export function Navbar() {
             alt="rodo&co"
             width={111}
             height={31}
+            priority
             className="h-8 w-auto"
           />
         </Link>

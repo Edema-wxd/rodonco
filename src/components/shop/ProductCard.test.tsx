@@ -40,6 +40,7 @@ function makeProduct(partial: Partial<Product> & Pick<Product, "id" | "name">): 
     description: partial.description ?? null,
     type: partial.type ?? "fresh_produce",
     image_url: partial.image_url ?? null,
+    images: partial.images ?? [],
     is_active: partial.is_active ?? true,
     created_at: partial.created_at ?? new Date(0).toISOString(),
   };

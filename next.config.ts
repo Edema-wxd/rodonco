@@ -32,11 +32,11 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               // Next.js 15 App Router requires unsafe-inline + unsafe-eval for inline scripts.
               // Tighten with nonce-based CSP post-launch.
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.paystack.co",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.paystack.co https://va.vercel-scripts.com",
               "style-src 'self' 'unsafe-inline'",
               // utfs.io = UploadThing CDN for product images (Phase 4)
               "img-src 'self' blob: data: https://utfs.io",
-              "connect-src 'self' https://api.paystack.co https://api.resend.com",
+              "connect-src 'self' https://api.paystack.co https://api.resend.com https://uploadthing.com https://*.ingest.uploadthing.com",
               // Paystack inline popup loads in a frame
               "frame-src https://js.paystack.co",
               "object-src 'none'",

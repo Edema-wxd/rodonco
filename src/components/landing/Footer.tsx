@@ -31,6 +31,7 @@ export function Footer() {
               width={111}
               height={63}
               className="h-8 w-auto"
+              unoptimized
             />
             <p
               className="text-xl font-black uppercase text-zinc-900"

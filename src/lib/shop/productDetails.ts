@@ -26,7 +26,7 @@ export async function getProductDetailsById(productId: string): Promise<ProductD
 
   if (!productRow) return null;
 
-  const [variantRows, prepRows] = await Promise.all([
+  const [variantRows, prepRows, imageRows] = await Promise.all([
     db
       .select()
       .from(schema.product_variants)
@@ -37,6 +37,11 @@ export async function getProductDetailsById(productId: string): Promise<ProductD
       .from(schema.product_prep_options)
       .where(eq(schema.product_prep_options.product_id, productId))
       .orderBy(asc(schema.product_prep_options.label)),
+    db
+      .select({ url: schema.product_images.url })
+      .from(schema.product_images)
+      .where(eq(schema.product_images.product_id, productId))
+      .orderBy(asc(schema.product_images.sort_order)),
   ]);
 
   return {
@@ -46,6 +51,7 @@ export async function getProductDetailsById(productId: string): Promise<ProductD
       description: productRow.description ?? null,
       type: productRow.type as Product["type"],
       image_url: productRow.image_url ?? null,
+      images: imageRows.map((r) => ({ url: r.url })),
       is_active: productRow.is_active,
       created_at: toIsoString(productRow.created_at),
     },
@@ -64,4 +70,3 @@ export async function getProductDetailsById(productId: string): Promise<ProductD
     })),
   };
 }
-
