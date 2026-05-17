@@ -12,15 +12,15 @@ A 3-week build delivering a complete food-prep ordering platform for the Nigeria
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - DB schema, env config, Supabase clients, Zustand cart store with SSR hydration guard, and @drawer slot skeleton
+- [x] **Phase 1: Foundation** - DB schema, env config, Neon/Drizzle clients, Zustand cart store with SSR hydration guard, and @drawer slot skeleton (completed 2026-05-17)
 - [x] **Phase 2: Static Shop UI** - Landing page, shop product grid, product cards — fully server-rendered with placeholder data (completed 2026-04-30)
-- [ ] **Phase 2.1: Migrate Supabase to Neon and Uploadthing** (INSERTED) - Swap database to Neon serverless Postgres, auth to Neon Auth, and media storage to Uploadthing
-- [ ] **Phase 3: Interactive Shop** - Product drawer (parallel route), cart sidebar, live price recalculation, and cutoff enforcement in UI
-- [ ] **Phase 4: Admin Panel** - Auth guard, orders table, product CRUD, analytics dashboard, and manual ordering-config toggle
-- [ ] **Phase 5: Payments + Email** - Paystack inline popup, webhook handler, order creation, Resend confirmation and admin-alert emails, order confirmation page
+- [x] **Phase 2.1: Migrate Supabase to Neon and Uploadthing** (INSERTED) - Swap database to Neon serverless Postgres, auth to NextAuth v5, and media storage to Uploadthing (completed 2026-05-17)
+- [x] **Phase 3: Interactive Shop** - Product drawer (parallel route), cart sidebar, live price recalculation, and cutoff enforcement in UI (completed 2026-05-17)
+- [x] **Phase 4: Admin Panel** - Auth guard, orders table, product CRUD, analytics dashboard, and manual ordering-config toggle (completed 2026-05-17)
+- [x] **Phase 5: Payments + Email** - Paystack inline popup, webhook handler, order creation, Resend confirmation and admin-alert emails, order confirmation page (completed 2026-05-17)
 - [x] **Phase 6: Automation + Launch** - Vercel Cron cutoff job, delivery reminder emails, pre-launch key swap, and go-live hardening (completed 2026-05-04)
 - [x] **Phase 7: Missing Pages + Route Completeness** (INSERTED) - Global 404 page, Privacy/Terms/Cookie Policy legal pages, dedicated Plans page, and Footer dead-link cleanup (completed 2026-05-07)
-- [ ] **Phase 8: Missing Admin Structures** (INSERTED) - Weekly prep/packing list, delivery manifest, customer search, analytics week picker, ordering config week management, pending order visibility, and bulk status transitions
+- [x] **Phase 8: Missing Admin Structures** (INSERTED) - Weekly prep/packing list, delivery manifest, customer search, analytics week picker, ordering config week management, pending order visibility, and bulk status transitions (completed 2026-05-16)
 
 ## Phase Details
 
@@ -36,9 +36,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. `.env.local.example` documents all required variables; `.env.local` is confirmed in `.gitignore`
 **Plans:** 3 plans
 Plans:
-- [ ] 01-01-PLAN.md — Install npm deps, shadcn init, TypeScript types, env docs
-- [ ] 01-02-PLAN.md — Supabase DB migration with RLS, seed, three client files
-- [ ] 01-03-PLAN.md — Zustand cart store, hydration hook, route skeleton, Navbar
+- [x] 01-01-PLAN.md — Install npm deps, shadcn init, TypeScript types, env docs
+- [x] 01-02-PLAN.md — DB migration with RLS, seed, three client files
+- [x] 01-03-PLAN.md — Zustand cart store, hydration hook, route skeleton, Navbar
 
 ### Phase 2: Static Shop UI
 **Goal**: A visitor can open the site, read the landing page, browse the shop product grid, and see individual product cards — all server-rendered from real DB data, with no cart interaction yet
@@ -69,7 +69,7 @@ Plans:
 - [x] 02.1-01-PLAN.md — Install Drizzle + Neon packages, declare all 7 tables in schema.ts, push schema to Neon, smoke test connectivity
 - [x] 02.1-02-PLAN.md — NextAuth v5 config (auth.ts), route handler, middleware (middleware.ts), seed-admin.ts script
 - [x] 02.1-03-PLAN.md — Uploadthing v7 FileRouter (core.ts, route.ts), typed client helpers, NextSSRPlugin in root layout
-- [x] 02.1-04-PLAN.md — Uninstall @supabase/* packages, delete lib/supabase/*.ts files, update env.d.ts + .env.local.example
+- [x] 02.1-04-PLAN.md — Uninstall @supabase/* packages, delete lib/supabase/*.ts files, update env.d.ts + .env.local.example (confirmed: no @supabase packages in package.json)
 
 ### Phase 3: Interactive Shop
 **Goal**: A customer can open a product drawer, configure quantity and prep options (or size for kits), see the price update live, add to cart, view and edit their cart in a sidebar, and be blocked from adding items when the ordering window is closed
@@ -81,7 +81,7 @@ Plans:
   3. Cart state persists to `localStorage` and survives page refresh; the cart icon badge shows the correct item count after hydration without a React hydration error
   4. Cart sidebar opens from anywhere in the app, lists items with quantities and subtotal, and `Free delivery on Saturdays` note; items can be incremented, decremented, and removed
   5. When `is_ordering_open = false`, the Add to Cart button in the drawer is disabled and shows a tooltip; no item can be added to cart during a closed window
-**Plans**: TBD
+**Plans**: Complete (ProductDrawer, CartSidebar, @drawer parallel route, cart store wired, cutoff enforcement)
 **UI hint**: yes
 
 ### Phase 4: Admin Panel
@@ -94,7 +94,7 @@ Plans:
   3. Admin can create a new product, upload an image (stored in Supabase Storage `products` bucket), add size variants, add prep options, set pricing in kobo, and toggle `is_active` — all changes are immediately reflected on the shop page
   4. Analytics page shows: total orders for the current week, total revenue in NGN, top 5 products by quantity, and order status breakdown — all sourced directly from DB queries
   5. Admin can toggle `is_ordering_open` in `ordering_config` from the dashboard; every ordering-state check across the app reads this value on each request with no caching
-**Plans**: TBD
+**Plans**: Complete (NextAuth v5 credentials, middleware guard, orders table, product CRUD with Uploadthing, analytics, ordering-config toggle)
 **UI hint**: yes
 
 ### Phase 5: Payments + Email
@@ -116,9 +116,9 @@ Plans:
 - [x] 05-03-PLAN.md — `POST /api/orders/init` pending order + Paystack initialize (`CHKT-04`)
 - [x] 05-04-PLAN.md — Paystack webhook HMAC + `paid` transition + Resend emails (`CHKT-06`, `CHKT-07`, `NOTF-02`, `NOTF-03`)
 - [x] 05-05-PLAN.md — Order confirmation `/order/[ref]` (`CONF-01`–`CONF-03`)
-- [ ] 05-06-PLAN.md — Gap closure: render `order.customer_name` on confirmation (`CONF-02`)
-- [ ] 05-07-PLAN.md — Gap closure: webhook amount mismatch guard (`CHKT-06`)
-- [ ] 05-08-PLAN.md — Gap closure: DB-authoritative pricing in init route (`CHKT-04`)
+- [x] 05-06-PLAN.md — Gap closure: render `order.customer_name` on confirmation (`CONF-02`) (confirmed: OrderConfirmationView renders customer_name)
+- [x] 05-07-PLAN.md — Gap closure: webhook amount mismatch guard (`CHKT-06`) (confirmed: lines 120-128 in webhook route)
+- [x] 05-08-PLAN.md — Gap closure: DB-authoritative pricing in init route (`CHKT-04`) (confirmed: implemented)
 
 ### Phase 6: Automation + Launch
 **Goal**: The ordering window closes automatically every Thursday at 22:59 UTC via Vercel Cron, admin can trigger bulk delivery reminder emails, and the platform passes a pre-launch hardening checklist — live Paystack keys wired, environment assertions in place, and the webhook URL registered in the Paystack live dashboard
@@ -224,12 +224,12 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Planning complete | - |
-| 2. Static Shop UI | 3/3 | Complete   | 2026-04-30 |
-| 2.1 Migrate Supabase to Neon + Uploadthing | 3/4 | In Progress|  |
-| 3. Interactive Shop | 0/TBD | Not started | - |
-| 4. Admin Panel | 0/TBD | Not started | - |
-| 5. Payments + Email | 0/5 | Planning complete | - |
+| 1. Foundation | 3/3 | Complete | 2026-05-17 |
+| 2. Static Shop UI | 3/3 | Complete | 2026-04-30 |
+| 2.1 Migrate Supabase to Neon + Uploadthing | 4/4 | Complete | 2026-05-17 |
+| 3. Interactive Shop | Complete | Complete | 2026-05-17 |
+| 4. Admin Panel | Complete | Complete | 2026-05-17 |
+| 5. Payments + Email | 8/8 | Complete | 2026-05-17 |
 | 6. Automation + Launch | 4/4 | Complete | 2026-05-04 |
 | 7. Missing Pages + Route Completeness | 3/3 | Complete | 2026-05-07 |
 | 8. Missing Admin Structures | 5/5 | Complete | 2026-05-16 |
