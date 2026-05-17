@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { auth } from "@/auth";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminShell } from "@/components/admin/AdminShell";
 import { getPendingOrdersCount } from "@/lib/admin/pendingOrders";
 
 export const dynamic = "force-dynamic";
@@ -19,9 +19,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const pendingCount = await getPendingOrdersCount();
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar adminEmail={session.user.email ?? null} pendingCount={pendingCount} />
-      <main className="flex-1 overflow-y-auto print:w-full">{children}</main>
-    </div>
+    <AdminShell adminEmail={session.user.email ?? null} pendingCount={pendingCount}>
+      {children}
+    </AdminShell>
   );
 }

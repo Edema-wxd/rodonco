@@ -41,7 +41,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
       </div>
 
       {/* Table card */}
-      <div className="overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white shadow-sm outline outline-1 outline-stone-200/60">
+      <div className="overflow-x-auto overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white shadow-sm outline outline-1 outline-stone-200/60">
         {rows.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
             <Package className="h-8 w-8 text-stone-300" />

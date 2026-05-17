@@ -21,8 +21,8 @@ export default async function AdminPrepListPage({
   const rows = await getPrepList(weekOf);
 
   return (
-    <div className="min-h-screen bg-stone-100 p-8">
-      <div className="mb-8">
+    <div className="min-h-screen bg-stone-100 p-4 sm:p-8">
+      <div className="mb-6 sm:mb-8">
         <p
           className="text-sm font-black uppercase tracking-wider text-red-600"
           style={{ fontFamily: "var(--font-lexend)" }}
@@ -30,7 +30,7 @@ export default async function AdminPrepListPage({
           Admin
         </p>
         <h1
-          className="mt-2 text-5xl font-black leading-[1.05] text-zinc-800"
+          className="mt-2 text-3xl font-black leading-[1.05] text-zinc-800 sm:text-5xl"
           style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Prep List

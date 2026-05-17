@@ -1,14 +1,24 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function AdminLogin() {
-  const [error, setError] = React.useState<string | null>(null);
+export function AdminLogin({
+  sessionExpired = false,
+  authError = false,
+}: {
+  sessionExpired?: boolean;
+  authError?: boolean;
+}) {
+  const router = useRouter();
+  const [error, setError] = React.useState<string | null>(
+    authError ? "Invalid email or password. Please try again." : null,
+  );
   const [pending, setPending] = React.useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -20,32 +30,70 @@ export function AdminLogin() {
     const email = String(fd.get("email") ?? "").trim();
     const password = String(fd.get("password") ?? "");
 
-    const result = (await signIn("credentials", {
-      email,
-      password,
-      redirectTo: "/admin/orders",
-    })) as unknown as { error?: string } | undefined;
+    // redirect: false returns a result object instead of redirecting on both
+    // success and failure — this lets us show inline errors without a page reload.
+    const result = await signIn("credentials", { email, password, redirect: false });
 
-    if (result?.error) {
+    if (!result?.ok) {
       setError("Invalid email or password. Please try again.");
       setPending(false);
+      return;
     }
+
+    router.push("/admin/orders");
+    router.refresh();
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+    <main className="flex min-h-screen items-center justify-center bg-stone-100 p-4">
       <form
         onSubmit={handleSubmit}
         aria-labelledby="admin-login-heading"
-        className="w-full max-w-sm rounded-xl border bg-white p-8 shadow-sm"
+        className="w-full max-w-sm rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] border border-stone-200/60 bg-white p-8 shadow-sm"
       >
-        <h1 id="admin-login-heading" className="text-xl font-semibold text-gray-900">
-          Sign in
+        {/* Brand mark */}
+        <div className="mb-6">
+          <p
+            className="text-[10px] font-black uppercase tracking-widest text-stone-400"
+            style={{ fontFamily: "var(--font-lexend)" }}
+          >
+            Admin
+          </p>
+          <p
+            className="mt-0.5 text-2xl font-black leading-tight text-zinc-800"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            rodo<span className="text-red-600">&</span>co
+          </p>
+        </div>
+
+        <h1
+          id="admin-login-heading"
+          className="text-base font-bold text-zinc-800"
+          style={{ fontFamily: "var(--font-lexend)" }}
+        >
+          Sign in to continue
         </h1>
 
-        <div className="mt-6 space-y-4">
+        {sessionExpired && !error ? (
+          <p
+            role="alert"
+            className="mt-3 rounded-xl bg-amber-50 px-3 py-2.5 text-sm text-amber-700"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Your session expired after 24 hours. Please sign in again.
+          </p>
+        ) : null}
+
+        <div className="mt-5 space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email address</Label>
+            <Label
+              htmlFor="email"
+              className="text-xs font-black uppercase tracking-wider text-stone-400"
+              style={{ fontFamily: "var(--font-lexend)" }}
+            >
+              Email address
+            </Label>
             <Input
               id="email"
               name="email"
@@ -57,7 +105,13 @@ export function AdminLogin() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
+            <Label
+              htmlFor="password"
+              className="text-xs font-black uppercase tracking-wider text-stone-400"
+              style={{ fontFamily: "var(--font-lexend)" }}
+            >
+              Password
+            </Label>
             <Input
               id="password"
               name="password"
@@ -68,12 +122,21 @@ export function AdminLogin() {
             />
           </div>
 
-          <Button type="submit" disabled={pending} className="w-full">
+          <button
+            type="submit"
+            disabled={pending}
+            className="w-full rounded-full bg-red-600 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+            style={{ fontFamily: "var(--font-lexend)" }}
+          >
             {pending ? "Signing in…" : "Sign in"}
-          </Button>
+          </button>
 
           {error ? (
-            <p role="alert" className="text-sm text-destructive">
+            <p
+              role="alert"
+              className="rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-700"
+              style={{ fontFamily: "var(--font-inter)" }}
+            >
               {error}
             </p>
           ) : null}
@@ -82,4 +145,3 @@ export function AdminLogin() {
     </main>
   );
 }
-

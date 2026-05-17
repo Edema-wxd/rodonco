@@ -15,6 +15,9 @@ declare module "next-auth" {
   }
 }
 
+// Sessions and JWT tokens expire after 24 hours.
+const SESSION_MAX_AGE = 24 * 60 * 60;
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
@@ -59,8 +62,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: SESSION_MAX_AGE,
+  },
+  jwt: {
+    maxAge: SESSION_MAX_AGE,
+  },
+  // Route NextAuth errors back to the admin login page rather than the
+  // default /api/auth/error page, so users always see a branded form.
+  pages: {
+    signIn: "/admin",
+    error: "/admin",
+  },
   callbacks: {
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
     session: async ({ session, token }) => {
       if (session.user && token.sub) {
         session.user.id = token.sub;

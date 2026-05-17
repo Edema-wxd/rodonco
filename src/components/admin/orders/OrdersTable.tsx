@@ -62,7 +62,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
   return (
     <div className="space-y-6">
       {/* Filters + Export */}
-      <div className="flex flex-wrap items-end gap-4">
+      <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="customer-search"
@@ -75,7 +75,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
             id="customer-search"
             type="search"
             placeholder="Name, phone, or email"
-            className="h-10 w-56 rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+            className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 sm:w-56"
             style={{ fontFamily: "var(--font-inter)" }}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -93,7 +93,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
           <select
             id="status-filter"
             aria-label="Status"
-            className="h-10 w-44 rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+            className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 sm:w-44"
             style={{ fontFamily: "var(--font-inter)" }}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -116,14 +116,14 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
           <input
             id="week-filter"
             type="date"
-            className="h-10 w-44 rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+            className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 sm:w-44"
             style={{ fontFamily: "var(--font-inter)" }}
             value={weekFilter}
             onChange={(e) => setWeekFilter(e.target.value)}
           />
         </div>
 
-        <div className="ml-auto">
+        <div className="sm:ml-auto">
           <button
             type="button"
             onClick={exportCsv}
@@ -155,20 +155,27 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
             </p>
           </div>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-stone-100">
-                {["Reference", "Customer", "Phone", "Date", "Status", "Total (NGN)", ""].map(
-                  (h) => (
+                {[
+                  { label: "Reference", mobile: true },
+                  { label: "Customer", mobile: true },
+                  { label: "Phone", mobile: false },
+                  { label: "Date", mobile: false },
+                  { label: "Status", mobile: true },
+                  { label: "Total (NGN)", mobile: true },
+                  { label: "", mobile: true },
+                ].map(({ label, mobile }) => (
                     <th
-                      key={h}
-                      className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400 last:text-right"
+                      key={label}
+                      className={`px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400 last:text-right${mobile ? "" : " hidden sm:table-cell"}`}
                       style={{ fontFamily: "var(--font-lexend)" }}
                     >
-                      {h}
+                      {label}
                     </th>
-                  ),
-                )}
+                  ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-50">
@@ -182,6 +189,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

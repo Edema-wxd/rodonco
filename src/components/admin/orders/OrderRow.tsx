@@ -57,14 +57,14 @@ export function OrderRow({
         </td>
 
         <td
-          className="px-6 py-4 text-sm text-stone-500"
+          className="hidden px-6 py-4 text-sm text-stone-500 sm:table-cell"
           style={{ fontFamily: "var(--font-inter)" }}
         >
           {order.customer_phone}
         </td>
 
         <td
-          className="px-6 py-4 text-sm text-stone-500"
+          className="hidden px-6 py-4 text-sm text-stone-500 sm:table-cell"
           style={{ fontFamily: "var(--font-inter)" }}
         >
           {new Date(order.created_at).toLocaleDateString("en-NG")}

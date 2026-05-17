@@ -9,9 +9,12 @@ export default async function middleware(req: NextRequest) {
 
   if (isAdminRoute && !isAdminLanding) {
     // Cryptographically verify the session JWT (prevents forged cookie-name bypass).
+    // getToken returns null for missing or expired tokens.
     const token = await getToken({ req, secret: process.env.AUTH_SECRET });
     if (!token) {
-      return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
+      const loginUrl = new URL("/admin", req.nextUrl.origin);
+      loginUrl.searchParams.set("expired", "1");
+      return NextResponse.redirect(loginUrl);
     }
   }
 

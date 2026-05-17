@@ -48,16 +48,23 @@ export function PendingOrdersTable({ orders }: { orders: AdminOrder[] }) {
 
   return (
     <div className="overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white shadow-sm outline outline-1 outline-stone-200/60">
+      <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-stone-100">
-            {["Reference", "Customer", "Phone", "Date", ""].map((h) => (
+            {[
+              { label: "Reference", mobile: true },
+              { label: "Customer", mobile: true },
+              { label: "Phone", mobile: false },
+              { label: "Date", mobile: false },
+              { label: "", mobile: true },
+            ].map(({ label, mobile }) => (
               <th
-                key={h}
-                className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400 last:text-right"
+                key={label}
+                className={`px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400 last:text-right${mobile ? "" : " hidden sm:table-cell"}`}
                 style={{ fontFamily: "var(--font-lexend)" }}
               >
-                {h}
+                {label}
               </th>
             ))}
           </tr>
@@ -78,13 +85,13 @@ export function PendingOrdersTable({ orders }: { orders: AdminOrder[] }) {
                 {order.customer_name || "—"}
               </td>
               <td
-                className="px-6 py-3 text-stone-500"
+                className="hidden px-6 py-3 text-stone-500 sm:table-cell"
                 style={{ fontFamily: "var(--font-inter)" }}
               >
                 {order.customer_phone || "—"}
               </td>
               <td
-                className="px-6 py-3 text-stone-500"
+                className="hidden px-6 py-3 text-stone-500 sm:table-cell"
                 style={{ fontFamily: "var(--font-inter)" }}
               >
                 {new Date(order.created_at).toLocaleDateString("en-NG", {
@@ -110,6 +117,7 @@ export function PendingOrdersTable({ orders }: { orders: AdminOrder[] }) {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

@@ -20,8 +20,8 @@ export default async function AdminManifestPage({
   const orders = await getManifestOrders(weekOf);
 
   return (
-    <div className="min-h-screen bg-stone-100 p-8">
-      <div className="mb-8 print:mb-4">
+    <div className="min-h-screen bg-stone-100 p-4 sm:p-8">
+      <div className="mb-6 sm:mb-8 print:mb-4">
         <p
           className="text-sm font-black uppercase tracking-wider text-red-600 print:hidden"
           style={{ fontFamily: "var(--font-lexend)" }}
@@ -29,7 +29,7 @@ export default async function AdminManifestPage({
           Admin
         </p>
         <h1
-          className="mt-2 text-5xl font-black leading-[1.05] text-zinc-800 print:text-3xl"
+          className="mt-2 text-3xl font-black leading-[1.05] text-zinc-800 sm:text-5xl print:text-3xl"
           style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Delivery Manifest
