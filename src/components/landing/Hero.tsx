@@ -4,7 +4,7 @@ import Link from "next/link";
 export function Hero() {
   return (
     <section className="bg-stone-100 overflow-hidden">
-      <div className="mx-auto max-w-7xl px-8 pt-24 pb-0 lg:pt-28">
+      <div className="mx-auto max-w-7xl px-8 pt-8 pb-0 lg:pt-28">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:gap-8 items-start">
           {/* Left — text content */}
           <div className="flex flex-col items-start gap-8 pt-8">
@@ -38,10 +38,10 @@ export function Hero() {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="flex flex-wrap items-center gap-4 pt-2 justify-center sm:justify-start w-full">
               <Link
                 href="/shop"
-                className="relative inline-flex items-center justify-center rounded-full bg-red-600 px-10 py-5 shadow-[0px_20px_25px_-5px_rgba(236,45,1,0.30)] transition-opacity hover:opacity-90"
+                className="relative inline-flex items-center justify-center rounded-full bg-red-600 px-10 py-5 shadow-[0px_20px_25px_-5px_rgba(236,45,1,0.30)] transition-all duration-200 hover:-translate-y-1 hover:bg-red-500 hover:shadow-[0px_28px_32px_-5px_rgba(236,45,1,0.40)] active:translate-y-0 active:scale-[0.97] active:shadow-[0px_10px_15px_-5px_rgba(236,45,1,0.30)]"
               >
                 <span
                   className="text-lg font-bold text-rose-50"
@@ -51,6 +51,7 @@ export function Hero() {
                 </span>
               </Link>
             </div>
+       
           </div>
 
           {/* Right — hero image */}

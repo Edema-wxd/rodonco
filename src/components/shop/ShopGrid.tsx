@@ -13,7 +13,7 @@ export default async function ShopGrid() {
   const cookingKits = products.filter((p) => p.type === "cooking_kit");
 
   return (
-    <section className="bg-stone-100 py-24 sm:py-28">
+    <section className="bg-stone-100 py-8 sm:py-28">
       <OrderingClosedBanner
         isOpen={ordering.is_ordering_open}
         cutoffMessage={ordering.cutoff_message}

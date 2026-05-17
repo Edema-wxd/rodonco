@@ -1,3 +1,7 @@
+"use client";
+
+import { useRef, useState } from "react";
+
 const steps = [
   {
     number: "01",
@@ -24,6 +28,16 @@ const steps = [
 ] as const;
 
 export function HowItWorks() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  function handleScroll() {
+    const el = scrollRef.current;
+    if (!el) return;
+    const index = Math.round(el.scrollLeft / el.offsetWidth);
+    setActiveIndex(index);
+  }
+
   return (
     <section id="how-it-works" className="overflow-hidden bg-stone-100 py-32">
       <div className="mx-auto max-w-7xl px-8">
@@ -46,12 +60,27 @@ export function HowItWorks() {
           </div>
         </div>
 
-        {/* Step cards */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {/* Step cards — swipe on mobile, grid on md+ */}
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="
+            -mx-8 flex snap-x snap-mandatory overflow-x-auto scroll-smooth px-8
+            scrollbar-none
+            md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0
+          "
+          style={{ scrollbarWidth: "none" }}
+        >
           {steps.map((step, i) => (
             <div
               key={step.number}
-              className="relative rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-white p-12 shadow-sm outline outline-1 outline-white/50"
+              className="
+                mr-6 w-[85vw] flex-none snap-center
+                rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px]
+                bg-white p-12 shadow-sm outline outline-1 outline-white/50
+                last:mr-0
+                md:mr-0 md:w-auto md:flex-auto
+              "
             >
               <span
                 className={`text-6xl font-black leading-none opacity-20 ${step.color}`}
@@ -72,7 +101,7 @@ export function HowItWorks() {
                 {step.description}
               </p>
               {/* Progress indicator */}
-              <div className="mt-10 flex items-center gap-2">
+              <div className="hidden mt-10 md:flex items-center gap-2">
                 {steps.map((s, j) => (
                   <div
                     key={j}
@@ -81,6 +110,27 @@ export function HowItWorks() {
                 ))}
               </div>
             </div>
+          ))}
+        </div>
+
+        {/* Mobile dot navigation */}
+        <div className="mt-6 flex justify-center gap-2 md:hidden">
+          {steps.map((step, i) => (
+            <button
+              key={i}
+              aria-label={`Go to step ${i + 1}`}
+              onClick={() => {
+                scrollRef.current?.scrollTo({
+                  left: scrollRef.current.offsetWidth * i,
+                  behavior: "smooth",
+                });
+              }}
+              className={`rounded-full transition-all duration-300 active:scale-90 ${
+                i === activeIndex
+                  ? `h-1 w-12 ${step.accent}`
+                  : "h-1 w-4 bg-stone-300 hover:bg-stone-400"
+              }`}
+            />
           ))}
         </div>
       </div>
