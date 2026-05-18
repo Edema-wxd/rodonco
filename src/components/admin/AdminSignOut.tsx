@@ -3,6 +3,8 @@
 import { LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 
+import { logAuthEventAction } from "@/app/admin/_actions";
+
 function clearClientStorage() {
   try {
     localStorage.clear();
@@ -20,6 +22,7 @@ function clearClientStorage() {
 export function AdminSignOut() {
   async function handleSignOut() {
     clearClientStorage();
+    await logAuthEventAction("auth.logout").catch(() => {});
     // Client-side signOut calls /api/auth/signout which reliably flushes
     // the HttpOnly session cookie before we redirect.
     await signOut({ redirect: false });

@@ -4,6 +4,7 @@ import { UTApi } from "uploadthing/server";
 
 import { auth } from "@/auth";
 import { productPayloadSchema } from "@/lib/admin/schemas";
+import { logActivity } from "@/lib/admin/activityLog";
 import { db } from "@/lib/db";
 import {
   product_images,
@@ -107,6 +108,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     );
   }
 
+  logActivity({
+    adminEmail: session.user.email ?? "unknown",
+    action: "product.updated",
+    entityId: id,
+    entityLabel: name,
+  }).catch(() => {});
+
   return NextResponse.json({ ok: true });
 }
 
@@ -118,7 +126,12 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
 
   const { id } = await params;
 
-  // Fetch images before cascade-delete so we can clean up UploadThing
+  const [product] = await db
+    .select({ name: products.name })
+    .from(products)
+    .where(eq(products.id, id))
+    .limit(1);
+
   const imagesToDelete = await db
     .select({ key: product_images.key })
     .from(product_images)
@@ -130,6 +143,15 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
 
   // FK ON DELETE CASCADE removes variants, prep_options, and product_images
   await db.delete(products).where(eq(products.id, id));
+
+  if (product) {
+    logActivity({
+      adminEmail: session.user.email ?? "unknown",
+      action: "product.deleted",
+      entityId: id,
+      entityLabel: product.name,
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ ok: true });
 }

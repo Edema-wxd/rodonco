@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { productPayloadSchema } from "@/lib/admin/schemas";
+import { logActivity } from "@/lib/admin/activityLog";
 import { db } from "@/lib/db";
 import {
   product_images,
@@ -70,6 +71,13 @@ export async function POST(req: Request) {
       })),
     );
   }
+
+  logActivity({
+    adminEmail: session.user.email ?? "unknown",
+    action: "product.created",
+    entityId: created.id,
+    entityLabel: name,
+  }).catch(() => {});
 
   return NextResponse.json({ id: created.id }, { status: 201 });
 }

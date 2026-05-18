@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { bulkStatusTransitionSchema } from "@/lib/admin/schemas";
 import { bulkTransitionOrders } from "@/lib/admin/bulkTransition";
+import { logActivity } from "@/lib/admin/activityLog";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -27,6 +28,12 @@ export async function POST(req: Request) {
 
   const { week_of, from_status, to_status } = parsed.data;
   const updated = await bulkTransitionOrders(week_of, from_status, to_status);
+
+  logActivity({
+    adminEmail: session.user.email ?? "unknown",
+    action: "order.bulk_status_changed",
+    details: { from: from_status, to: to_status, count: updated, week_of },
+  }).catch(() => {});
 
   return NextResponse.json({ updated });
 }

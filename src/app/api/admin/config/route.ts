@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { orderingConfigPatchSchema } from "@/lib/admin/schemas";
+import { logActivity } from "@/lib/admin/activityLog";
 import { db, schema } from "@/lib/db";
 
 export async function PATCH(req: Request) {
@@ -39,6 +40,11 @@ export async function PATCH(req: Request) {
     .set(updateFields)
     .where(eq(schema.ordering_config.id, 1));
 
+  logActivity({
+    adminEmail: session.user.email ?? "unknown",
+    action: "settings.ordering_config_updated",
+    details: parsed.data as Record<string, unknown>,
+  }).catch(() => {});
+
   return NextResponse.json({ ok: true });
 }
-

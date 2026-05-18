@@ -26,6 +26,7 @@ const buildNavItems = (pendingCount: number): NavItem[] => [
   { href: "/admin/prep-list", label: "Prep List", Icon: Lucide.ClipboardList },
   { href: "/admin/manifest", label: "Manifest", Icon: Lucide.Truck },
   { href: "/admin/pending", label: "Pending Orders", Icon: Lucide.Clock, badge: pendingCount },
+  { href: "/admin/activity", label: "Activity", Icon: Lucide.Activity },
 ];
 
 export function AdminSidebar({

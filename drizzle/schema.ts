@@ -10,6 +10,7 @@ import {
   integer,
   timestamp,
   date,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 // ============================================================
@@ -131,5 +132,18 @@ export const admins = pgTable("admins", {
   id: uuid("id").defaultRandom().primaryKey(),
   email: text("email").unique().notNull(),
   password_hash: text("password_hash").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ============================================================
+// ACTIVITY LOGS
+// ============================================================
+export const activity_logs = pgTable("activity_logs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  admin_email: text("admin_email").notNull(),
+  action: text("action").notNull(),
+  entity_id: text("entity_id"),
+  entity_label: text("entity_label"),
+  details: jsonb("details"),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
