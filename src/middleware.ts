@@ -14,7 +14,11 @@ export default async function middleware(req: NextRequest) {
     if (!token) {
       const loginUrl = new URL("/admin", req.nextUrl.origin);
       loginUrl.searchParams.set("expired", "1");
-      return NextResponse.redirect(loginUrl);
+      const res = NextResponse.redirect(loginUrl);
+      // Prevent the redirect target from being served from the client-side
+      // router cache — ensures the browser makes a fresh unauthenticated request.
+      res.headers.set("Cache-Control", "no-store");
+      return res;
     }
   }
 
