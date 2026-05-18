@@ -1,8 +1,7 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-
-import { signOutAction } from "@/app/admin/_actions";
+import { signOut } from "next-auth/react";
 
 function clearClientStorage() {
   try {
@@ -21,10 +20,11 @@ function clearClientStorage() {
 export function AdminSignOut() {
   async function handleSignOut() {
     clearClientStorage();
-    await signOutAction();
+    // Client-side signOut calls /api/auth/signout which reliably flushes
+    // the HttpOnly session cookie before we redirect.
+    await signOut({ redirect: false });
     // Hard navigation bypasses the Next.js router cache so the browser
-    // always fetches a fresh unauthenticated page instead of serving
-    // the cached dashboard.
+    // always fetches a fresh unauthenticated page.
     window.location.href = "/admin";
   }
 

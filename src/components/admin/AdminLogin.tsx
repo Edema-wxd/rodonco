@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,6 @@ export function AdminLogin({
   sessionExpired?: boolean;
   authError?: boolean;
 }) {
-  const router = useRouter();
   const [error, setError] = React.useState<string | null>(
     authError ? "Invalid email or password. Please try again." : null,
   );
@@ -40,8 +38,10 @@ export function AdminLogin({
       return;
     }
 
-    router.push("/admin/orders");
-    router.refresh();
+    // Hard navigation so the browser makes a fresh request with the new
+    // session cookie — avoids the router cache serving a stale unauthenticated
+    // page or the middleware bouncing the soft navigation back to ?expired=1.
+    window.location.href = "/admin/orders";
   }
 
   return (
