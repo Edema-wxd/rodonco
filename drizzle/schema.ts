@@ -97,6 +97,7 @@ export const ordering_config = pgTable("ordering_config", {
   is_ordering_open: boolean("is_ordering_open").notNull().default(true),
   cutoff_message: text("cutoff_message"),
   next_delivery_date: date("next_delivery_date"),
+  delivery_fee_ngn: integer("delivery_fee_ngn").notNull().default(0),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -133,6 +134,22 @@ export const admins = pgTable("admins", {
   email: text("email").unique().notNull(),
   password_hash: text("password_hash").notNull(),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ============================================================
+// ABANDONED CARTS
+// ============================================================
+export const abandoned_carts = pgTable("abandoned_carts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  customer_name: text("customer_name").notNull(),
+  customer_email: text("customer_email").notNull(),
+  customer_phone: text("customer_phone").notNull(),
+  delivery_address: text("delivery_address").notNull(),
+  allergy_notes: text("allergy_notes"),
+  cart_items: jsonb("cart_items").notNull(),
+  subtotal_ngn: integer("subtotal_ngn").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  contacted_at: timestamp("contacted_at", { withTimezone: true }),
 });
 
 // ============================================================

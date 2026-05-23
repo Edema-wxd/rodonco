@@ -46,7 +46,7 @@ export function HowItWorks() {
           <div className="flex flex-col gap-4">
             <h2
               className="text-4xl font-black uppercase text-zinc-800"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               How It{" "}
               <span className="text-green-800">Works</span>
@@ -84,13 +84,13 @@ export function HowItWorks() {
             >
               <span
                 className={`text-6xl font-black leading-none opacity-20 ${step.color}`}
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {step.number}
               </span>
               <h3
                 className="mt-12 text-2xl font-bold text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {step.title}
               </h3>

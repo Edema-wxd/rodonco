@@ -10,7 +10,7 @@ export default function NotFound() {
         {/* Section label */}
         <p
           className="text-xs font-black uppercase tracking-wider text-red-600"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           404 — Page not found
         </p>
@@ -39,7 +39,7 @@ export default function NotFound() {
           >
             <span
               className="text-lg font-bold text-rose-50"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Back to home
             </span>

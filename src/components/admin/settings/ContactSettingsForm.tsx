@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { SiteSettingsRow } from "@/lib/admin/config";
@@ -47,7 +48,7 @@ export function ContactSettingsForm({ initialSettings }: Props) {
     <div className="rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
       <p
         className="text-xs font-black uppercase tracking-wider text-stone-400"
-        style={{ fontFamily: "var(--font-lexend)" }}
+        style={{ fontFamily: "var(--font-quicksand)" }}
       >
         Contact Information
       </p>
@@ -64,7 +65,7 @@ export function ContactSettingsForm({ initialSettings }: Props) {
           <label
             htmlFor="whatsapp-number"
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             WhatsApp Number
           </label>
@@ -93,7 +94,7 @@ export function ContactSettingsForm({ initialSettings }: Props) {
           <label
             htmlFor="contact-email"
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Contact Email
           </label>
@@ -113,7 +114,7 @@ export function ContactSettingsForm({ initialSettings }: Props) {
           <label
             htmlFor="instagram-handle"
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Instagram Handle
           </label>
@@ -140,10 +141,11 @@ export function ContactSettingsForm({ initialSettings }: Props) {
           type="button"
           onClick={() => void handleSave()}
           disabled={submitting}
-          className="rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
-          {submitting ? "Saving..." : "Save Contact Info"}
+          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+          {submitting ? "Saving…" : "Save Contact Info"}
         </button>
       </div>
     </div>

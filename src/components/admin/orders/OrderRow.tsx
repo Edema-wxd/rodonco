@@ -40,7 +40,7 @@ export function OrderRow({
         <td className="px-6 py-4">
           <span
             className="font-bold text-red-600"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             {order.reference}
           </span>
@@ -73,7 +73,7 @@ export function OrderRow({
         <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
           <span
             className={`mb-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold capitalize ${st.bg} ${st.text}`}
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
             {order.status}

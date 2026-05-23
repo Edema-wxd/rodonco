@@ -17,7 +17,7 @@ const quicksand = Quicksand({
 
 const lexend = Lexend({
   subsets: ["latin"],
-  variable: "--font-lexend",
+  variable: "--font-quicksand",
   display: "swap",
 });
 

@@ -89,7 +89,7 @@ export function ActivityFeed({ entries }: { entries: ActivityLogEntry[] }) {
         <Lucide.ClipboardList className="h-8 w-8 text-stone-300" />
         <p
           className="text-sm font-bold text-stone-400"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           No activity recorded yet
         </p>
@@ -106,7 +106,7 @@ export function ActivityFeed({ entries }: { entries: ActivityLogEntry[] }) {
               <th
                 key={h}
                 className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {h}
               </th>

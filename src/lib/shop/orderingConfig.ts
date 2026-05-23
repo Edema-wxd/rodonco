@@ -9,6 +9,7 @@ export type OrderingConfig = {
   is_ordering_open: boolean;
   cutoff_message: string | null;
   next_delivery_date: string | null;
+  delivery_fee_ngn: number;
 };
 
 const SAFE_DEFAULT: OrderingConfig = {
@@ -17,6 +18,7 @@ const SAFE_DEFAULT: OrderingConfig = {
   is_ordering_open: true,
   cutoff_message: null,
   next_delivery_date: null,
+  delivery_fee_ngn: 0,
 };
 
 async function readOrderingConfigFromDb(): Promise<OrderingConfig> {
@@ -38,6 +40,7 @@ async function readOrderingConfigFromDb(): Promise<OrderingConfig> {
       is_ordering_open: row.is_ordering_open,
       cutoff_message: row.cutoff_message ?? null,
       next_delivery_date: row.next_delivery_date ?? null,
+      delivery_fee_ngn: row.delivery_fee_ngn,
     };
   } catch (err) {
     console.warn("[getOrderingConfig] DB unavailable (likely cold start); defaulting ordering to OPEN");

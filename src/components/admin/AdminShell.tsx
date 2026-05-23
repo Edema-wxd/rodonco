@@ -45,7 +45,7 @@ export function AdminShell({
         </p>
         <span
           className="ml-1 text-[10px] font-black uppercase tracking-widest text-stone-400"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Admin
         </span>

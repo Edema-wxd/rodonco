@@ -49,7 +49,7 @@ export default function WallOfLovePage() {
             <Link
               href="/"
               className="text-sm font-black uppercase tracking-wider text-red-700"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               ← Back to home
             </Link>
@@ -59,13 +59,13 @@ export default function WallOfLovePage() {
             <div className="flex flex-col gap-4">
               <p
                 className="text-sm font-black uppercase tracking-wider text-red-700"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Wall of Love
               </p>
               <h1
                 className="text-5xl font-black text-zinc-800 sm:text-6xl"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Join 5,000+ happy chefs.
               </h1>
@@ -88,7 +88,7 @@ export default function WallOfLovePage() {
               </div>
               <p
                 className="pl-2 text-sm font-bold text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 4.9/5 Average Rating
               </p>
@@ -152,7 +152,7 @@ export default function WallOfLovePage() {
             <Link
               href="/shop"
               className="border-b-2 border-red-700 pb-0.5 text-sm font-black uppercase tracking-wider text-red-700"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Browse the menu
             </Link>

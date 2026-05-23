@@ -84,7 +84,7 @@ export function ShopContent({
         <div className="sticky top-28 flex flex-col gap-1">
           <p
             className="mb-3 text-[10px] font-bold uppercase tracking-widest text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Browse
           </p>
@@ -99,7 +99,7 @@ export function ShopContent({
                   ? "bg-white text-zinc-800 shadow-sm"
                   : "text-stone-500 hover:text-zinc-800",
               ].join(" ")}
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               <span
                 className={[
@@ -154,7 +154,7 @@ export function ShopContent({
                     ? "border-b-2 border-red-600 text-red-600"
                     : "text-stone-500",
                 ].join(" ")}
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {label}
               </button>
@@ -181,7 +181,7 @@ export function ShopContent({
                   <div>
                     <h2
                       className="text-4xl font-black uppercase leading-10 text-zinc-800"
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       Fresh{" "}
                       <span className="text-green-800">Produce</span>
@@ -207,7 +207,7 @@ export function ShopContent({
                             ? "bg-green-800 text-white"
                             : "bg-white text-stone-600 hover:bg-stone-200 outline outline-1 outline-stone-200",
                         ].join(" ")}
-                        style={{ fontFamily: "var(--font-lexend)" }}
+                        style={{ fontFamily: "var(--font-quicksand)" }}
                       >
                         {label}
                       </button>
@@ -241,7 +241,7 @@ export function ShopContent({
               <div className="pb-6">
                 <h2
                   className="text-4xl font-black uppercase leading-10 text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   Cooking{" "}
                   <span className="text-red-700">Kits</span>

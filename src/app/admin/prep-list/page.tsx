@@ -25,7 +25,7 @@ export default async function AdminPrepListPage({
       <div className="mb-6 sm:mb-8">
         <p
           className="text-sm font-black uppercase tracking-wider text-red-600"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Admin
         </p>
@@ -48,7 +48,7 @@ export default async function AdminPrepListPage({
         <label
           htmlFor="prep-week"
           className="text-xs font-black uppercase tracking-wider text-stone-400"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Select week
         </label>

@@ -26,7 +26,7 @@ export default async function ProductPage({
     return (
       <div className="bg-stone-100 py-24">
         <div className="mx-auto max-w-7xl px-8">
-          <h1 className="text-3xl font-black text-zinc-800" style={{ fontFamily: "var(--font-lexend)" }}>
+          <h1 className="text-3xl font-black text-zinc-800" style={{ fontFamily: "var(--font-quicksand)" }}>
             Product not found
           </h1>
           <p className="mt-3 text-stone-600" style={{ fontFamily: "var(--font-inter)" }}>
@@ -53,7 +53,7 @@ export default async function ProductPage({
           <Link
             href="/shop"
             className="text-sm font-black uppercase tracking-wider text-red-700"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             ← Back to menu
           </Link>
@@ -69,7 +69,7 @@ export default async function ProductPage({
           </div>
 
           <div>
-            <h1 className="text-5xl font-black text-zinc-800" style={{ fontFamily: "var(--font-lexend)" }}>
+            <h1 className="text-5xl font-black text-zinc-800" style={{ fontFamily: "var(--font-quicksand)" }}>
               {details.product.name}
             </h1>
 
@@ -80,7 +80,7 @@ export default async function ProductPage({
             ) : null}
 
             <div className="mt-8 rounded-[32px] bg-white p-8 outline outline-1 outline-stone-200/50">
-              <p className="text-xs font-black uppercase tracking-wider text-stone-500" style={{ fontFamily: "var(--font-lexend)" }}>
+              <p className="text-xs font-black uppercase tracking-wider text-stone-500" style={{ fontFamily: "var(--font-quicksand)" }}>
                 Ordering
               </p>
               <p className="mt-2 text-sm text-stone-600" style={{ fontFamily: "var(--font-inter)" }}>
@@ -91,7 +91,7 @@ export default async function ProductPage({
                 <Link
                   href={`/shop?drawer=${encodeURIComponent(details.product.id)}`}
                   className="inline-flex w-full items-center justify-center rounded-full bg-stone-100 py-4 text-base font-bold text-zinc-800 transition-colors hover:bg-stone-200"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   {hasChoices ? "Choose options & add to order" : "Add to order"}
                 </Link>
@@ -105,7 +105,7 @@ export default async function ProductPage({
               <div className="mt-10 space-y-6">
                 {details.variants.length > 0 ? (
                   <section>
-                    <h2 className="text-sm font-black uppercase tracking-wider text-zinc-800" style={{ fontFamily: "var(--font-lexend)" }}>
+                    <h2 className="text-sm font-black uppercase tracking-wider text-zinc-800" style={{ fontFamily: "var(--font-quicksand)" }}>
                       Sizes
                     </h2>
                     <ul className="mt-3 space-y-2">
@@ -125,7 +125,7 @@ export default async function ProductPage({
 
                 {details.prepOptions.length > 0 ? (
                   <section>
-                    <h2 className="text-sm font-black uppercase tracking-wider text-zinc-800" style={{ fontFamily: "var(--font-lexend)" }}>
+                    <h2 className="text-sm font-black uppercase tracking-wider text-zinc-800" style={{ fontFamily: "var(--font-quicksand)" }}>
                       Prep options
                     </h2>
                     <ul className="mt-3 space-y-2">

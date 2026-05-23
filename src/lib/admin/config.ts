@@ -9,6 +9,7 @@ export type OrderingConfigRow = {
   is_ordering_open: boolean;
   cutoff_message: string | null;
   next_delivery_date: string | null;
+  delivery_fee_ngn: number;
   updated_at: Date;
 };
 
@@ -46,6 +47,7 @@ export async function getOrderingConfig(): Promise<OrderingConfigRow> {
     is_ordering_open: row.is_ordering_open,
     cutoff_message: row.cutoff_message ?? null,
     next_delivery_date: row.next_delivery_date ?? null,
+    delivery_fee_ngn: row.delivery_fee_ngn,
     updated_at: row.updated_at,
   };
 }

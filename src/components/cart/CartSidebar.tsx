@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { OrderingClosedBanner } from "@/components/shop/OrderingClosedBanner";
@@ -200,6 +201,20 @@ export function CartSidebar({
             <p className="text-sm font-semibold text-black">{formatNgn(subtotalKobo)}</p>
           </div>
           <p className="mt-1 text-xs text-black/60">Free delivery on Saturdays</p>
+          <Link
+            href="/checkout"
+            onClick={closeCart}
+            className={[
+              "mt-4 flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition-colors sm:py-3.5",
+              items.length > 0 && !isViewOnly
+                ? "bg-black text-white hover:bg-black/90"
+                : "pointer-events-none bg-gray-100 text-gray-400",
+            ].join(" ")}
+            aria-disabled={items.length === 0 || isViewOnly}
+            tabIndex={items.length === 0 || isViewOnly ? -1 : undefined}
+          >
+            {isViewOnly ? "Ordering closed" : "Checkout"}
+          </Link>
         </div>
           </motion.aside>
         </div>

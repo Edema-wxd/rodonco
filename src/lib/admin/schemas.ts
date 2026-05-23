@@ -61,6 +61,7 @@ export const orderingConfigPatchSchema = z
       .nullable()
       .optional(),
     cutoff_message: z.string().max(300).nullable().optional(),
+    delivery_fee_ngn: z.coerce.number().int().nonnegative().optional(),
   })
   .strict()
   .refine(

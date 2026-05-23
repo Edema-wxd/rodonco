@@ -47,7 +47,7 @@ export function ProductDrawer({
 }: ProductDrawerProps) {
   const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
-  const autoOpenOnFirstAdd = useCartUiStore((s) => s.autoOpenOnFirstAdd);
+  const openCart = useCartUiStore((s) => s.openCart);
   const [isOpen, setIsOpen] = useState(true);
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -90,7 +90,7 @@ export function ProductDrawer({
   const subtotalKobo = useMemo(() => unitPriceKobo * quantity, [unitPriceKobo, quantity]);
 
   const selectionSatisfied = (!needsVariant || !!selectedVariant) && (!needsPrep || !!selectedPrep);
-  const canAddToCart = isOrderingOpen && selectionSatisfied && quantity >= 1 && unitPriceKobo > 0;
+  const canAddToCart = isOrderingOpen && selectionSatisfied && quantity >= 1;
 
   const CLOSE_DELAY = 150;
 
@@ -118,7 +118,7 @@ export function ProductDrawer({
       subtotalNgn: subtotalKobo,
     });
 
-    autoOpenOnFirstAdd();
+    openCart();
     close();
   };
 
@@ -330,9 +330,7 @@ export function ProductDrawer({
                   ? "Ordering is closed"
                   : !selectionSatisfied
                     ? "Select the required option to add to cart"
-                    : unitPriceKobo <= 0
-                      ? "Price unavailable"
-                      : undefined
+                    : undefined
               }
             >
               {!isOrderingOpen ? "Ordering closed" : "Add to cart"}

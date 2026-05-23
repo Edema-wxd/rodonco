@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { X, Plus, Trash2, AlertTriangle } from "lucide-react";
+import { X, Plus, Trash2, AlertTriangle, Loader2 } from "lucide-react";
 
 import type { AdminProduct } from "@/lib/admin/products";
 import { productPayloadSchema, type ProductPayload } from "@/lib/admin/schemas";
@@ -39,6 +39,7 @@ export function ProductDrawer({
 }) {
   const router = useRouter();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const form = useForm<ProductPayload>({
     resolver: zodResolver(productPayloadSchema),
@@ -105,9 +106,10 @@ export function ProductDrawer({
   async function handleDelete() {
     if (!product) return;
 
+    setDeleting(true);
     const res = await fetch(`/api/admin/products/${product.id}`, { method: "DELETE" });
-    if (res.status === 401) { toast.error("Unauthorized"); return; }
-    if (!res.ok) { toast.error("Failed to delete product."); return; }
+    if (res.status === 401) { toast.error("Unauthorized"); setDeleting(false); return; }
+    if (!res.ok) { toast.error("Failed to delete product."); setDeleting(false); return; }
 
     toast.success("Product deleted");
     router.refresh();
@@ -132,7 +134,7 @@ export function ProductDrawer({
           <div>
             <p
               className="text-xs font-black uppercase tracking-wider text-red-600"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               {product ? "Edit" : "New"}
             </p>
@@ -164,7 +166,7 @@ export function ProductDrawer({
 
               {/* Name */}
               <div className="space-y-2">
-                <label htmlFor="prod-name" className={labelCls} style={{ fontFamily: "var(--font-lexend)" }}>
+                <label htmlFor="prod-name" className={labelCls} style={{ fontFamily: "var(--font-quicksand)" }}>
                   Name
                 </label>
                 <input
@@ -177,7 +179,7 @@ export function ProductDrawer({
 
               {/* Description */}
               <div className="space-y-2">
-                <label htmlFor="prod-desc" className={labelCls} style={{ fontFamily: "var(--font-lexend)" }}>
+                <label htmlFor="prod-desc" className={labelCls} style={{ fontFamily: "var(--font-quicksand)" }}>
                   Description
                 </label>
                 <textarea
@@ -191,7 +193,7 @@ export function ProductDrawer({
 
               {/* Type */}
               <div className="space-y-2">
-                <label htmlFor="prod-type" className={labelCls} style={{ fontFamily: "var(--font-lexend)" }}>
+                <label htmlFor="prod-type" className={labelCls} style={{ fontFamily: "var(--font-quicksand)" }}>
                   Type
                 </label>
                 <select
@@ -215,7 +217,7 @@ export function ProductDrawer({
                 <label
                   htmlFor="prod-active"
                   className="text-sm font-bold text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   Active on shop
                 </label>
@@ -235,7 +237,7 @@ export function ProductDrawer({
                 <div className="flex items-center justify-between">
                   <h3
                     className="text-xs font-black uppercase tracking-wider text-stone-400"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     Size Variants
                   </h3>
@@ -243,7 +245,7 @@ export function ProductDrawer({
                     type="button"
                     onClick={() => variants.append({ label: "", price_ngn: 0, is_default: false })}
                     className="inline-flex items-center gap-1 text-xs font-bold text-red-600 hover:text-red-700"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     <Plus className="h-3 w-3" />
                     + Add variant
@@ -283,7 +285,7 @@ export function ProductDrawer({
                 <div className="flex items-center justify-between">
                   <h3
                     className="text-xs font-black uppercase tracking-wider text-stone-400"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     Prep Options
                   </h3>
@@ -291,7 +293,7 @@ export function ProductDrawer({
                     type="button"
                     onClick={() => prepOptions.append({ label: "", extra_cost_ngn: 0 })}
                     className="inline-flex items-center gap-1 text-xs font-bold text-red-600 hover:text-red-700"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     <Plus className="h-3 w-3" />
                     + Add prep option
@@ -336,7 +338,7 @@ export function ProductDrawer({
                       <p
                         className="flex items-center gap-2 text-sm font-bold text-red-700"
                         id="delete-confirm-text"
-                        style={{ fontFamily: "var(--font-lexend)" }}
+                        style={{ fontFamily: "var(--font-quicksand)" }}
                       >
                         <AlertTriangle className="h-4 w-4" />
                         Are you sure? This cannot be undone.
@@ -344,17 +346,19 @@ export function ProductDrawer({
                       <div className="flex gap-2">
                         <button
                           type="button"
-                          className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
+                          disabled={deleting}
+                          className="inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                           aria-describedby="delete-confirm-text"
-                          style={{ fontFamily: "var(--font-lexend)" }}
+                          style={{ fontFamily: "var(--font-quicksand)" }}
                           onClick={handleDelete}
                         >
-                          Confirm Delete
+                          {deleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                          {deleting ? "Deleting…" : "Confirm Delete"}
                         </button>
                         <button
                           type="button"
                           className="rounded-full bg-white px-5 py-2 text-sm font-bold text-stone-500 transition-colors hover:bg-stone-100"
-                          style={{ fontFamily: "var(--font-lexend)" }}
+                          style={{ fontFamily: "var(--font-quicksand)" }}
                           onClick={() => setConfirmingDelete(false)}
                         >
                           Cancel
@@ -365,7 +369,7 @@ export function ProductDrawer({
                     <button
                       type="button"
                       className="inline-flex items-center gap-2 text-sm font-bold text-red-600 hover:text-red-700"
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                       onClick={() => setConfirmingDelete(true)}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -381,17 +385,19 @@ export function ProductDrawer({
               <button
                 type="button"
                 className="rounded-full px-6 py-2.5 text-sm font-bold text-stone-500 transition-colors hover:bg-stone-100"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
                 onClick={onClose}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-90"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                disabled={form.formState.isSubmitting}
+                className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
-                Save Product
+                {form.formState.isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                {form.formState.isSubmitting ? "Saving…" : "Save Product"}
               </button>
             </div>
           </form>

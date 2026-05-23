@@ -101,7 +101,7 @@ export function ProductImageUpload() {
       <div className="flex items-center justify-between">
         <p
           className="text-xs font-black uppercase tracking-wider text-stone-400"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Images
           <span className="ml-1.5 font-normal text-stone-300">
@@ -161,7 +161,7 @@ export function ProductImageUpload() {
             {i === 0 && (
               <span
                 className="absolute bottom-1 left-1 rounded px-1.5 py-0.5 text-[9px] font-bold bg-zinc-900/70 text-white"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Primary
               </span>
@@ -179,7 +179,7 @@ export function ProductImageUpload() {
             <ImagePlus className="h-5 w-5" />
             <span
               className="text-[10px] font-bold uppercase tracking-wide"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Add
             </span>
@@ -192,7 +192,7 @@ export function ProductImageUpload() {
             <Loader2 className="h-5 w-5 animate-spin text-red-500" />
             <span
               className="text-[10px] font-bold uppercase tracking-wide"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Uploading
             </span>

@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { useState } from "react";
+import { Loader2, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 import { logAuthEventAction } from "@/app/admin/_actions";
@@ -20,7 +21,10 @@ function clearClientStorage() {
 }
 
 export function AdminSignOut() {
+  const [pending, setPending] = useState(false);
+
   async function handleSignOut() {
+    setPending(true);
     clearClientStorage();
     await logAuthEventAction("auth.logout").catch(() => {});
     // Client-side signOut calls /api/auth/signout which reliably flushes
@@ -35,11 +39,12 @@ export function AdminSignOut() {
     <button
       type="button"
       onClick={handleSignOut}
-      className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-bold text-stone-400 transition-colors hover:bg-red-50 hover:text-red-600"
-      style={{ fontFamily: "var(--font-lexend)" }}
+      disabled={pending}
+      className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-bold text-stone-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:pointer-events-none disabled:opacity-50"
+      style={{ fontFamily: "var(--font-quicksand)" }}
     >
-      <LogOut className="h-4 w-4" />
-      Sign out
+      {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+      {pending ? "Signing out…" : "Sign out"}
     </button>
   );
 }

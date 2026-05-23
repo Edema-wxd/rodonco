@@ -23,7 +23,7 @@ export function CleanPromise() {
           <div className="flex flex-col gap-8">
             <h2
               className="text-6xl font-black leading-[1.1] text-lime-100"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Our{" "}
               <span className="text-green-300">Clean</span>

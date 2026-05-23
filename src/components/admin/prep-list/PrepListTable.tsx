@@ -49,7 +49,7 @@ export function PrepListTable({ rows }: { rows: PrepListRow[] }) {
       <div className="overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-12 text-center shadow-sm outline outline-1 outline-stone-200/60">
         <p
           className="text-sm font-bold text-stone-400"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           No items for this week
         </p>
@@ -71,7 +71,7 @@ export function PrepListTable({ rows }: { rows: PrepListRow[] }) {
               <th
                 key={label}
                 className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {key ? (
                   <button
@@ -112,7 +112,7 @@ export function PrepListTable({ rows }: { rows: PrepListRow[] }) {
               </td>
               <td
                 className="px-6 py-3 font-black text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {row.total_quantity}
               </td>

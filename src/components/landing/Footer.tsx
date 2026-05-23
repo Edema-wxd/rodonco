@@ -35,7 +35,7 @@ export function Footer() {
             />
             <p
               className="text-xl font-black uppercase text-zinc-900"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               rodo&amp;co
             </p>
@@ -67,7 +67,7 @@ export function Footer() {
                   key={link.href}
                   href={link.href}
                   className="text-[10px] font-normal uppercase tracking-wide text-zinc-500 transition-colors hover:text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   {link.label}
                 </Link>

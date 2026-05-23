@@ -67,7 +67,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
           <label
             htmlFor="customer-search"
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Search
           </label>
@@ -86,7 +86,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
           <label
             htmlFor="status-filter"
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Status
           </label>
@@ -109,7 +109,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
           <label
             htmlFor="week-filter"
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Delivery week
           </label>
@@ -128,7 +128,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
             type="button"
             onClick={exportCsv}
             className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             <Download className="h-4 w-4" />
             Export CSV
@@ -143,7 +143,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
             <ShoppingBag className="h-8 w-8 text-stone-300" />
             <p
               className="text-sm font-bold text-stone-400"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               No orders found
             </p>
@@ -171,7 +171,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
                     <th
                       key={label}
                       className={`px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400 last:text-right${mobile ? "" : " hidden sm:table-cell"}`}
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       {label}
                     </th>

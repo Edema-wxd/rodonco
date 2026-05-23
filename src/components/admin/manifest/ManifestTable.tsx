@@ -33,7 +33,7 @@ export function ManifestTable({
         <label
           htmlFor="manifest-week"
           className="text-xs font-black uppercase tracking-wider text-stone-400"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Week
         </label>
@@ -56,7 +56,7 @@ export function ManifestTable({
               ? "bg-zinc-800 text-white"
               : "bg-white text-stone-500 outline outline-1 outline-stone-200 hover:bg-stone-50"
           }`}
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Sort by Name
         </button>
@@ -68,7 +68,7 @@ export function ManifestTable({
               ? "bg-zinc-800 text-white"
               : "bg-white text-stone-500 outline outline-1 outline-stone-200 hover:bg-stone-50"
           }`}
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Sort by Address
         </button>
@@ -77,7 +77,7 @@ export function ManifestTable({
           type="button"
           onClick={() => window.print()}
           className="ml-auto inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-red-700 print:hidden"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           <Printer className="h-4 w-4" />
           Print Manifest
@@ -88,7 +88,7 @@ export function ManifestTable({
         <div className="overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-12 text-center shadow-sm outline outline-1 outline-stone-200/60">
           <p
             className="text-sm font-bold text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             No deliveries for this week
           </p>
@@ -131,7 +131,7 @@ export function ManifestTable({
                 </div>
                 <p
                   className="shrink-0 text-base font-black text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   {formatNgn(order.total_ngn)}
                 </p>

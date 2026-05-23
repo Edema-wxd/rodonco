@@ -25,7 +25,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
       <div className="mb-6 flex items-center justify-between">
         <p
           className="text-xs font-black uppercase tracking-wider text-stone-400"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           {rows.length} {rows.length === 1 ? "product" : "products"}
         </p>
@@ -33,7 +33,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
           type="button"
           onClick={() => setCreating(true)}
           className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-90"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           <Plus className="h-4 w-4" />
           + New Product
@@ -47,7 +47,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
             <Package className="h-8 w-8 text-stone-300" />
             <p
               className="text-sm font-bold text-stone-400"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               No products yet
             </p>
@@ -66,7 +66,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
                   <th
                     key={h}
                     className="px-6 py-4 text-xs font-black uppercase tracking-wider text-stone-400"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     {h}
                   </th>
@@ -96,7 +96,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
                   <td className="px-6 py-4">
                     <span
                       className="font-bold text-zinc-800"
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       {p.name}
                     </span>
@@ -104,7 +104,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
                   <td className="px-6 py-4">
                     <span
                       className="inline-flex rounded-full bg-stone-100 px-2.5 py-1 text-xs font-bold capitalize text-stone-600"
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       {p.type.replace("_", " ")}
                     </span>
@@ -113,7 +113,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
                     {p.is_active ? (
                       <span
                         className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-bold text-green-800"
-                        style={{ fontFamily: "var(--font-lexend)" }}
+                        style={{ fontFamily: "var(--font-quicksand)" }}
                       >
                         <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
                         Yes
@@ -121,7 +121,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
                     ) : (
                       <span
                         className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-bold text-stone-500"
-                        style={{ fontFamily: "var(--font-lexend)" }}
+                        style={{ fontFamily: "var(--font-quicksand)" }}
                       >
                         <span className="h-1.5 w-1.5 rounded-full bg-stone-300" />
                         No

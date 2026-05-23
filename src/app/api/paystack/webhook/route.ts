@@ -118,10 +118,11 @@ export async function POST(req: Request): Promise<NextResponse> {
   }
 
   // ── Step 6b: Verify charged amount matches stored order total ─────────────
-  if (payload.data.amount !== pendingOrder.total_ngn) {
+  // total_ngn is stored in NGN; Paystack sends amount in kobo — multiply by 100.
+  if (payload.data.amount !== pendingOrder.total_ngn * 100) {
     console.error(
       `[webhook] Amount mismatch for ${reference}: ` +
-        `expected ${pendingOrder.total_ngn} kobo, got ${payload.data.amount} kobo`
+        `expected ${pendingOrder.total_ngn * 100} kobo, got ${payload.data.amount} kobo`
     );
     // Return 200 so Paystack does not retry; mismatch flagged for ops monitoring.
     return NextResponse.json({ received: true, mismatch: true });

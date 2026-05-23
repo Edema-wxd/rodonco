@@ -38,7 +38,7 @@ export function PendingOrdersTable({ orders }: { orders: AdminOrder[] }) {
       <div className="overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-12 text-center shadow-sm outline outline-1 outline-stone-200/60">
         <p
           className="text-sm font-bold text-stone-400"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           No pending orders
         </p>
@@ -62,7 +62,7 @@ export function PendingOrdersTable({ orders }: { orders: AdminOrder[] }) {
               <th
                 key={label}
                 className={`px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400 last:text-right${mobile ? "" : " hidden sm:table-cell"}`}
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {label}
               </th>
@@ -107,7 +107,7 @@ export function PendingOrdersTable({ orders }: { orders: AdminOrder[] }) {
                   disabled={deleting === order.id}
                   onClick={() => void handleDelete(order.id)}
                   className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                   {deleting === order.id ? "Deleting…" : "Delete"}

@@ -39,7 +39,7 @@ export function MenuPreview() {
         <div className="mx-auto mb-16 max-w-2xl text-center">
           <h2
             className="text-5xl font-black text-zinc-800"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Ready for the Pot
           </h2>
@@ -73,13 +73,13 @@ export function MenuPreview() {
                   <div className="absolute left-4 top-4 flex gap-2">
                     <span
                       className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-red-700 backdrop-blur-sm"
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       {kit.time}
                     </span>
                     <span
                       className={`rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide backdrop-blur-sm ${kit.difficultyColor}`}
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       {kit.difficulty}
                     </span>
@@ -111,7 +111,7 @@ export function MenuPreview() {
                   <button
                     type="button"
                     className="w-full cursor-pointer rounded-full bg-stone-100 py-4 text-base font-bold text-zinc-800 transition-all duration-150 hover:bg-red-600 hover:text-white active:scale-[0.97] active:bg-red-700"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     Add to Box
                   </button>
@@ -139,13 +139,13 @@ export function MenuPreview() {
                   <div className="absolute left-4 top-4 flex gap-2">
                     <span
                       className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-red-700 backdrop-blur-sm"
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       {kit.time}
                     </span>
                     <span
                       className={`rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide backdrop-blur-sm ${kit.difficultyColor}`}
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       {kit.difficulty}
                     </span>
@@ -177,7 +177,7 @@ export function MenuPreview() {
                   <button
                     type="button"
                     className="w-full cursor-pointer rounded-full bg-stone-100 py-4 text-base font-bold text-zinc-800 transition-all duration-150 hover:bg-red-600 hover:text-white active:scale-[0.97] active:bg-red-700"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     Add to Box
                   </button>
@@ -196,7 +196,7 @@ export function MenuPreview() {
           >
             <span
               className="text-lg font-bold text-rose-50"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               View All Products
             </span>

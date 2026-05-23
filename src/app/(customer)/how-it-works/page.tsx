@@ -63,13 +63,13 @@ export default function HowItWorksPage() {
           <div className="mx-auto max-w-3xl text-center">
             <p
               className="inline-flex items-center rounded-full bg-green-300 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-green-900"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Ordering, simplified
             </p>
             <h1
               className="mt-6 text-5xl font-black text-zinc-800 sm:text-6xl"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               How ordering works
             </h1>
@@ -87,7 +87,7 @@ export default function HowItWorksPage() {
               >
                 <span
                   className="text-lg font-bold text-rose-50"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   Browse the menu
                 </span>
@@ -98,7 +98,7 @@ export default function HowItWorksPage() {
               >
                 <span
                   className="text-lg font-bold text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   Back to home
                 </span>
@@ -114,7 +114,7 @@ export default function HowItWorksPage() {
           <div className="mb-14 flex flex-col gap-4">
             <h2
               className="text-4xl font-black uppercase text-zinc-800"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               The flow, <span className="text-green-800">step-by-step.</span>
             </h2>
@@ -134,13 +134,13 @@ export default function HowItWorksPage() {
               >
                 <span
                   className={`text-6xl font-black leading-none opacity-20 ${step.color}`}
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   {step.number}
                 </span>
                 <h3
                   className="mt-10 text-2xl font-bold text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   {step.title}
                 </h3>
@@ -174,7 +174,7 @@ export default function HowItWorksPage() {
           <div className="mb-10">
             <h2
               className="text-4xl font-black uppercase text-zinc-800"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Quick <span className="text-red-700">FAQs</span>
             </h2>
@@ -194,7 +194,7 @@ export default function HowItWorksPage() {
               >
                 <h3
                   className="text-lg font-bold text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   {f.q}
                 </h3>
@@ -212,7 +212,7 @@ export default function HowItWorksPage() {
             <Link
               href="/shop"
               className="border-b-2 border-red-700 pb-0.5 text-sm font-black uppercase tracking-wider text-red-700"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Start ordering
             </Link>

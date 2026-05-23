@@ -22,26 +22,21 @@ export default async function ShopGrid() {
 
       <div className="mx-auto max-w-7xl px-8">
         <div className="mx-auto mb-14 max-w-2xl text-center">
-          <p
-            className="inline-flex items-center rounded-full bg-green-300 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-green-900"
-            style={{ fontFamily: "var(--font-lexend)" }}
-          >
-            Freshly prepped, never frozen
-          </p>
+      
           <h1
-            className="mt-6 text-5xl font-black text-zinc-800 sm:text-6xl"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            className="mt-6 text-2xl sm:text-3xl md:text-5xl font-black text-zinc-800"
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             The Local-Global Menu
           </h1>
           <p
-            className="mt-4 text-base leading-6 text-stone-600"
+            className="mt-3 text-xs sm:text-sm md:text-base leading-5 md:leading-6 text-stone-600"
             style={{ fontFamily: "var(--font-inter)" }}
           >
-            Choose your kits and produce for the week. Tap any item to select
-            options, then add it to your order.
+            Choose your kits and produce for the week. Tap any item to select options, then add it to your order.
           </p>
         </div>
+   
 
         <ShopContent freshProduce={freshProduce} cookingKits={cookingKits} />
       </div>

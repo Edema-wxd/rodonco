@@ -90,7 +90,7 @@ export default async function AdminDashboardPage({
       <div className="mb-6 sm:mb-10">
         <p
           className="text-sm font-black uppercase tracking-wider text-red-600"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Admin Dashboard
         </p>
@@ -114,13 +114,13 @@ export default async function AdminDashboardPage({
         <div className="rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
           <p
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Orders this week
           </p>
           <p
             className="mt-4 text-5xl font-black leading-none text-zinc-800"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             {analytics.totalOrders}
           </p>
@@ -135,13 +135,13 @@ export default async function AdminDashboardPage({
         <div className="rounded-tl-2xl rounded-tr-[32px] rounded-bl-[32px] rounded-br-2xl bg-green-800 p-8 shadow-sm">
           <p
             className="text-xs font-black uppercase tracking-wider text-green-300/70"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Revenue this week
           </p>
           <p
             className="mt-4 text-4xl font-black leading-none text-lime-100"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             {formatNgn(analytics.totalRevenue)}
           </p>
@@ -156,7 +156,7 @@ export default async function AdminDashboardPage({
         <div className="rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
           <p
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Top product
           </p>
@@ -164,7 +164,7 @@ export default async function AdminDashboardPage({
             <>
               <p
                 className="mt-4 text-xl font-bold leading-tight text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {analytics.topProducts[0].name}
               </p>
@@ -186,7 +186,7 @@ export default async function AdminDashboardPage({
         <div className="rounded-tl-2xl rounded-tr-[32px] rounded-bl-[32px] rounded-br-2xl bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
           <p
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Status snapshot
           </p>
@@ -202,14 +202,14 @@ export default async function AdminDashboardPage({
                   <li key={s.status} className="flex items-center justify-between">
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold capitalize ${st.bg} ${st.text}`}
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
                       {s.status}
                     </span>
                     <span
                       className="text-sm font-bold tabular-nums text-zinc-800"
-                      style={{ fontFamily: "var(--font-lexend)" }}
+                      style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       {s.count}
                     </span>
@@ -226,14 +226,14 @@ export default async function AdminDashboardPage({
         <div className="mb-5 flex items-center justify-between">
           <h2
             className="text-xl font-black text-zinc-800"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Recent Orders
           </h2>
           <Link
             href="/admin/orders"
             className="border-b-2 border-red-600 pb-0.5 text-xs font-black uppercase tracking-wider text-red-600"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             View all
           </Link>
@@ -245,7 +245,7 @@ export default async function AdminDashboardPage({
               <Lucide.ShoppingBag className="h-8 w-8 text-stone-300" />
               <p
                 className="text-sm font-bold text-stone-400"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 No orders yet this week
               </p>
@@ -256,25 +256,25 @@ export default async function AdminDashboardPage({
                 <tr className="border-b border-stone-100">
                   <th
                     className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     Reference
                   </th>
                   <th
                     className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     Customer
                   </th>
                   <th
                     className="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-stone-400"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     Status
                   </th>
                   <th
                     className="px-6 py-4 text-right text-xs font-black uppercase tracking-wider text-stone-400"
-                    style={{ fontFamily: "var(--font-lexend)" }}
+                    style={{ fontFamily: "var(--font-quicksand)" }}
                   >
                     Total
                   </th>
@@ -289,7 +289,7 @@ export default async function AdminDashboardPage({
                         <Link
                           href="/admin/orders"
                           className="font-bold text-red-600 hover:underline"
-                          style={{ fontFamily: "var(--font-lexend)" }}
+                          style={{ fontFamily: "var(--font-quicksand)" }}
                         >
                           #{order.reference}
                         </Link>
@@ -306,7 +306,7 @@ export default async function AdminDashboardPage({
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold capitalize ${st.bg} ${st.text}`}
-                          style={{ fontFamily: "var(--font-lexend)" }}
+                          style={{ fontFamily: "var(--font-quicksand)" }}
                         >
                           <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
                           {order.status}
@@ -331,7 +331,7 @@ export default async function AdminDashboardPage({
       <div>
         <h2
           className="mb-5 text-xl font-black text-zinc-800"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Quick Access
         </h2>
@@ -349,7 +349,7 @@ export default async function AdminDashboardPage({
               </div>
               <p
                 className={`text-base font-black ${textAccent}`}
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {label}
               </p>

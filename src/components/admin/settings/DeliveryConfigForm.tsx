@@ -2,17 +2,20 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
   initialNextDeliveryDate: string | null;
   initialCutoffMessage: string | null;
+  initialDeliveryFeeNgn: number;
 }
 
-export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessage }: Props) {
+export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessage, initialDeliveryFeeNgn }: Props) {
   const router = useRouter();
   const [nextDeliveryDate, setNextDeliveryDate] = React.useState(initialNextDeliveryDate ?? "");
   const [cutoffMessage, setCutoffMessage] = React.useState(initialCutoffMessage ?? "");
+  const [deliveryFeeNgn, setDeliveryFeeNgn] = React.useState(String(initialDeliveryFeeNgn));
   const [submitting, setSubmitting] = React.useState(false);
 
   async function handleSave() {
@@ -24,6 +27,7 @@ export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessa
         body: JSON.stringify({
           next_delivery_date: nextDeliveryDate || null,
           cutoff_message: cutoffMessage || null,
+          delivery_fee_ngn: Number(deliveryFeeNgn) || 0,
         }),
       });
       if (!res.ok) {
@@ -43,7 +47,7 @@ export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessa
     <div className="rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
       <p
         className="text-xs font-black uppercase tracking-wider text-stone-400"
-        style={{ fontFamily: "var(--font-lexend)" }}
+        style={{ fontFamily: "var(--font-quicksand)" }}
       >
         Delivery Configuration
       </p>
@@ -58,7 +62,7 @@ export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessa
           <label
             htmlFor="next-delivery-date"
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Next delivery date
           </label>
@@ -75,7 +79,7 @@ export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessa
           <label
             htmlFor="cutoff-message"
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Cutoff message (shown to customers when ordering is closed)
           </label>
@@ -90,16 +94,45 @@ export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessa
             style={{ fontFamily: "var(--font-inter)" }}
           />
         </div>
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="delivery-fee"
+            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            Delivery fee (₦)
+          </label>
+          <div className="relative">
+            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-stone-400">
+              ₦
+            </span>
+            <input
+              id="delivery-fee"
+              type="number"
+              min={0}
+              step={100}
+              value={deliveryFeeNgn}
+              onChange={(e) => setDeliveryFeeNgn(e.target.value)}
+              placeholder="0"
+              className="h-10 w-full rounded-xl border border-stone-200 bg-white pl-7 pr-3 text-sm text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+              style={{ fontFamily: "var(--font-inter)" }}
+            />
+          </div>
+          <p className="text-xs text-stone-400" style={{ fontFamily: "var(--font-inter)" }}>
+            Set to 0 for free delivery. Added to every order at checkout.
+          </p>
+        </div>
       </div>
       <div className="mt-6">
         <button
           type="button"
           onClick={() => void handleSave()}
           disabled={submitting}
-          className="rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
-          {submitting ? "Saving..." : "Save Settings"}
+          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+          {submitting ? "Saving…" : "Save Settings"}
         </button>
       </div>
     </div>

@@ -13,7 +13,7 @@ export function WeekPickerBar({ currentWeek }: Props) {
       <label
         htmlFor="analytics-week"
         className="text-xs font-black uppercase tracking-wider text-stone-400"
-        style={{ fontFamily: "var(--font-lexend)" }}
+        style={{ fontFamily: "var(--font-quicksand)" }}
       >
         Filter by week
       </label>

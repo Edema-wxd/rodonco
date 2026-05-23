@@ -17,7 +17,7 @@ export default async function ActivityPage() {
       <div className="mb-6 sm:mb-8">
         <p
           className="text-sm font-black uppercase tracking-wider text-red-600"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Admin
         </p>

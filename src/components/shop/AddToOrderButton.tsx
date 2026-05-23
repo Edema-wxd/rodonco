@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const buttonClassName =
   "w-full rounded-full bg-stone-100 py-3 text-center text-sm font-bold text-zinc-800 transition-colors hover:bg-stone-200 sm:py-4 sm:text-base";
-const buttonFontStyle = { fontFamily: "var(--font-lexend)" } as const;
+const buttonFontStyle = { fontFamily: "var(--font-quicksand)" } as const;
 
 function AddToOrderButtonInner({ productId }: { productId: string }) {
   const router = useRouter();

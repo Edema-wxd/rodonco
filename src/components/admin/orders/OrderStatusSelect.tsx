@@ -14,7 +14,7 @@ export function OrderStatusSelect({
   initial: string;
 }) {
   const [value, setValue] = useState<string>(initial);
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   async function handleChange(next: string) {
@@ -40,9 +40,10 @@ export function OrderStatusSelect({
     <select
       aria-label="Update order status"
       value={value}
+      disabled={isPending}
       onChange={(e) => void handleChange(e.target.value)}
       onClick={(e) => e.stopPropagation()}
-      className="mt-1 h-8 w-36 rounded-lg border border-stone-200 bg-white px-2 text-xs font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+      className="mt-1 h-8 w-36 rounded-lg border border-stone-200 bg-white px-2 text-xs font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 disabled:cursor-not-allowed disabled:opacity-50"
       style={{ fontFamily: "var(--font-inter)" }}
     >
       {STATUS_OPTIONS.map((s) => (

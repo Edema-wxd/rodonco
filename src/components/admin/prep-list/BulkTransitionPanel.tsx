@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -48,7 +49,7 @@ export function BulkTransitionPanel({ currentWeek }: Props) {
     <div className="mt-8 rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
       <p
         className="text-xs font-black uppercase tracking-wider text-stone-400"
-        style={{ fontFamily: "var(--font-lexend)" }}
+        style={{ fontFamily: "var(--font-quicksand)" }}
       >
         Bulk Status Transition
       </p>
@@ -64,7 +65,7 @@ export function BulkTransitionPanel({ currentWeek }: Props) {
           <label
             htmlFor="bulk-week"
             className="text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Week of
           </label>
@@ -83,18 +84,20 @@ export function BulkTransitionPanel({ currentWeek }: Props) {
             type="button"
             disabled={submitting !== null || !weekOf}
             onClick={() => void transition("paid", "processing")}
-            className="rounded-full bg-zinc-800 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
+            {submitting === "paid" && <Loader2 className="h-4 w-4 animate-spin" />}
             {submitting === "paid" ? "Updating…" : "Paid → Processing"}
           </button>
           <button
             type="button"
             disabled={submitting !== null || !weekOf}
             onClick={() => void transition("processing", "delivered")}
-            className="rounded-full bg-zinc-800 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
+            {submitting === "processing" && <Loader2 className="h-4 w-4 animate-spin" />}
             {submitting === "processing" ? "Updating…" : "Processing → Delivered"}
           </button>
         </div>

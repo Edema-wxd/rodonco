@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Send, CheckCircle, AlertCircle } from "lucide-react";
+import { Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 export function ReminderForm() {
   const [weekOf, setWeekOf] = useState("");
@@ -40,7 +40,7 @@ export function ReminderForm() {
     <div className="rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
       <p
         className="text-xs font-black uppercase tracking-wider text-stone-400"
-        style={{ fontFamily: "var(--font-lexend)" }}
+        style={{ fontFamily: "var(--font-quicksand)" }}
       >
         Delivery Reminders
       </p>
@@ -62,7 +62,7 @@ export function ReminderForm() {
           <label
             htmlFor="reminder-week-of"
             className="block text-xs font-black uppercase tracking-wider text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Delivery week (Saturday)
           </label>
@@ -81,9 +81,9 @@ export function ReminderForm() {
           type="submit"
           disabled={loading || !weekOf}
           className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
-          <Send className="h-4 w-4" />
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           {loading ? "Sending…" : "Send Reminders"}
         </button>
 
@@ -93,7 +93,7 @@ export function ReminderForm() {
               "flex items-center gap-2 text-sm font-bold",
               result.ok ? "text-green-700" : "text-red-600",
             ].join(" ")}
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
             aria-live="polite"
           >
             {result.ok ? (

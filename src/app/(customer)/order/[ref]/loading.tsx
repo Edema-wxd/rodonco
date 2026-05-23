@@ -4,7 +4,7 @@ export default function OrderConfirmationLoading() {
       {/* Branded loading message */}
       <p
         className="mb-8 text-sm font-medium text-stone-500"
-        style={{ fontFamily: "var(--font-lexend)" }}
+        style={{ fontFamily: "var(--font-quicksand)" }}
       >
         Your kitchen assistant is on it.
       </p>

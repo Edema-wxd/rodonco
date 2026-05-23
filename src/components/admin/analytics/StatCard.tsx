@@ -57,7 +57,7 @@ export function StatCard(props: StatCardProps) {
           "text-xs font-black uppercase tracking-wider",
           isDark ? "text-green-300/70" : "text-stone-400",
         ].join(" ")}
-        style={{ fontFamily: "var(--font-lexend)" }}
+        style={{ fontFamily: "var(--font-quicksand)" }}
       >
         {props.label}
       </p>
@@ -72,7 +72,7 @@ function renderBody(props: StatCardProps): ReactNode {
       <>
         <p
           className="text-5xl font-black leading-none text-zinc-800"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           {Number(props.value).toLocaleString("en-NG")}
         </p>
@@ -98,7 +98,7 @@ function renderBody(props: StatCardProps): ReactNode {
       <>
         <p
           className="text-4xl font-black leading-none text-lime-100"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           {formatNgn(props.value)}
         </p>
@@ -141,7 +141,7 @@ function renderBody(props: StatCardProps): ReactNode {
             <div className="flex items-center gap-3">
               <span
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-100 text-[10px] font-black text-stone-400"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 {i + 1}
               </span>
@@ -154,7 +154,7 @@ function renderBody(props: StatCardProps): ReactNode {
             </div>
             <span
               className="ml-4 shrink-0 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-bold text-red-600 tabular-nums"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               × {item.qty}
             </span>
@@ -188,7 +188,7 @@ function renderBody(props: StatCardProps): ReactNode {
             <div className="flex items-center justify-between">
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold capitalize ${st.bg} ${st.text}`}
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
                 {item.label}
@@ -196,7 +196,7 @@ function renderBody(props: StatCardProps): ReactNode {
               <div className="flex items-center gap-2">
                 <span
                   className="text-sm font-bold tabular-nums text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   {item.count}
                 </span>

@@ -15,7 +15,7 @@ export default function PlansPage() {
             {/* Badge */}
             <p
               className="inline-flex items-center rounded-full bg-green-300 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-green-900"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Weekly ordering
             </p>
@@ -46,7 +46,7 @@ export default function PlansPage() {
               >
                 <span
                   className="text-lg font-bold text-rose-50"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   Browse the menu
                 </span>
@@ -57,7 +57,7 @@ export default function PlansPage() {
               >
                 <span
                   className="text-lg font-bold text-zinc-800"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   Back to home
                 </span>
@@ -73,7 +73,7 @@ export default function PlansPage() {
           <div className="mb-14">
             <h2
               className="text-4xl font-black uppercase text-zinc-800"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Weekly ordering, <span className="text-green-800">simplified.</span>
             </h2>
@@ -92,13 +92,13 @@ export default function PlansPage() {
             <div className="relative rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-white p-10 shadow-sm outline outline-1 outline-stone-200/60">
               <p
                 className="inline-flex items-center rounded-full bg-green-300 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-900"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Fresh Produce
               </p>
               <h3
                 className="mt-6 text-2xl font-bold text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Weekly Essentials
               </h3>
@@ -128,13 +128,13 @@ export default function PlansPage() {
             <div className="relative rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-white p-10 shadow-sm outline outline-1 outline-stone-200/60">
               <p
                 className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-700"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Cooking Kits
               </p>
               <h3
                 className="mt-6 text-2xl font-bold text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Ready-to-Cook Kits
               </h3>
@@ -164,7 +164,7 @@ export default function PlansPage() {
             <div className="relative rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-white p-10 shadow-sm outline outline-1 outline-stone-200/60 md:col-span-2">
               <h3
                 className="text-2xl font-bold text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 The ordering window
               </h3>
@@ -184,7 +184,7 @@ export default function PlansPage() {
             <Link
               href="/shop"
               className="border-b-2 border-red-700 pb-0.5 text-sm font-black uppercase tracking-wider text-red-700"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Browse this week&apos;s menu
             </Link>

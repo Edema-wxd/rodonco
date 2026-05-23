@@ -41,7 +41,7 @@ export function Navbar() {
               key={link.label}
               href={link.href}
               className="text-sm uppercase tracking-wider text-zinc-600 transition-colors hover:text-zinc-900"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               {link.label}
             </Link>

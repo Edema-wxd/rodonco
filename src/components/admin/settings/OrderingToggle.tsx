@@ -75,7 +75,7 @@ export function OrderingToggle({ initialIsOpen }: { initialIsOpen: boolean }) {
       {/* Section label */}
       <p
         className="text-xs font-black uppercase tracking-wider text-stone-400"
-        style={{ fontFamily: "var(--font-lexend)" }}
+        style={{ fontFamily: "var(--font-quicksand)" }}
       >
         Ordering Window
       </p>
@@ -86,7 +86,7 @@ export function OrderingToggle({ initialIsOpen }: { initialIsOpen: boolean }) {
           "mt-4 text-3xl font-black leading-tight",
           isOpen ? "text-green-700" : "text-red-600",
         ].join(" ")}
-        style={{ fontFamily: "var(--font-lexend)" }}
+        style={{ fontFamily: "var(--font-quicksand)" }}
         aria-live="polite"
       >
         {isOpen ? "✓ Ordering is OPEN" : "✗ Ordering is CLOSED"}
@@ -97,7 +97,7 @@ export function OrderingToggle({ initialIsOpen }: { initialIsOpen: boolean }) {
         <Label
           htmlFor="ordering-switch"
           className="text-sm font-bold text-zinc-800"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Enable ordering
         </Label>
@@ -116,7 +116,7 @@ export function OrderingToggle({ initialIsOpen }: { initialIsOpen: boolean }) {
           <p
             className="flex items-center gap-2 text-sm font-bold text-red-700"
             id="close-confirm-text"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             <AlertTriangle className="h-4 w-4 shrink-0" />
             This will prevent new orders. Confirm?
@@ -128,7 +128,7 @@ export function OrderingToggle({ initialIsOpen }: { initialIsOpen: boolean }) {
               onClick={() => void patchConfig(false)}
               aria-describedby="close-confirm-text"
               className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Yes, Close
             </button>
@@ -137,7 +137,7 @@ export function OrderingToggle({ initialIsOpen }: { initialIsOpen: boolean }) {
               disabled={submitting}
               onClick={cancelClose}
               className="rounded-full bg-white px-5 py-2 text-sm font-bold text-stone-500 transition-colors hover:bg-stone-100 disabled:opacity-50"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Cancel
             </button>
@@ -152,7 +152,7 @@ export function OrderingToggle({ initialIsOpen }: { initialIsOpen: boolean }) {
           onClick={() => void patchConfig(isOpen)}
           disabled={saveDisabled}
           className="rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Save Settings
         </button>
@@ -163,7 +163,7 @@ export function OrderingToggle({ initialIsOpen }: { initialIsOpen: boolean }) {
           }
           role="status"
           aria-hidden={!savedVisible}
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Saved ✓
         </span>

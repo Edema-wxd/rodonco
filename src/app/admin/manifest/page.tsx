@@ -24,7 +24,7 @@ export default async function AdminManifestPage({
       <div className="mb-6 sm:mb-8 print:mb-4">
         <p
           className="text-sm font-black uppercase tracking-wider text-red-600 print:hidden"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Admin
         </p>

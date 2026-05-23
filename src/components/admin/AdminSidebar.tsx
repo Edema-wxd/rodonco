@@ -55,7 +55,7 @@ export function AdminSidebar({
         <div>
           <p
             className="text-[10px] font-black uppercase tracking-widest text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Admin
           </p>
@@ -93,7 +93,7 @@ export function AdminSidebar({
                   ? "bg-red-600 text-white shadow-sm"
                   : "text-stone-500 hover:bg-stone-50 hover:text-zinc-800",
               )}
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               <Icon className="h-4 w-4 shrink-0" />
               {label}

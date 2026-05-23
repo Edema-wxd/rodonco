@@ -89,11 +89,12 @@ export async function POST(req: Request): Promise<NextResponse> {
 
   // week_of from DB config (falls back to today's ISO date if missing)
   const weekOf = config.next_delivery_date ?? new Date().toISOString().slice(0, 10);
+  const deliveryFeeNgn = config.delivery_fee_ngn;
 
   // 3. Server-side price authority: fetch canonical prices from DB (CR-02 fix)
   const productIds = [...new Set(cart.map((i) => i.productId))];
 
-  let totalKobo: number;
+  let totalNgn: number;
   let pricedCart: typeof cart;
 
   try {
@@ -137,7 +138,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       return { ...item, unitPriceNgn: unitPrice, subtotalNgn: subtotal };
     });
 
-    totalKobo = runningTotal;
+    totalNgn = runningTotal + deliveryFeeNgn;
     pricedCart = computed;
   } catch (err) {
     console.error("[/api/orders/init] Price lookup failed:", err);
@@ -154,11 +155,13 @@ export async function POST(req: Request): Promise<NextResponse> {
   const existingOrder = await findPendingReuse(email, pricedCart);
 
   if (existingOrder) {
-    // Reuse: skip DB insert, go straight to Paystack init
+    // Reuse: skip DB insert, go straight to Paystack init.
+    // Always use the freshly computed totalNgn so the delivery fee and current
+    // prices are reflected even if the stored order pre-dates them.
     try {
       const paystackResult = await initializePaystackTransaction({
         email,
-        amount: existingOrder.total_ngn,
+        amount: totalNgn * 100,
         reference: existingOrder.reference,
         metadata: { customer_name: name, phone },
       });
@@ -166,7 +169,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       return NextResponse.json({
         reference: existingOrder.reference,
         access_code: paystackResult.access_code,
-        amount_kobo: existingOrder.total_ngn,
+        amount_kobo: totalNgn * 100,
       });
     } catch (err) {
       console.error("[/api/orders/init] Paystack error on reused order:", err);
@@ -193,7 +196,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         delivery_address,
         allergy_notes: allergy_notes ?? null,
         status: "pending",
-        total_ngn: totalKobo,
+        total_ngn: totalNgn,
         week_of: weekOf,
       })
       .returning({ id: schema.orders.id, reference: schema.orders.reference });
@@ -215,7 +218,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   try {
     const paystackResult = await initializePaystackTransaction({
       email,
-      amount: totalKobo,
+      amount: totalNgn * 100,
       reference,
       metadata: { customer_name: name, phone },
     });
@@ -223,7 +226,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({
       reference,
       access_code: paystackResult.access_code,
-      amount_kobo: totalKobo,
+      amount_kobo: totalNgn * 100,
     });
   } catch (err) {
     console.error("[/api/orders/init] Paystack initialization error:", err);

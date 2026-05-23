@@ -55,7 +55,7 @@ export function AdminLogin({
         <div className="mb-6">
           <p
             className="text-[10px] font-black uppercase tracking-widest text-stone-400"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Admin
           </p>
@@ -70,7 +70,7 @@ export function AdminLogin({
         <h1
           id="admin-login-heading"
           className="text-base font-bold text-zinc-800"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Sign in to continue
         </h1>
@@ -90,7 +90,7 @@ export function AdminLogin({
             <Label
               htmlFor="email"
               className="text-xs font-black uppercase tracking-wider text-stone-400"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Email address
             </Label>
@@ -108,7 +108,7 @@ export function AdminLogin({
             <Label
               htmlFor="password"
               className="text-xs font-black uppercase tracking-wider text-stone-400"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Password
             </Label>
@@ -126,7 +126,7 @@ export function AdminLogin({
             type="submit"
             disabled={pending}
             className="w-full rounded-full bg-red-600 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             {pending ? "Signing in…" : "Sign in"}
           </button>

@@ -65,13 +65,13 @@ export function Testimonials() {
           <div className="flex flex-col gap-4">
             <p
               className="text-sm font-black uppercase tracking-wider text-red-700"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Wall of Love
             </p>
             <h2
               className="text-5xl font-black text-zinc-800"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Join the soft cooking life.
             </h2>
@@ -87,7 +87,7 @@ export function Testimonials() {
             </div>
             <p
               className="pl-2 text-sm font-bold text-zinc-800"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               4.9/5 Average Rating
             </p>

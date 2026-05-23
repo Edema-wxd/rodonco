@@ -23,7 +23,7 @@ export default async function AdminSettingsPage() {
       <div className="mb-6 sm:mb-8">
         <p
           className="text-sm font-black uppercase tracking-wider text-red-600"
-          style={{ fontFamily: "var(--font-lexend)" }}
+          style={{ fontFamily: "var(--font-quicksand)" }}
         >
           Admin
         </p>
@@ -41,6 +41,7 @@ export default async function AdminSettingsPage() {
         <DeliveryConfigForm
           initialNextDeliveryDate={config.next_delivery_date}
           initialCutoffMessage={config.cutoff_message}
+          initialDeliveryFeeNgn={config.delivery_fee_ngn}
         />
         <ContactSettingsForm initialSettings={siteSettings} />
       </div>

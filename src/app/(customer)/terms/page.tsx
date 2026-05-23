@@ -16,7 +16,7 @@ export default function TermsPage() {
             <Link
               href="/"
               className="text-sm font-black uppercase tracking-wider text-red-700"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               ← Back to home
             </Link>
@@ -25,7 +25,7 @@ export default function TermsPage() {
           {/* Section label */}
           <p
             className="text-xs font-black uppercase tracking-wider text-red-600"
-            style={{ fontFamily: "var(--font-lexend)" }}
+            style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Legal
           </p>
@@ -58,7 +58,7 @@ export default function TermsPage() {
             <div className="relative rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-white p-10 shadow-sm outline outline-1 outline-stone-200/60">
               <h3
                 className="text-2xl font-bold text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Orders &amp; Payments
               </h3>
@@ -76,7 +76,7 @@ export default function TermsPage() {
             <div className="relative rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-white p-10 shadow-sm outline outline-1 outline-stone-200/60">
               <h3
                 className="text-2xl font-bold text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Cancellations &amp; Refunds
               </h3>
@@ -94,7 +94,7 @@ export default function TermsPage() {
             <div className="relative rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-white p-10 shadow-sm outline outline-1 outline-stone-200/60">
               <h3
                 className="text-2xl font-bold text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Delivery
               </h3>
@@ -112,7 +112,7 @@ export default function TermsPage() {
             <div className="relative rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-white p-10 shadow-sm outline outline-1 outline-stone-200/60">
               <h3
                 className="text-2xl font-bold text-zinc-800"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Contact
               </h3>
@@ -131,7 +131,7 @@ export default function TermsPage() {
             <Link
               href="/"
               className="border-b-2 border-red-700 pb-0.5 text-sm font-black uppercase tracking-wider text-red-700"
-              style={{ fontFamily: "var(--font-lexend)" }}
+              style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Back to home
             </Link>

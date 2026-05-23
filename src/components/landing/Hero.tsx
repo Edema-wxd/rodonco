@@ -9,15 +9,27 @@ export function Hero() {
           {/* Left — text content */}
           <div className="flex flex-col items-start gap-8 pt-8">
             {/* Badge */}
-            <div className="flex items-center gap-2 rounded-full bg-green-300 px-4 py-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-green-900" />
+            <div
+              className="flex items-center gap-2 rounded-full bg-green-300 px-4 py-1.5 justify-center sm:justify-start transition-transform duration-700 ease-in-out animate-bounce-in"
+              style={{
+                animation: "badge-bounce-in 1s cubic-bezier(0.23, 1, 0.32, 1) 0.05s"
+              }}
+            >
+              <span
+                className="h-2.5 w-2.5 rounded-full bg-green-900"
+                style={{
+                  animation: "badge-pulse 1.6s infinite cubic-bezier(0.4, 0, 0.6, 1)"
+                }}
+              />
               <span
                 className="text-xs font-bold uppercase tracking-wider text-green-900"
-                style={{ fontFamily: "var(--font-lexend)" }}
+                style={{ fontFamily: "var(--font-quicksand)" }}
               >
                 Freshly Prepped, Never Frozen
               </span>
+
             </div>
+      
 
             {/* Headline */}
             <h1
@@ -45,7 +57,7 @@ export function Hero() {
               >
                 <span
                   className="text-lg font-bold text-rose-50"
-                  style={{ fontFamily: "var(--font-lexend)" }}
+                  style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   Start Cooking
                 </span>
