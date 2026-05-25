@@ -21,6 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Automation + Launch** - Vercel Cron cutoff job, delivery reminder emails, pre-launch key swap, and go-live hardening (completed 2026-05-04)
 - [x] **Phase 7: Missing Pages + Route Completeness** (INSERTED) - Global 404 page, Privacy/Terms/Cookie Policy legal pages, dedicated Plans page, and Footer dead-link cleanup (completed 2026-05-07)
 - [x] **Phase 8: Missing Admin Structures** (INSERTED) - Weekly prep/packing list, delivery manifest, customer search, analytics week picker, ordering config week management, pending order visibility, and bulk status transitions (completed 2026-05-16)
+- [x] **Phase 9: Tech debt: cache revalidation + requirements cleanup** - Tag-based revalidateTag invalidation replacing ISR TTLs across shop surfaces; REQUIREMENTS.md reconciled with Phases 1-8 shipped work (completed 2026-05-25)
 
 ## Phase Details
 
@@ -215,10 +216,21 @@ Plans:
 - [x] 08-04-PLAN.md — prepList lib + RSC page + PrepListTable; manifest lib + RSC page + ManifestTable with print (OPS-01, OPS-04)
 - [x] 08-05-PLAN.md — pending orders page + DELETE handler; bulkTransition lib + bulk-status API + BulkTransitionPanel (OPS-06, OPS-07)
 
+### Phase 9: Tech debt: cache revalidation + requirements cleanup
+
+**Goal:** Customer-facing shop pages (ordering banner and product grid/detail) reflect admin mutations on the very next request via Next.js tag-based revalidation (no 15-second or 60-second ISR lag), AND the planning/REQUIREMENTS.md document is reconciled with the shipped Phases 1-8 stack — every shipped item ticked, FOUND-01..05 rewritten for the real Neon + Drizzle + NextAuth v5 + Uploadthing stack, and Phase 7-8 features (route completeness + admin operations) captured as first-class requirement IDs in the traceability table.
+**Requirements**: INFRA-04, REQ-CLEANUP-09
+**Depends on:** Phase 8
+**Plans:** 2/2 plans complete
+
+Plans:
+- [x] 09-01-PLAN.md — Tag-based cache invalidation: add tags to lib readers, wire revalidateTag into admin config + product mutation handlers, remove ISR revalidate exports from shop pages
+- [x] 09-02-PLAN.md — REQUIREMENTS.md audit: tick shipped items, rewrite FOUND-01..05 for Neon/Drizzle/NextAuth/Uploadthing stack, add ROUTES + ADMIN-OPS sections, extend traceability through Phase 8
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 2.1 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 → 2 → 2.1 → 3 → 4 → 5 → 6 → 7 → 8 → 9
 
 Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel with Phases 2-3, but is executed in sequence here for clarity.
 
@@ -233,14 +245,4 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 | 6. Automation + Launch | 4/4 | Complete | 2026-05-04 |
 | 7. Missing Pages + Route Completeness | 3/3 | Complete | 2026-05-07 |
 | 8. Missing Admin Structures | 5/5 | Complete | 2026-05-16 |
-
-### Phase 9: Tech debt: cache revalidation + requirements cleanup
-
-**Goal:** Customer-facing shop pages (ordering banner and product grid/detail) reflect admin mutations on the very next request via Next.js tag-based revalidation (no 15-second or 60-second ISR lag), AND the planning/REQUIREMENTS.md document is reconciled with the shipped Phases 1-8 stack — every shipped item ticked, FOUND-01..05 rewritten for the real Neon + Drizzle + NextAuth v5 + Uploadthing stack, and Phase 7-8 features (route completeness + admin operations) captured as first-class requirement IDs in the traceability table.
-**Requirements**: INFRA-04, REQ-CLEANUP-09
-**Depends on:** Phase 8
-**Plans:** 2/2 plans complete
-
-Plans:
-- [x] 09-01-PLAN.md — Tag-based cache invalidation: add tags to lib readers, wire revalidateTag into admin config + product mutation handlers, remove ISR revalidate exports from shop pages
-- [x] 09-02-PLAN.md — REQUIREMENTS.md audit: tick shipped items, rewrite FOUND-01..05 for Neon/Drizzle/NextAuth/Uploadthing stack, add ROUTES + ADMIN-OPS sections, extend traceability through Phase 8
+| 9. Tech debt: cache revalidation + requirements cleanup | 2/2 | Complete | 2026-05-25 |
