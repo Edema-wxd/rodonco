@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
@@ -41,6 +42,8 @@ export async function PATCH(req: Request) {
     .update(schema.ordering_config)
     .set(updateFields)
     .where(eq(schema.ordering_config.id, 1));
+
+  revalidateTag("ordering-config");
 
   logActivity({
     adminEmail: session.user.email ?? "unknown",

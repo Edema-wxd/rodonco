@@ -4,8 +4,6 @@ import { ProductImageCarousel } from "@/components/shop/ProductImageCarousel";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { getProductDetailsById } from "@/lib/shop/productDetails";
 
-export const revalidate = 60;
-
 function formatNgn(kobo: number): string {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",

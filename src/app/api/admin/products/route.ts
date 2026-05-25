@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
@@ -71,6 +72,8 @@ export async function POST(req: Request) {
       })),
     );
   }
+
+  revalidateTag("shop-products");
 
   logActivity({
     adminEmail: session.user.email ?? "unknown",

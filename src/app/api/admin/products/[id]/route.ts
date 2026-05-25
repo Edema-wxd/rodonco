@@ -1,4 +1,5 @@
 import { eq, inArray } from "drizzle-orm";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { UTApi } from "uploadthing/server";
 
@@ -108,6 +109,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     );
   }
 
+  revalidateTag("shop-products");
+
   logActivity({
     adminEmail: session.user.email ?? "unknown",
     action: "product.updated",
@@ -143,6 +146,8 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
 
   // FK ON DELETE CASCADE removes variants, prep_options, and product_images
   await db.delete(products).where(eq(products.id, id));
+
+  revalidateTag("shop-products");
 
   if (product) {
     logActivity({

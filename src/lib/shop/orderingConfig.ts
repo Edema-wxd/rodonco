@@ -52,8 +52,7 @@ const getOrderingConfigCached = unstable_cache(
   async () => readOrderingConfigFromDb(),
   ["shop-ordering-config-v1"],
   {
-    // Keep UI snappy, while still reflecting admin changes quickly.
-    revalidate: 15,
+    tags: ["ordering-config"],
   }
 );
 
