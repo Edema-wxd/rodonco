@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: complete
-stopped_at: Phase 9 verification passed
-last_updated: "2026-05-25T07:00:00.000Z"
+milestone_name: MVP
+status: shipped
+stopped_at: v1.0 milestone archived 2026-05-25
+last_updated: "2026-05-25T00:00:00.000Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 10
@@ -18,84 +18,35 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-15)
+See: .planning/PROJECT.md (updated 2026-05-25 after v1.0 milestone)
 
 **Core value:** Customers can browse, configure, and pay for weekly food prep orders in one smooth flow — with zero friction between browsing and checkout.
-**Current focus:** Phase 09 — COMPLETE (verified 2026-05-25)
+**Current focus:** v1.0 shipped — planning next milestone
 
 ## Current Position
 
-Phase: 09 (tech-debt-cache-revalidation-requirements-cleanup) — COMPLETE
-Plan: 2 of 2
-Status: Verified — all must-haves confirmed in codebase
-Last activity: 2026-05-25
+Milestone: v1.0 MVP — SHIPPED 2026-05-25
+All 10 phases complete. All 44 plans complete. All 69 requirements satisfied.
 
-Progress: [██████████] 100%
+Archive: `.planning/milestones/v1.0-ROADMAP.md`
 
-## Performance Metrics
+## Next Step
 
-**Velocity:**
+Start v1.1: `/gsd:new-milestone`
 
-- Total plans completed: 31
-- Average duration: -
-- Total execution time: 0 hours
+## Deferred Items
 
-**By Phase:**
+Items acknowledged and deferred at milestone close on 2026-05-25:
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 02.1 | 4 | - | - |
-| 03 | 5 | - | - |
-| 04 | 7 | - | - |
-| 02 | 3 | - | - |
+| Category | Item | Status |
+|----------|------|--------|
+| UX | CONF-02: order confirmation error variant hardcoded to "not-found" even for pending orders | Warning |
+| UX | ReminderForm: no client-side Saturday hint — API rejects correctly, error is generic | Warning |
+| Performance | manifest.ts + pendingOrders.ts full table scan | Warning (functional at MVP volume) |
+| Content | Legal page copy (Privacy, Terms, Cookie Policy) still placeholder | Blocked on client |
+| Types | types/index.ts Supabase-era types coexist with Drizzle schema | Info (TSC clean) |
+| Docs | Nyquist VALIDATION.md sign-off not updated for 9 of 10 phases | Info |
+| Code | src/lib/admin/orders.ts missing `import "server-only"` | Warning |
+| Code | findPendingReuse query missing ORDER BY created_at DESC | Warning |
 
-**Recent Trend:**
-
-- Last 5 plans: -
-- Trend: -
-
-*Updated after each plan completion*
-| Phase 02.1 P03 | 0min | 2 tasks | 6 files |
-| Phase 02.1 P04 | ~ | 1 tasks | 8 files |
-| Phase 02 P03 | ~3h | 3 tasks | 7 files |
-| Phase 09 P01 | 10min | 3 tasks | 8 files |
-| Phase 09 P02 | 10 minutes | 3 tasks | 1 files |
-
-## Accumulated Context
-
-### Decisions
-
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- Foundation: Use `motion` (not `framer-motion`) — package was rebranded; all imports must be `"motion/react"`
-- Foundation: Pin Zod to v3 — v4 breaks `@hookform/resolvers` v3 as of April 2026
-- Foundation: `@drawer/default.tsx` MUST be created in the same commit as the `@drawer` slot folder — missing it causes hard-refresh 404s that are painful to retrofit
-- Foundation: Zustand SSR hydration guard (`useHasHydrated`) must exist before any cart UI component is built — cart badge is the highest-visibility location for this bug
-- Foundation: `SUPABASE_SERVICE_ROLE_KEY` server-only from day one — two-client pattern (`lib/supabase/admin.ts` and `lib/supabase/server.ts`) established in Phase 1, never touched again
-- Payments: Paystack webhook must call `req.text()` before any JSON parsing — body stream is one-time-read; parsing JSON first silently breaks HMAC verification
-- [Phase ?]: FOUND-03: 11 pgTable exports; FOUND-05 includes Upstash vars from .env.local.example
-
-### Roadmap Evolution
-
-- Phase 7 added then moved: Migrate Supabase to Neon and Uploadthing re-inserted as Phase 2.1 (urgent — do before Phase 3)
-- Phase 2.1 inserted after Phase 2: Migrate Supabase to Neon and Uploadthing (URGENT)
-- Phase 7 inserted after Phase 6: Missing Pages + Route Completeness — closes all broken Navbar/Footer links, adds global 404, 3 legal pages, Plans page (2026-05-07)
-- Phase 8 inserted after Phase 7: Missing Admin Structures — 7 operational gaps identified in business impact assessment: prep list, delivery manifest, customer search, analytics week picker, ordering config week management, pending order visibility, bulk status transitions (2026-05-07)
-- Phase 9 added: Tech debt: cache revalidation + requirements cleanup (2026-05-22)
-
-### Pending Todos
-
-None.
-
-### Blockers/Concerns
-
-- **Client blockers (not code blockers):** Kit size labels, prep options per product, and Paystack account/live keys are pending from client. Phase 3 drawer options will use placeholders; Phase 5 Paystack integration requires live keys before go-live.
-- **Brand assets pending:** Product photography, copy, and moodboard not yet received. Phase 2 uses placeholder images and copy.
-- **Pre-existing TSC errors:** 4 test files have TypeScript errors (Footer.test.tsx, analytics.test.ts, pendingOrders.test.ts, products.test.ts) introduced in prior phases — not Phase 9 regressions. Address in a future cleanup pass.
-
-## Session Continuity
-
-Last session: 2026-05-25T07:00:00.000Z
-Stopped at: Phase 9 verification passed — milestone complete
-Resume file: None
+Known deferred items at close: 8 (see above)
