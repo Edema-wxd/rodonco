@@ -3,6 +3,10 @@
     {
       "path": "/api/cutoff",
       "schedule": "59 22 * * 4"
+    },
+    {
+      "path": "/api/cron/purge-abandoned-carts",
+      "schedule": "0 3 * * *"
     }
   ]
 }

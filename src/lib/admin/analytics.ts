@@ -1,10 +1,13 @@
 import "server-only";
 
 import { db } from "@/lib/db";
-import { count, desc, eq, sum } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sum } from "drizzle-orm";
 
 import { order_items, orders } from "../../../drizzle/schema";
 import { currentWeekOf } from "./week";
+
+// Statuses that represent real, committed revenue. Pending = unpaid; cancelled = void.
+const COMPLETED_STATUSES = ["paid", "processing", "delivered"] as const;
 
 export type WeeklyAnalytics = {
   week: string;
@@ -19,8 +22,14 @@ export async function getWeeklyAnalytics(weekOverride?: string): Promise<WeeklyA
 
   const [totalOrdersResult, totalRevenueResult, topProductsResult, statusBreakdownResult] =
     await Promise.all([
-      db.select({ c: count() }).from(orders).where(eq(orders.week_of, week)),
-      db.select({ s: sum(orders.total_ngn) }).from(orders).where(eq(orders.week_of, week)),
+      db
+        .select({ c: count() })
+        .from(orders)
+        .where(and(eq(orders.week_of, week), inArray(orders.status, [...COMPLETED_STATUSES]))),
+      db
+        .select({ s: sum(orders.total_ngn) })
+        .from(orders)
+        .where(and(eq(orders.week_of, week), inArray(orders.status, [...COMPLETED_STATUSES]))),
       db
         .select({
           name: order_items.product_name,
@@ -28,10 +37,11 @@ export async function getWeeklyAnalytics(weekOverride?: string): Promise<WeeklyA
         })
         .from(order_items)
         .innerJoin(orders, eq(order_items.order_id, orders.id))
-        .where(eq(orders.week_of, week))
+        .where(and(eq(orders.week_of, week), inArray(orders.status, [...COMPLETED_STATUSES])))
         .groupBy(order_items.product_name)
         .orderBy(desc(sum(order_items.quantity)))
         .limit(5),
+      // Status breakdown intentionally includes ALL statuses — percentages add to 100% across everything.
       db
         .select({ status: orders.status, c: count() })
         .from(orders)

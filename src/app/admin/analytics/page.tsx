@@ -45,6 +45,13 @@ export default async function AdminAnalyticsPage({
         <WeekPickerBar currentWeek={analytics.week} />
       </div>
 
+      <p
+        className="mb-6 text-xs text-stone-400"
+        style={{ fontFamily: "var(--font-inter)" }}
+      >
+        Revenue and order totals include paid, processing, and delivered orders only.
+      </p>
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <StatCard
           label="Total Orders"

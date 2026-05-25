@@ -5,20 +5,25 @@ import { describe, it, vi, expect as _expect, beforeEach } from "vitest";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const expect = _expect as any;
 
-const mockAuth = vi.fn();
+// --- Hoist all mock state so references survive vi.resetModules() ---
+const { mockAuth, mockGetPaidOrders, MockResend, mockBatchSend } = vi.hoisted(() => {
+  const mockBatchSend = vi.fn();
+  // Must use a regular function (not arrow) — arrow fns can't be called with `new`.
+  const MockResend = vi.fn(function (this: { batch: { send: typeof mockBatchSend } }) {
+    this.batch = { send: mockBatchSend };
+  });
+  const mockAuth = vi.fn();
+  const mockGetPaidOrders = vi.fn();
+  return { mockAuth, mockGetPaidOrders, MockResend, mockBatchSend };
+});
+
 vi.mock("@/auth", () => ({ auth: mockAuth }));
 
-const mockGetPaidOrders = vi.fn();
 vi.mock("@/lib/admin/reminders", () => ({
   getPaidOrdersForWeek: mockGetPaidOrders,
 }));
 
-const mockBatchSend = vi.fn();
-vi.mock("resend", () => ({
-  Resend: vi.fn().mockImplementation(() => ({
-    batch: { send: mockBatchSend },
-  })),
-}));
+vi.mock("resend", () => ({ Resend: MockResend }));
 
 async function callRoute(body: unknown, withSession = true) {
   if (withSession) {

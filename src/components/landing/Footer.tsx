@@ -1,5 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
+
+import { getSiteSettings } from "@/lib/admin/config";
+import { DEFAULT_CONTACT_EMAIL } from "@/lib/email/emailConfig";
+
+const getCachedSiteSettings = unstable_cache(getSiteSettings, ["footer-site-settings"], {
+  revalidate: 60,
+});
 
 const footerLinks = [
   {
@@ -18,7 +26,10 @@ const footerLinks = [
   },
 ] as const;
 
-export function Footer() {
+export async function Footer() {
+  const siteSettings = await getCachedSiteSettings();
+  const contactEmail = siteSettings?.contact_email ?? DEFAULT_CONTACT_EMAIL;
+
   return (
     <footer className="bg-zinc-100 px-8 py-16">
       <div className="mx-auto max-w-7xl">
@@ -45,6 +56,13 @@ export function Footer() {
             >
               &copy; 2025 rodo&amp;co. Your demure kitchen assistant.
             </p>
+            <a
+              href={`mailto:${contactEmail}`}
+              className="text-sm text-zinc-500 transition-colors hover:text-zinc-800"
+              style={{ fontFamily: "var(--font-inter)" }}
+            >
+              {contactEmail}
+            </a>
             {/* Social icons placeholder */}
             <div className="flex gap-4">
               {[0, 1, 2].map((i) => (

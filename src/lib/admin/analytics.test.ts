@@ -32,6 +32,7 @@ vi.mock("drizzle-orm", () => ({
   count: vi.fn(() => ({})),
   desc: vi.fn((col: unknown) => ({ col })),
   and: vi.fn((...args: unknown[]) => args),
+  inArray: vi.fn((col: unknown, vals: unknown) => ({ col, vals })),
 }));
 
 vi.mock("./week", () => ({ currentWeekOf: vi.fn(() => "2026-05-03") }));

@@ -229,12 +229,14 @@ export interface CustomerOrderReceiptProps {
   order: Order;
   items: OrderItem[];
   nextDeliveryDate: string; // ISO YYYY-MM-DD
+  contactEmail: string;
 }
 
 export function CustomerOrderReceipt({
   order,
   items,
   nextDeliveryDate,
+  contactEmail,
 }: CustomerOrderReceiptProps) {
   return (
     <Html>
@@ -323,8 +325,8 @@ export function CustomerOrderReceipt({
 
             <Text style={paragraph}>
               Questions? Reply to this email or contact us at{" "}
-              <a href="mailto:orders@rodoandco.com" style={{ color: "#c8501a" }}>
-                orders@rodoandco.com
+              <a href={`mailto:${contactEmail}`} style={{ color: "#c8501a" }}>
+                {contactEmail}
               </a>
               .
             </Text>

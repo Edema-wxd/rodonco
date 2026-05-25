@@ -15,7 +15,12 @@ export type ActivityAction =
   | "product.updated"
   | "product.deleted"
   | "settings.ordering_config_updated"
-  | "settings.site_settings_updated";
+  | "settings.site_settings_updated"
+  | "abandoned_cart.marked_contacted"
+  | "abandoned_cart.marked_not_contacted"
+  | "abandoned_cart.deleted"
+  | "abandoned_cart.bulk_marked_contacted"
+  | "abandoned_cart.bulk_deleted";
 
 export interface LogActivityInput {
   adminEmail: string;

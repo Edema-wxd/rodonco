@@ -32,4 +32,14 @@ export function validateEnv(): void {
       "[validateEnv] RESEND_API_KEY must be set. Add it to .env.local (dev) or Vercel environment variables (production)."
     );
   }
+
+  // Upstash: warn-only — rate limiting is fail-open, so missing vars degrade gracefully
+  if (process.env.NODE_ENV === "production") {
+    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+      console.warn(
+        "[validateEnv] UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN is not set. " +
+          "Rate limiting is disabled — strongly recommended for production."
+      );
+    }
+  }
 }

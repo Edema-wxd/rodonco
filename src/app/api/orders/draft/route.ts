@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { db, schema } from "@/lib/db";
+import { rateLimit, getClientIP } from "@/lib/rate-limit";
 
 const nigerianPhoneRegex = /^0[7-9][0-9]{9}$/;
 
@@ -31,6 +32,10 @@ const draftSchema = z.object({
 });
 
 export async function POST(req: Request): Promise<NextResponse> {
+  const ip = getClientIP(req);
+  const rl = await rateLimit(ip, { requests: 10, window: "1 m", prefix: "rl:orders-draft", route: "/api/orders/draft" });
+  if (rl.limited) return rl.response;
+
   let rawBody: unknown;
   try {
     rawBody = await req.json();

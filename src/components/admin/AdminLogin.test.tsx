@@ -10,6 +10,8 @@ vi.mock("next-auth/react", () => ({
   signIn: (...args: unknown[]) => signInMock(...args),
 }));
 
+vi.mock("@/app/admin/_actions", () => ({ logAuthEventAction: vi.fn().mockResolvedValue(undefined) }));
+
 import { AdminLogin } from "./AdminLogin";
 
 describe("AdminLogin [AUTH-01]", () => {
@@ -46,7 +48,7 @@ describe("AdminLogin [AUTH-01]", () => {
     expect(signInMock).toHaveBeenCalledWith("credentials", {
       email: "admin@rodo.co",
       password: "secret",
-      redirectTo: "/admin/orders",
+      redirect: false,
     });
   });
 

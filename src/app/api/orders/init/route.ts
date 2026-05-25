@@ -15,13 +15,14 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { nanoid } from "nanoid";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { db, schema } from "@/lib/db";
 import { findPendingReuse } from "@/lib/orders/findPendingReuse";
 import { initializePaystackTransaction } from "@/lib/paystack/initialize";
 import { buildOrderItemsDraftFromCart } from "@/lib/checkout/cartToOrderDraft";
+import { rateLimit, getClientIP } from "@/lib/rate-limit";
 
 // ─────────────────────────────────────────
 // Request validation schema
@@ -60,6 +61,15 @@ export type InitOrderRequest = z.infer<typeof initOrderSchema>;
 // ─────────────────────────────────────────
 
 export async function POST(req: Request): Promise<NextResponse> {
+  // Rate limiting: 5/min and 20/hr per IP — checked in parallel before any DB or Paystack work
+  const ip = getClientIP(req);
+  const [perMinute, perHour] = await Promise.all([
+    rateLimit(ip, { requests: 5, window: "1 m", prefix: "rl:orders-init:minute", route: "/api/orders/init (5/min)" }),
+    rateLimit(ip, { requests: 20, window: "1 h", prefix: "rl:orders-init:hour", route: "/api/orders/init (20/hr)" }),
+  ]);
+  if (perMinute.limited) return perMinute.response;
+  if (perHour.limited) return perHour.response;
+
   // 1. Parse + validate JSON body
   let rawBody: unknown;
   try {
@@ -206,6 +216,14 @@ export async function POST(req: Request): Promise<NextResponse> {
     // Insert order items
     const itemDrafts = buildOrderItemsDraftFromCart(pricedCart, newOrderId);
     await db.insert(schema.order_items).values(itemDrafts);
+
+    // Option A auto-cleanup: delete any abandoned_carts rows for this email so
+    // converted customers don't appear in the abandoned carts admin view.
+    db.delete(schema.abandoned_carts)
+      .where(eq(schema.abandoned_carts.customer_email, email))
+      .catch((err) =>
+        console.warn("[/api/orders/init] Could not clean up abandoned_carts:", err),
+      );
   } catch (err) {
     console.error("[/api/orders/init] DB insert error:", err);
     return NextResponse.json(

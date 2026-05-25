@@ -17,7 +17,7 @@ type NavItem = {
   badge?: number;
 };
 
-const buildNavItems = (pendingCount: number): NavItem[] => [
+const buildNavItems = (pendingCount: number, abandonedCartCount: number): NavItem[] => [
   { href: "/admin", label: "Dashboard", Icon: Lucide.LayoutDashboard, exact: true },
   { href: "/admin/orders", label: "Orders", Icon: Lucide.ShoppingBag },
   { href: "/admin/products", label: "Products", Icon: Lucide.Package },
@@ -26,17 +26,25 @@ const buildNavItems = (pendingCount: number): NavItem[] => [
   { href: "/admin/prep-list", label: "Prep List", Icon: Lucide.ClipboardList },
   { href: "/admin/manifest", label: "Manifest", Icon: Lucide.Truck },
   { href: "/admin/pending", label: "Pending Orders", Icon: Lucide.Clock, badge: pendingCount },
+  {
+    href: "/admin/abandoned-carts",
+    label: "Abandoned Carts",
+    Icon: Lucide.ShoppingCart,
+    badge: abandonedCartCount,
+  },
   { href: "/admin/activity", label: "Activity", Icon: Lucide.Activity },
 ];
 
 export function AdminSidebar({
   adminEmail,
   pendingCount,
+  abandonedCartCount,
   mobileOpen,
   onMobileClose,
 }: {
   adminEmail: string | null;
   pendingCount: number;
+  abandonedCartCount: number;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
 }) {
@@ -79,7 +87,7 @@ export function AdminSidebar({
       <div className="mx-4 h-px bg-stone-100" />
 
       <nav className="flex-1 space-y-0.5 px-3 py-3">
-        {buildNavItems(pendingCount).map(({ href, label, Icon, exact, badge }) => {
+        {buildNavItems(pendingCount, abandonedCartCount).map(({ href, label, Icon, exact, badge }) => {
           const active = exact ? pathname === href : (pathname === href || pathname.startsWith(href + "/"));
           return (
             <Link

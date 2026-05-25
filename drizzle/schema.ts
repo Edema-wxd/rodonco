@@ -138,6 +138,10 @@ export const admins = pgTable("admins", {
 
 // ============================================================
 // ABANDONED CARTS
+// Retention policy: records older than 90 days should be purged to limit PII
+// exposure (NDPR compliance). A scheduled purge job has not yet been built —
+// see README "Data Retention" for details. Indexes on created_at and
+// customer_email exist in migration 0004_abandoned_carts.sql.
 // ============================================================
 export const abandoned_carts = pgTable("abandoned_carts", {
   id: uuid("id").defaultRandom().primaryKey(),

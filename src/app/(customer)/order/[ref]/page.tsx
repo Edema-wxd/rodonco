@@ -8,6 +8,7 @@
 import type { Metadata } from "next";
 import { getOrderForConfirmation } from "@/lib/orders/getOrderForConfirmation";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
+import { getSiteSettings } from "@/lib/admin/config";
 import { OrderConfirmationView } from "@/components/order/OrderConfirmationView";
 
 export const dynamic = "force-dynamic";
@@ -23,10 +24,11 @@ export default async function OrderConfirmationPage({
 }) {
   const { ref } = await params;
 
-  // Parallel-fetch order data and ordering config (for next delivery date)
-  const [data, orderingConfig] = await Promise.all([
+  // Parallel-fetch order data, ordering config, and site settings
+  const [data, orderingConfig, siteSettings] = await Promise.all([
     getOrderForConfirmation(ref),
     getOrderingConfig(),
+    getSiteSettings(),
   ]);
 
   // Determine which error variant to show when data is null.
@@ -42,6 +44,7 @@ export default async function OrderConfirmationPage({
       data={data}
       errorVariant={errorVariant}
       nextDeliveryDate={orderingConfig.next_delivery_date}
+      contactEmail={siteSettings?.contact_email ?? undefined}
     />
   );
 }

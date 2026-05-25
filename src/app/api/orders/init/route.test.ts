@@ -12,6 +12,7 @@ vi.mock("server-only", () => ({}));
 const { mockState, mockDbInsert, mockDbSelect } = vi.hoisted(() => {
   const mockState = {
     isOrderingOpen: true,
+    deliveryFeeNgn: 0,
     paystackResult: {
       access_code: "test_access_code",
       authorization_url: "https://checkout.paystack.com/abc",
@@ -38,6 +39,7 @@ vi.mock("@/lib/shop/orderingConfig", () => ({
     is_ordering_open: mockState.isOrderingOpen,
     cutoff_message: null,
     next_delivery_date: "2026-05-09",
+    delivery_fee_ngn: mockState.deliveryFeeNgn,
   })),
 }));
 
@@ -56,6 +58,10 @@ vi.mock("@/lib/db", () => ({
   db: {
     insert: mockDbInsert,
     select: mockDbSelect,
+    // fire-and-forget abandoned_carts cleanup — must exist but result is ignored
+    delete: vi.fn().mockReturnValue({
+      where: vi.fn().mockResolvedValue({ rowCount: 0 }),
+    }),
   },
   schema: {
     orders: {
@@ -71,6 +77,20 @@ vi.mock("@/lib/db", () => ({
       week_of: "orders.week_of",
     },
     order_items: {},
+    abandoned_carts: {
+      customer_email: "abandoned_carts.customer_email",
+    },
+    product_variants: {
+      product_id: "product_variants.product_id",
+      label: "product_variants.label",
+      price_ngn: "product_variants.price_ngn",
+      is_default: "product_variants.is_default",
+    },
+    product_prep_options: {
+      product_id: "product_prep_options.product_id",
+      label: "product_prep_options.label",
+      extra_cost_ngn: "product_prep_options.extra_cost_ngn",
+    },
   },
 }));
 
@@ -116,6 +136,19 @@ function makeRequest(body: unknown) {
   });
 }
 
+// Sets up db.select() to return a matching variant for "prod-abc/1kg" (price_ngn: 150000)
+// and empty prep options — used by the server-side price authority in the route.
+function setupSuccessfulDbSelect() {
+  const variantWhere = vi.fn().mockResolvedValue([
+    { product_id: "prod-abc", label: "1kg", price_ngn: 150000, is_default: false },
+  ]);
+  const prepWhere = vi.fn().mockResolvedValue([]);
+
+  mockDbSelect
+    .mockReturnValueOnce({ from: vi.fn().mockReturnValue({ where: variantWhere }) })
+    .mockReturnValueOnce({ from: vi.fn().mockReturnValue({ where: prepWhere }) });
+}
+
 function setupSuccessfulDbInsert() {
   const returning = vi.fn().mockResolvedValue([{ id: "new-order-uuid", reference: "RDC-test1234567" }]);
   const values = vi.fn().mockReturnValue({ returning });
@@ -137,6 +170,7 @@ describe("POST /api/orders/init", () => {
     vi.clearAllMocks();
     // Reset state
     mockState.isOrderingOpen = true;
+    mockState.deliveryFeeNgn = 0;
     mockState.pendingReuseResult = null;
     mockState.paystackError = null;
     mockState.paystackResult = {
@@ -226,6 +260,7 @@ describe("POST /api/orders/init", () => {
 
   describe("success path — new order", () => {
     it("returns 200 with reference, access_code, amount_kobo", async () => {
+      setupSuccessfulDbSelect();
       setupSuccessfulDbInsert();
 
       const req = makeRequest(validPayload);
@@ -235,10 +270,12 @@ describe("POST /api/orders/init", () => {
       const body = await res.json();
       expect(body.reference).toBeDefined();
       expect(body.access_code).toBe("test_access_code");
-      expect(body.amount_kobo).toBe(300000); // sum of subtotals
+      // totalNgn = 150000 * 2 + delivery(0) = 300000; amount_kobo = totalNgn * 100
+      expect(body.amount_kobo).toBe(30000000);
     });
 
     it("generates reference with RDC- prefix", async () => {
+      setupSuccessfulDbSelect();
       setupSuccessfulDbInsert();
 
       const req = makeRequest(validPayload);
@@ -249,6 +286,7 @@ describe("POST /api/orders/init", () => {
     });
 
     it("inserts order into DB before calling Paystack", async () => {
+      setupSuccessfulDbSelect();
       setupSuccessfulDbInsert();
 
       const req = makeRequest(validPayload);
@@ -262,6 +300,7 @@ describe("POST /api/orders/init", () => {
 
   describe("success path — reuse existing pending order", () => {
     it("reuses existing pending order and returns its reference", async () => {
+      setupSuccessfulDbSelect();
       mockState.pendingReuseResult = {
         id: "existing-order-id",
         reference: "RDC-existing123",
@@ -282,6 +321,7 @@ describe("POST /api/orders/init", () => {
 
   describe("error handling", () => {
     it("returns 503 when Paystack fails", async () => {
+      setupSuccessfulDbSelect();
       setupSuccessfulDbInsert();
       mockState.paystackError = new Error("Paystack API unavailable");
 

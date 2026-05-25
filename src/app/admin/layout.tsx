@@ -3,6 +3,7 @@ import * as React from "react";
 import { auth } from "@/auth";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { getPendingOrdersCount } from "@/lib/admin/pendingOrders";
+import { getUncContactedCount } from "@/lib/admin/abandonedCarts";
 
 export const dynamic = "force-dynamic";
 
@@ -15,11 +16,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return <>{children}</>;
   }
 
-  // Fetch pending count only for authenticated admins (T-8-03-01 mitigation)
-  const pendingCount = await getPendingOrdersCount();
+  // Fetch sidebar badge counts in parallel
+  const [pendingCount, abandonedCartCount] = await Promise.all([
+    getPendingOrdersCount(),
+    getUncContactedCount(),
+  ]);
 
   return (
-    <AdminShell adminEmail={session.user.email ?? null} pendingCount={pendingCount}>
+    <AdminShell
+      adminEmail={session.user.email ?? null}
+      pendingCount={pendingCount}
+      abandonedCartCount={abandonedCartCount}
+    >
       {children}
     </AdminShell>
   );

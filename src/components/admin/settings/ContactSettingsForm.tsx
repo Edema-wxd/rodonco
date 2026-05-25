@@ -17,8 +17,18 @@ export function ContactSettingsForm({ initialSettings }: Props) {
   const [email, setEmail] = React.useState(initialSettings?.contact_email ?? "");
   const [instagram, setInstagram] = React.useState(initialSettings?.instagram_handle ?? "");
   const [submitting, setSubmitting] = React.useState(false);
+  const [emailError, setEmailError] = React.useState("");
+
+  function isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
 
   async function handleSave() {
+    if (email.trim() && !isValidEmail(email.trim())) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
+    setEmailError("");
     setSubmitting(true);
     try {
       const res = await fetch("/api/admin/site-settings", {
@@ -102,11 +112,19 @@ export function ContactSettingsForm({ initialSettings }: Props) {
             id="contact-email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) setEmailError("");
+            }}
             placeholder="hello@rodonco.com"
-            className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+            className={`h-10 w-full rounded-xl border bg-white px-3 text-sm text-zinc-800 outline-none focus:ring-2 focus:ring-red-100 ${emailError ? "border-red-400 focus:border-red-400" : "border-stone-200 focus:border-red-400"}`}
             style={{ fontFamily: "var(--font-inter)" }}
           />
+          {emailError && (
+            <p className="text-xs text-red-500" style={{ fontFamily: "var(--font-inter)" }}>
+              {emailError}
+            </p>
+          )}
         </div>
 
         {/* Instagram */}

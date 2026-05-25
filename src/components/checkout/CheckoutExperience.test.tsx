@@ -71,9 +71,10 @@ vi.mock("sonner", () => ({
 }));
 
 vi.mock("@paystack/inline-js", () => ({
-  default: vi.fn(() => ({
-    resumeTransaction: mockResumeTransaction,
-  })),
+  // Must use regular function — arrow fns can't be called with `new` in Vitest 4.x.
+  default: vi.fn(function (this: { resumeTransaction: typeof mockResumeTransaction }) {
+    this.resumeTransaction = mockResumeTransaction;
+  }),
 }));
 
 vi.mock("@/store/cart", () => ({
@@ -119,7 +120,36 @@ function getCapturedCallbacks() {
 }
 
 function renderCheckout() {
-  return render(<CheckoutExperience />);
+  return render(<CheckoutExperience deliveryFeeNgn={0} />);
+}
+
+// Fills step-1 form and clicks "Continue to Payment", waits for step-2 "Pay Now" button.
+// Caller must set up global.fetch before calling renderCheckout — first call is the draft save.
+async function fillAndAdvanceToPayment(
+  user = {
+    name: "Tunde Bakare",
+    phone: "07011223344",
+    email: "tunde@example.com",
+    address: "22 Allen Avenue, Ikeja, Lagos",
+  }
+) {
+  fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: user.name } });
+  fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: user.phone } });
+  fireEvent.change(screen.getByLabelText(/email/i), { target: { value: user.email } });
+  fireEvent.change(screen.getByLabelText(/delivery address/i), { target: { value: user.address } });
+  fireEvent.click(screen.getByRole("checkbox"));
+  fireEvent.click(screen.getByRole("button", { name: /continue to payment/i }));
+  await waitFor(() => {
+    expect(screen.getByRole("button", { name: /pay now/i })).toBeTruthy();
+  });
+}
+
+// Factory — Response bodies are streams; each fetch call needs a fresh object.
+function makeDraftOk() {
+  return new Response(JSON.stringify({}), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 // ── Setup / teardown ──────────────────────────────────────────────────────────
@@ -139,10 +169,12 @@ beforeEach(() => {
     }
   );
 
-  // Re-wire PaystackPop constructor after resetAllMocks
-  (PaystackPopMock as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-    resumeTransaction: mockResumeTransaction,
-  }));
+  // Re-wire PaystackPop constructor after resetAllMocks — regular function required for `new`.
+  (PaystackPopMock as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+    function (this: { resumeTransaction: typeof mockResumeTransaction }) {
+      this.resumeTransaction = mockResumeTransaction;
+    }
+  );
 
   vi.stubEnv("NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY", "pk_test_abc123");
 });
@@ -169,7 +201,7 @@ describe("CheckoutExperience — layout and cart summary", () => {
     expect(screen.getByLabelText(/email/i)).toBeTruthy();
     expect(screen.getByLabelText(/delivery address/i)).toBeTruthy();
     expect(screen.getByRole("checkbox")).toBeTruthy();
-    expect(screen.getByRole("button", { name: /pay now/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /continue to payment/i })).toBeTruthy();
   });
 
   it("renders cart summary with correct item names and total", () => {
@@ -178,8 +210,8 @@ describe("CheckoutExperience — layout and cart summary", () => {
     expect(screen.getByText("Your Order")).toBeTruthy();
     expect(screen.getByText("Organic Tomatoes")).toBeTruthy();
     expect(screen.getByText("Cooking Kit A")).toBeTruthy();
-    // Total: (300000 + 800000) / 100 = 11000 NGN — formatted as ₦11,000
-    expect(screen.getByText(/11,000/)).toBeTruthy();
+    // Subtotal and total are both ₦11,000 when delivery is free
+    expect(screen.getAllByText(/11,000/).length).toBeGreaterThan(0);
   });
 
   it("shows prep option as secondary text when present", () => {
@@ -192,9 +224,10 @@ describe("CheckoutExperience — layout and cart summary", () => {
     expect(screen.getByText(/Family \(4 people\)/i)).toBeTruthy();
   });
 
-  it('shows "Free delivery every Saturday" note in cart summary', () => {
+  it("shows delivery row in cart summary (Free when no delivery fee)", () => {
     renderCheckout();
-    expect(screen.getByText(/free delivery every saturday/i)).toBeTruthy();
+    expect(screen.getByText("Delivery")).toBeTruthy();
+    expect(screen.getByText("Free")).toBeTruthy();
   });
 });
 
@@ -223,28 +256,16 @@ describe("CheckoutExperience — empty cart redirect", () => {
 describe("CheckoutExperience — Pay Now loading state (D-03)", () => {
   it("disables Pay Now and shows Processing... while init in-flight", async () => {
     let resolveInit!: (value: Response) => void;
-    global.fetch = vi.fn(
-      () =>
-        new Promise<Response>((resolve) => {
-          resolveInit = resolve;
-        })
-    );
+    const initPending = new Promise<Response>((resolve) => { resolveInit = resolve; });
+
+    // Draft (1st fetch) resolves immediately; init (2nd fetch) stays pending.
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce(makeDraftOk())
+      .mockReturnValueOnce(initPending);
 
     renderCheckout();
+    await fillAndAdvanceToPayment({ name: "Adaeze Obi", phone: "08012345678", email: "adaeze@example.com", address: "15 Banana Island Road, Ikoyi, Lagos" });
 
-    fireEvent.change(screen.getByLabelText(/full name/i), {
-      target: { value: "Adaeze Obi" },
-    });
-    fireEvent.change(screen.getByLabelText(/phone/i), {
-      target: { value: "08012345678" },
-    });
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: "adaeze@example.com" },
-    });
-    fireEvent.change(screen.getByLabelText(/delivery address/i), {
-      target: { value: "15 Banana Island Road, Ikoyi, Lagos" },
-    });
-    fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(screen.getByRole("button", { name: /pay now/i }));
 
     await waitFor(() => {
@@ -266,32 +287,17 @@ describe("CheckoutExperience — Pay Now loading state (D-03)", () => {
 
 describe("CheckoutExperience — Paystack cancellation (D-04)", () => {
   it("shows cancellation toast and stays on page when Paystack popup cancelled", async () => {
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          reference: "RDC-abc1234567",
-          access_code: "acc_test_123",
-          amount_kobo: 1100000,
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      )
+    const initResponse = new Response(
+      JSON.stringify({ reference: "RDC-abc1234567", access_code: "acc_test_123", amount_kobo: 1100000 }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce(makeDraftOk())
+      .mockResolvedValueOnce(initResponse);
 
     renderCheckout();
+    await fillAndAdvanceToPayment();
 
-    fireEvent.change(screen.getByLabelText(/full name/i), {
-      target: { value: "Tunde Bakare" },
-    });
-    fireEvent.change(screen.getByLabelText(/phone/i), {
-      target: { value: "07011223344" },
-    });
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: "tunde@example.com" },
-    });
-    fireEvent.change(screen.getByLabelText(/delivery address/i), {
-      target: { value: "22 Allen Avenue, Ikeja, Lagos" },
-    });
-    fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(screen.getByRole("button", { name: /pay now/i }));
 
     await waitFor(() => {
@@ -319,32 +325,17 @@ describe("CheckoutExperience — payment success (D-08)", () => {
   it("clears cart and redirects to /order/[ref] on Paystack success", async () => {
     const testRef = "RDC-xyz9876543";
 
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          reference: testRef,
-          access_code: "acc_success_456",
-          amount_kobo: 1100000,
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      )
+    const initResponse = new Response(
+      JSON.stringify({ reference: testRef, access_code: "acc_success_456", amount_kobo: 1100000 }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce(makeDraftOk())
+      .mockResolvedValueOnce(initResponse);
 
     renderCheckout();
+    await fillAndAdvanceToPayment({ name: "Ngozi Adeyemi", phone: "09099887766", email: "ngozi@example.com", address: "3 Marina Road, Lagos Island" });
 
-    fireEvent.change(screen.getByLabelText(/full name/i), {
-      target: { value: "Ngozi Adeyemi" },
-    });
-    fireEvent.change(screen.getByLabelText(/phone/i), {
-      target: { value: "09099887766" },
-    });
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: "ngozi@example.com" },
-    });
-    fireEvent.change(screen.getByLabelText(/delivery address/i), {
-      target: { value: "3 Marina Road, Lagos Island" },
-    });
-    fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(screen.getByRole("button", { name: /pay now/i }));
 
     await waitFor(() => {

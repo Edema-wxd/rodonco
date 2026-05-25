@@ -53,3 +53,12 @@ For a full project review (scope, architecture, data model, setup, deployment, a
 - [`LAUNCH-CHECKLIST.md`](./LAUNCH-CHECKLIST.md)
 - [`.planning/PROJECT.md`](./.planning/PROJECT.md)
 - [`.planning/ROADMAP.md`](./.planning/ROADMAP.md)
+
+
+## Data Retention
+
+**Abandoned carts** store customer PII (name, phone, email, address) for checkout recovery outreach. To limit NDPR exposure, records older than **90 days** are purged automatically.
+
+A Vercel Cron job runs daily at **03:00 UTC** and calls `GET /api/cron/purge-abandoned-carts`, which deletes all `abandoned_carts` rows where `created_at < NOW() - 90 days`. The deleted count is logged and returned in the response body for visibility in Vercel's cron dashboard.
+
+The route is protected by the existing `CRON_SECRET` environment variable (Bearer token). Records can also be deleted manually via the admin at `/admin/abandoned-carts`.

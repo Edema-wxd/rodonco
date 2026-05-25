@@ -15,6 +15,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import type { Order, OrderItem } from "@/types";
+import { DEFAULT_CONTACT_EMAIL } from "@/lib/email/emailConfig";
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
@@ -52,9 +53,10 @@ type ErrorVariant = "not-found" | "not-paid";
 
 interface ErrorStateProps {
   variant: ErrorVariant;
+  contactEmail: string;
 }
 
-function ErrorState({ variant }: ErrorStateProps) {
+function ErrorState({ variant, contactEmail }: ErrorStateProps) {
   const heading =
     variant === "not-found" ? "Order not found" : "Payment not confirmed";
   const body =
@@ -76,7 +78,7 @@ function ErrorState({ variant }: ErrorStateProps) {
           Back to Shop
         </Link>
         <a
-          href="mailto:orders@rodoandco.com"
+          href={`mailto:${contactEmail}`}
           className={cn(buttonVariants({ variant: "ghost" }))}
         >
           Contact Support
@@ -215,15 +217,18 @@ interface OrderConfirmationViewProps {
   errorVariant?: OrderConfirmationErrorVariant;
   /** `ordering_config.next_delivery_date` — passed from server page */
   nextDeliveryDate: string | null;
+  /** Contact email from site_settings; falls back to DEFAULT_CONTACT_EMAIL */
+  contactEmail?: string;
 }
 
 export function OrderConfirmationView({
   data,
   errorVariant = "not-found",
   nextDeliveryDate,
+  contactEmail = DEFAULT_CONTACT_EMAIL,
 }: OrderConfirmationViewProps) {
   if (!data) {
-    return <ErrorState variant={errorVariant} />;
+    return <ErrorState variant={errorVariant} contactEmail={contactEmail} />;
   }
 
   return (

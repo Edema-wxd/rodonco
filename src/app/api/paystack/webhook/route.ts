@@ -21,6 +21,7 @@ import { verifyPaystackSignature } from "@/lib/paystack/verifySignature";
 import { db, schema } from "@/lib/db";
 import { sendOrderEmails } from "@/lib/email/sendOrderEmails";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
+import { rateLimit, getClientIP } from "@/lib/rate-limit";
 
 // ─── Paystack payload types ───────────────────────────────────────────────────
 // Minimal shapes covering the fields we actually use.
@@ -42,6 +43,11 @@ interface PaystackWebhookPayload {
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: Request): Promise<NextResponse> {
+  // ── Rate limit: 60/min per IP — before body read and HMAC to save CPU on flooded requests
+  const ip = getClientIP(req);
+  const rl = await rateLimit(ip, { requests: 60, window: "1 m", prefix: "rl:webhook", route: "/api/paystack/webhook" });
+  if (rl.limited) return rl.response;
+
   // ── Step 1: Read raw body BEFORE any JSON parsing ─────────────────────────
   let rawBody: string;
   try {

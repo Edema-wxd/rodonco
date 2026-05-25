@@ -11,6 +11,8 @@ import React from "react";
 import { resend } from "./resendClient";
 import { CustomerOrderReceipt } from "./templates/CustomerOrderReceipt";
 import { AdminNewOrderAlert } from "./templates/AdminNewOrderAlert";
+import { DEFAULT_CONTACT_EMAIL } from "./emailConfig";
+import { getSiteSettings } from "@/lib/admin/config";
 import type { Order, OrderItem } from "@/types";
 
 // ─── Env ─────────────────────────────────────────────────────────────────────
@@ -48,15 +50,25 @@ export async function sendOrderEmails({
   const from = getFromAddress();
   const adminEmail = getAdminEmail();
 
+  // Fetch contact_email fresh from DB — no cache so admin updates take effect immediately
+  let contactEmail = DEFAULT_CONTACT_EMAIL;
+  try {
+    const settings = await getSiteSettings();
+    if (settings?.contact_email) contactEmail = settings.contact_email;
+  } catch (err) {
+    console.warn("[sendOrderEmails] Could not fetch site_settings contact_email — using default:", err);
+  }
+
   // ── Customer receipt ───────────────────────────────────────────────────────
   try {
     const customerHtml = await render(
-      React.createElement(CustomerOrderReceipt, { order, items, nextDeliveryDate })
+      React.createElement(CustomerOrderReceipt, { order, items, nextDeliveryDate, contactEmail })
     );
 
     const { error: customerError } = await resend.emails.send({
       from: `Rodo & Co <${from}>`,
       to: order.customer_email,
+      replyTo: contactEmail,
       subject: `Order confirmed: ${order.reference}`,
       html: customerHtml,
     });
