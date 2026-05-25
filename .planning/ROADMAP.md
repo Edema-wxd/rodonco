@@ -239,8 +239,8 @@ Note: Phase 4 (Admin Panel) depends only on Phase 1 and can be built in parallel
 **Goal:** Customer-facing shop pages (ordering banner and product grid/detail) reflect admin mutations on the very next request via Next.js tag-based revalidation (no 15-second or 60-second ISR lag), AND the planning/REQUIREMENTS.md document is reconciled with the shipped Phases 1-8 stack — every shipped item ticked, FOUND-01..05 rewritten for the real Neon + Drizzle + NextAuth v5 + Uploadthing stack, and Phase 7-8 features (route completeness + admin operations) captured as first-class requirement IDs in the traceability table.
 **Requirements**: INFRA-04, REQ-CLEANUP-09
 **Depends on:** Phase 8
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 09-01-PLAN.md — Tag-based cache invalidation: add tags to lib readers, wire revalidateTag into admin config + product mutation handlers, remove ISR revalidate exports from shop pages
+- [x] 09-01-PLAN.md — Tag-based cache invalidation: add tags to lib readers, wire revalidateTag into admin config + product mutation handlers, remove ISR revalidate exports from shop pages
 - [ ] 09-02-PLAN.md — REQUIREMENTS.md audit: tick shipped items, rewrite FOUND-01..05 for Neon/Drizzle/NextAuth/Uploadthing stack, add ROUTES + ADMIN-OPS sections, extend traceability through Phase 8
