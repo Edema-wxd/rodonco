@@ -44,15 +44,19 @@ Customers can browse, configure, and pay for weekly food prep orders in one smoo
 - ✓ Delivery manifest: printable, sortable by name/address — v1.0
 - ✓ Customer search across name/phone/email — v1.0
 - ✓ Pending orders view with count badge + delete — v1.0
+- ✓ Abandoned carts view with count badge + delete — v1.0
 - ✓ Bulk status transitions (paid→processing, processing→delivered) per delivery week — v1.0
-- ✓ Settings: next_delivery_date + cutoff_message editable with immediate banner reflection — v1.0
+- ✓ Settings: next_delivery_date + cutoff_message + delivery_fee_ngn + contact_email editable — v1.0
 - ✓ Activity log: admin actions recorded and viewable — v1.0
 
 **Automation & Infrastructure** *(Validated in Phases 6, 9)*
 - ✓ Vercel Cron cutoff (Thu 22:59 UTC), CRON_SECRET validated — v1.0
+- ✓ Vercel Cron purge-abandoned — cleans up stale draft orders automatically — v1.0
 - ✓ Admin-triggered delivery reminder emails — v1.0
 - ✓ validateEnv startup assertion, security headers, error boundaries — v1.0
 - ✓ Tag-based revalidateTag cache invalidation — shop pages reflect admin mutations on next request — v1.0
+- ✓ Rate limiting on `/api/orders/init` via Upstash Redis; fails open when Redis env vars absent — v1.0
+- ✓ Server-side price authority — `/api/orders/init` queries DB for variant + prep option prices, delivery fee from ordering_config; client-submitted prices are ignored — v1.0
 
 **Route Completeness** *(Validated in Phase 7)*
 - ✓ Global 404, Privacy, Terms, Cookie Policy, Plans pages — all HTTP 200, on-brand design — v1.0
@@ -85,7 +89,7 @@ Known candidates from deferred items and audit warnings:
 - **Payment market:** Nigerian market. Prices stored in kobo (integer). Display divides by 100.
 - **Delivery schedule:** Orders open Sunday, close Thursday midnight WAT (Vercel Cron), processing Friday, delivery Saturday.
 - **Client assets pending:** Legal page copy (Privacy, Terms, Cookie Policy) marked PLACEHOLDER — client deliverable outstanding. Product photography and copy used placeholders during build.
-- **Pre-existing TSC errors at v1.0 close:** 4 test files (Footer.test.tsx, analytics.test.ts, pendingOrders.test.ts, products.test.ts) — not Phase 9 regressions.
+- **Test suite (post-v1.0):** All tests passing — 165 passing, 2 todo. Pre-existing test failures from v1.0 close (Footer.test.tsx, analytics.test.ts, pendingOrders.test.ts, products.test.ts) resolved post-ship by fixing Vitest 4.x compatibility (plugin-react, constructor mocks, async server component pattern).
 
 ## Constraints
 

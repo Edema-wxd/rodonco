@@ -16,7 +16,7 @@ Core value:
 - Product configuration drawer (quantity, variants, prep options)
 - Persistent cart with subtotal and checkout flow
 - Guest checkout (no customer account required)
-- Paystack payment flow + order confirmation
+- Two-step checkout: save draft → server-side price verification → Paystack payment → order confirmation
 - Ordering cutoff logic (open Sun–Thu, close after Thursday cutoff)
 
 ### Admin Experience
@@ -24,20 +24,21 @@ Core value:
 - Orders management (view, filter, status updates, CSV export)
 - Product management (CRUD, variants, prep options, image upload)
 - Analytics summary (orders, revenue, top products, status mix)
-- Operational controls (ordering toggle, reminders, weekly ops tools)
+- Abandoned carts view (count badge + delete)
+- Operational controls (ordering toggle, delivery fee, contact email, reminders, weekly ops tools)
 
 ### Platform & Operations
-- Automated cutoff via Vercel Cron
+- Automated cutoff via Vercel Cron (Thursday 22:59 UTC)
+- Automated abandoned-cart purge via Vercel Cron (`/api/purge-abandoned`)
+- Rate limiting on order-init endpoint via Upstash Redis (fails open when Redis is absent)
 - Transactional email notifications through Resend
 - Deployment on Vercel with environment validation and security headers
 - Seed scripts for admin account and products
 
 ## Current Status Snapshot
 
-Based on planning documents in `.planning/`:
-- Major phases for foundation, static UI, payments/email, automation, and route completeness are in place.
-- Current focus is operational completion of missing admin workflows (Phase 8 planning complete, execution pending).
-- The project is in a late-stage MVP hardening/completion phase, not an early prototype phase.
+v1.0 MVP shipped 2026-05-25. All 10 phases complete, 44 plans executed, 69 requirements satisfied.  
+Post-v1.0 additions: rate-limited `/api/orders/init`, server-side price authority, delivery fee in order total, two-step checkout flow (draft → init), abandoned cart cleanup cron, and a fully passing test suite (165 passing, 2 todo).
 
 ## Architecture
 
@@ -58,16 +59,20 @@ Based on planning documents in `.planning/`:
 
 ## Data Model (Drizzle)
 
-Primary tables:
+Primary tables (11 total):
 - `products`
 - `product_variants`
 - `product_prep_options`
+- `product_images`
 - `orders`
 - `order_items`
-- `ordering_config` (single-row operational control)
+- `ordering_config` (single-row: cutoff state, next delivery date, delivery fee, contact email)
+- `site_settings` (admin-editable site-wide settings)
 - `admins`
+- `abandoned_carts` (draft orders cleaned up by purge cron)
+- `activity_logs` (admin action audit trail)
 
-This schema supports configurable product options, transactional order capture, and centralized weekly ordering state.
+This schema supports configurable product options, transactional order capture, centralized weekly ordering state, and admin audit logging.
 
 ## Repository Structure
 
@@ -97,6 +102,7 @@ Use `.env.local.example` as the source template. Required groups include:
 - Resend (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ADMIN_NOTIFICATION_EMAIL`)
 - Cron security (`CRON_SECRET`)
 - App URL (`NEXT_PUBLIC_APP_URL`)
+- Upstash Redis (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`) — optional; enables rate limiting on `/api/orders/init`; omitting causes the rate limiter to fail open (requests pass through)
 
 ## Deployment Notes
 
@@ -107,8 +113,6 @@ Use `.env.local.example` as the source template. Required groups include:
 
 ## Known Baseline Validation State
 
-At the time of this documentation update:
-- `npm test` runs but has pre-existing failures in `src/app/api/orders/init/route.test.ts`
-- `npm run build` fails in local environment when production Paystack key validation is not satisfied
-
-These issues were observed before documentation-only changes and are not introduced by this update.
+As of v1.0 post-ship:
+- `npm test` — 165 passing, 2 todo (no failures)
+- `npm run build` — passes; requires production env vars (`PAYSTACK_SECRET_KEY`, etc.) to be present for `validateEnv` to succeed

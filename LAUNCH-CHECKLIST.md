@@ -31,13 +31,17 @@ Verify all of the following are set in Vercel Production environment:
 - [ ] `ADMIN_NOTIFICATION_EMAIL` — Email that receives new order alerts
 - [ ] `UPLOADTHING_TOKEN` — From UploadThing Dashboard
 - [ ] `NEXT_PUBLIC_APP_URL` — Production URL (e.g., https://rodoandco.com)
+- [ ] `UPSTASH_REDIS_REST_URL` — (Optional) Upstash Redis REST URL; enables rate limiting on `/api/orders/init`
+- [ ] `UPSTASH_REDIS_REST_TOKEN` — (Optional) Upstash Redis REST token; required when above URL is set
 
 ## 4. Vercel Cron Verification
 
 - [ ] Deploy to production with `vercel.json` in place
 - [ ] Confirm cron job appears in Vercel Dashboard → Project → Cron Jobs (should show `/api/cutoff` at `59 22 * * 4`)
+- [ ] Confirm purge cron appears in Vercel Dashboard → Project → Cron Jobs (should show `/api/purge-abandoned` on its configured schedule)
 - [ ] **Note on plan tier:** If on Vercel Hobby plan, cron fires within the 22:xx UTC hour (not exactly 22:59). On Pro plan, fires within the specified minute. Verify ordering closes by 23:00 WAT on Thursday.
-- [ ] Trigger a manual cron run from Vercel Dashboard to confirm the route returns 200
+- [ ] Trigger a manual cron run from Vercel Dashboard to confirm `/api/cutoff` returns 200
+- [ ] Trigger a manual cron run for `/api/purge-abandoned` and confirm it returns 200
 
 ## 5. Admin Seeding
 
@@ -72,4 +76,4 @@ The CSP shipped at launch uses `'unsafe-inline'` and `'unsafe-eval'` in script-s
 
 ---
 
-*Generated: Phase 6 — Automation + Launch*
+*Last updated: 2026-05-26 (post v1.0 ship — added Upstash Redis vars and purge-abandoned cron step)*

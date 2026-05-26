@@ -30,6 +30,17 @@ All 10 phases complete. All 44 plans complete. All 69 requirements satisfied.
 
 Archive: `.planning/milestones/v1.0-ROADMAP.md`
 
+## Post-v1.0 Additions (2026-05-26)
+
+Applied after milestone archive without a new phase:
+- Test suite fully fixed: 165 passing, 2 todo (Vitest 4.x compatibility — plugin-react, constructor mocks, async server component pattern)
+- Server-side price authority in `/api/orders/init` (DB lookup replaces client-submitted prices)
+- Delivery fee (`delivery_fee_ngn`) from `ordering_config` included in order total
+- Rate limiting on `/api/orders/init` via Upstash Redis (fails open when Redis absent)
+- Two-step checkout: draft save → server-side init → Paystack
+- Abandoned carts purge cron (`/api/purge-abandoned`)
+- Abandoned carts admin view
+
 ## Next Step
 
 Start v1.1: `/gsd:new-milestone`
