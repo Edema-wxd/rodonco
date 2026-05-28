@@ -90,7 +90,7 @@ export function ProductDrawer({
   const subtotalKobo = useMemo(() => unitPriceKobo * quantity, [unitPriceKobo, quantity]);
 
   const selectionSatisfied = (!needsVariant || !!selectedVariant) && (!needsPrep || !!selectedPrep);
-  const canAddToCart = isOrderingOpen && selectionSatisfied && quantity >= 1;
+  const canAddToCart = selectionSatisfied && quantity >= 1;
 
   const CLOSE_DELAY = 150;
 
@@ -326,21 +326,13 @@ export function ProductDrawer({
               onClick={onAddToCart}
               disabled={!canAddToCart}
               title={
-                !isOrderingOpen
-                  ? "Ordering is closed"
-                  : !selectionSatisfied
-                    ? "Select the required option to add to cart"
-                    : undefined
+                !selectionSatisfied
+                  ? "Select the required option to add to cart"
+                  : undefined
               }
             >
-              {!isOrderingOpen ? "Ordering closed" : "Add to cart"}
+              Add to cart
             </button>
-
-            {!isOrderingOpen ? (
-              <p className="mt-2 text-center text-xs text-black/60">
-                Ordering is closed — you can still browse, but you can’t add items right now.
-              </p>
-            ) : null}
           </div>
           </motion.aside>
         </div>
