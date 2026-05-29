@@ -72,7 +72,7 @@ export function Hero() {
             <div className="absolute inset-0 -rotate-2 rounded-tl-[48px] rounded-tr-2xl rounded-bl-2xl rounded-br-[48px] bg-red-700/5" />
 
             <Image
-              src="https://placehold.co/584x584"
+              src="https://placehold.co/584x584https://83e8y8wx7t.ufs.sh/f/qDzKWrcltWgcyr60UcFGq6g3dZQiKMa5pkVFlC10rzc9tfyE"
               alt="Freshly prepped meal kit"
               width={584}
               height={584}
