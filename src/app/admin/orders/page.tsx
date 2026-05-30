@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { OrdersTable } from "@/components/admin/orders/OrdersTable";
 import { getAdminOrders } from "@/lib/admin/orders";
+import { ORDERS_PAGE_SIZE } from "./_constants";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ export default async function AdminOrdersPage() {
   const session = await auth();
   if (!session?.user) redirect("/admin");
 
-  const initialOrders = await getAdminOrders();
+  const initialOrders = await getAdminOrders({ limit: ORDERS_PAGE_SIZE });
 
   return (
     <div className="min-h-screen bg-stone-100 p-4 sm:p-8">

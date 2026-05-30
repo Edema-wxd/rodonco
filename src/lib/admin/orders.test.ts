@@ -40,11 +40,15 @@ vi.mock("@/lib/db", () => {
         from: (table: unknown) => {
           if (table === orders) {
             return {
-              orderBy: async () => rows,
+              where: () => ({
+                orderBy: async () => rows,
+              }),
             };
           }
           if (table === order_items) {
-            return Promise.resolve(items);
+            return {
+              where: async () => items,
+            };
           }
           throw new Error("Unexpected table");
         },

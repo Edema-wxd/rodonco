@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Download, ShoppingBag } from "lucide-react";
+import { useMemo, useState, useTransition } from "react";
+import { Download, Loader2, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 
 import type { AdminOrder } from "@/lib/admin/orders";
 import { serializeOrdersCsv } from "@/lib/admin/csv";
+import { loadMoreOrdersAction } from "@/app/admin/orders/_actions";
+import { ORDERS_PAGE_SIZE } from "@/app/admin/orders/_constants";
 
 import { OrderRow } from "./OrderRow";
 
@@ -13,10 +16,13 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
   const [weekFilter, setWeekFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [expanded, setExpanded] = useState<Map<string, boolean>>(new Map());
+  const [orders, setOrders] = useState<AdminOrder[]>(initialOrders);
+  const [hasMore, setHasMore] = useState<boolean>(initialOrders.length >= ORDERS_PAGE_SIZE);
+  const [isLoadingMore, startLoadMore] = useTransition();
 
   const filteredOrders = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    return initialOrders.filter((o) => {
+    return orders.filter((o) => {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (weekFilter && o.week_of !== weekFilter) return false;
       if (q) {
@@ -26,7 +32,28 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
       }
       return true;
     });
-  }, [initialOrders, statusFilter, weekFilter, searchQuery]);
+  }, [orders, statusFilter, weekFilter, searchQuery]);
+
+  function loadMore() {
+    const last = orders[orders.length - 1];
+    if (!last) return;
+    startLoadMore(async () => {
+      try {
+        const next = await loadMoreOrdersAction({
+          created_at: last.created_at,
+          id: last.id,
+        });
+        setOrders((prev) => {
+          const seen = new Set(prev.map((o) => o.id));
+          const deduped = next.filter((o) => !seen.has(o.id));
+          return [...prev, ...deduped];
+        });
+        setHasMore(next.length >= ORDERS_PAGE_SIZE);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Failed to load more orders.");
+      }
+    });
+  }
 
   function toggleRow(id: string) {
     setExpanded((prev) => {
@@ -137,6 +164,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
       </div>
 
       {/* Table */}
+      <div>
       <div className="overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white shadow-sm outline outline-1 outline-stone-200/60">
         {filteredOrders.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
@@ -191,6 +219,34 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
           </table>
           </div>
         )}
+      </div>
+
+      {hasMore && (
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={loadMore}
+            disabled={isLoadingMore}
+            className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-6 py-2.5 text-sm font-bold text-zinc-800 shadow-sm transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-60"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            {isLoadingMore ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading…
+              </>
+            ) : (
+              <>Load more</>
+            )}
+          </button>
+          <p
+            className="text-xs text-stone-400"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Showing {orders.length} order{orders.length === 1 ? "" : "s"}
+          </p>
+        </div>
+      )}
       </div>
     </div>
   );

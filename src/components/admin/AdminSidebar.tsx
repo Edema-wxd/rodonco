@@ -14,37 +14,40 @@ type NavItem = {
   label: string;
   Icon: React.ComponentType<{ className?: string }>;
   exact?: boolean;
-  badge?: number;
+  badge?: React.ReactNode;
 };
 
-const buildNavItems = (pendingCount: number, abandonedCartCount: number): NavItem[] => [
+const buildNavItems = (
+  pendingBadge: React.ReactNode,
+  abandonedBadge: React.ReactNode,
+): NavItem[] => [
   { href: "/admin", label: "Dashboard", Icon: Lucide.LayoutDashboard, exact: true },
-  { href: "/admin/orders", label: "Orders", Icon: Lucide.ShoppingBag },
   { href: "/admin/products", label: "Products", Icon: Lucide.Package },
-  { href: "/admin/analytics", label: "Analytics", Icon: Lucide.BarChart2 },
-  { href: "/admin/settings", label: "Settings", Icon: Lucide.Settings2 },
+  { href: "/admin/orders", label: "Orders", Icon: Lucide.ShoppingBag },
+  { href: "/admin/pending", label: "Pending Orders", Icon: Lucide.Clock, badge: pendingBadge },
   { href: "/admin/prep-list", label: "Prep List", Icon: Lucide.ClipboardList },
   { href: "/admin/manifest", label: "Manifest", Icon: Lucide.Truck },
-  { href: "/admin/pending", label: "Pending Orders", Icon: Lucide.Clock, badge: pendingCount },
+  { href: "/admin/analytics", label: "Analytics", Icon: Lucide.BarChart2 },
   {
     href: "/admin/abandoned-carts",
     label: "Abandoned Carts",
     Icon: Lucide.ShoppingCart,
-    badge: abandonedCartCount,
+    badge: abandonedBadge,
   },
   { href: "/admin/activity", label: "Activity", Icon: Lucide.Activity },
+  { href: "/admin/settings", label: "Settings", Icon: Lucide.Settings2 },
 ];
 
 export function AdminSidebar({
   adminEmail,
-  pendingCount,
-  abandonedCartCount,
+  pendingBadge,
+  abandonedBadge,
   mobileOpen,
   onMobileClose,
 }: {
   adminEmail: string | null;
-  pendingCount: number;
-  abandonedCartCount: number;
+  pendingBadge?: React.ReactNode;
+  abandonedBadge?: React.ReactNode;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
 }) {
@@ -87,7 +90,7 @@ export function AdminSidebar({
       <div className="mx-4 h-px bg-stone-100" />
 
       <nav className="flex-1 space-y-0.5 px-3 py-3">
-        {buildNavItems(pendingCount, abandonedCartCount).map(({ href, label, Icon, exact, badge }) => {
+        {buildNavItems(pendingBadge, abandonedBadge).map(({ href, label, Icon, exact, badge }) => {
           const active = exact ? pathname === href : (pathname === href || pathname.startsWith(href + "/"));
           return (
             <Link
@@ -105,7 +108,7 @@ export function AdminSidebar({
             >
               <Icon className="h-4 w-4 shrink-0" />
               {label}
-              {badge != null && badge > 0 ? (
+              {badge ? (
                 <span
                   className={cn(
                     "ml-auto rounded-full px-2 py-0.5 text-xs font-bold",

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { count, desc, eq } from "drizzle-orm";
+import { count, desc, eq, inArray } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { order_items, orders } from "../../../drizzle/schema";
@@ -23,10 +23,11 @@ export async function getPendingOrders(): Promise<AdminOrder[]> {
 
   if (orderRows.length === 0) return [];
 
-  const pendingIds = new Set(orderRows.map((o) => o.id));
-
-  const allItemRows = await db.select().from(order_items);
-  const itemsForPending = allItemRows.filter((it) => pendingIds.has(it.order_id));
+  const pendingIds = orderRows.map((o) => o.id);
+  const itemsForPending = await db
+    .select()
+    .from(order_items)
+    .where(inArray(order_items.order_id, pendingIds));
 
   const itemsByOrderId = new Map<string, AdminOrderItem[]>();
   for (const it of itemsForPending) {

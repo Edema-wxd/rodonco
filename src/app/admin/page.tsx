@@ -70,12 +70,10 @@ export default async function AdminDashboardPage({
     );
   }
 
-  const [analytics, allOrders] = await Promise.all([
+  const [analytics, recentOrders] = await Promise.all([
     getWeeklyAnalytics(),
-    getAdminOrders(),
+    getAdminOrders({ limit: 6 }),
   ]);
-
-  const recentOrders = allOrders.slice(0, 6);
 
   const greeting = (() => {
     const h = new Date().getHours();

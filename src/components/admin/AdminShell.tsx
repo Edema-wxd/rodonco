@@ -7,13 +7,13 @@ import { AdminSidebar } from "./AdminSidebar";
 
 export function AdminShell({
   adminEmail,
-  pendingCount,
-  abandonedCartCount,
+  pendingBadge,
+  abandonedBadge,
   children,
 }: {
   adminEmail: string | null;
-  pendingCount: number;
-  abandonedCartCount: number;
+  pendingBadge?: React.ReactNode;
+  abandonedBadge?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -55,8 +55,8 @@ export function AdminShell({
 
       <AdminSidebar
         adminEmail={adminEmail}
-        pendingCount={pendingCount}
-        abandonedCartCount={abandonedCartCount}
+        pendingBadge={pendingBadge}
+        abandonedBadge={abandonedBadge}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
       />

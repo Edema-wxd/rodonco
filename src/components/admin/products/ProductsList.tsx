@@ -1,16 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Package, Plus } from "lucide-react";
+import { Package, Plus, Search, ChevronUp, ChevronDown } from "lucide-react";
 
 import type { AdminProduct } from "@/lib/admin/products";
 
 import { ProductDrawer } from "./ProductDrawer";
 
 export function ProductsList({ initialProducts }: { initialProducts: AdminProduct[] }) {
-  const rows = useMemo(() => initialProducts, [initialProducts]);
   const [editing, setEditing] = useState<AdminProduct | null>(null);
   const [creating, setCreating] = useState(false);
+  const [search, setSearch] = useState("");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  const rows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const filtered = q
+      ? initialProducts.filter((p) => p.name.toLowerCase().includes(q))
+      : initialProducts;
+    return [...filtered].sort((a, b) =>
+      sortDir === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name)
+    );
+  }, [initialProducts, search, sortDir]);
 
   const open = creating || editing !== null;
 
@@ -22,22 +35,35 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
   return (
     <div>
       {/* Toolbar */}
-      <div className="mb-6 flex items-center justify-between">
-        <p
-          className="text-xs font-black uppercase tracking-wider text-stone-400"
-          style={{ fontFamily: "var(--font-quicksand)" }}
-        >
-          {rows.length} {rows.length === 1 ? "product" : "products"}
-        </p>
-        <button
-          type="button"
-          onClick={() => setCreating(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-90"
-          style={{ fontFamily: "var(--font-quicksand)" }}
-        >
-          <Plus className="h-4 w-4" />
-          + New Product
-        </button>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search products…"
+            className="w-full rounded-full border border-stone-200 bg-white py-2 pl-9 pr-4 text-sm text-zinc-800 placeholder:text-stone-400 focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-100"
+            style={{ fontFamily: "var(--font-inter)" }}
+          />
+        </div>
+        <div className="flex items-center justify-between gap-4 sm:justify-end">
+          <p
+            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            {rows.length} {rows.length === 1 ? "product" : "products"}
+          </p>
+          <button
+            type="button"
+            onClick={() => setCreating(true)}
+            className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-90"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            <Plus className="h-4 w-4" />
+            + New Product
+          </button>
+        </div>
       </div>
 
       {/* Table card */}
@@ -49,26 +75,43 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
               className="text-sm font-bold text-stone-400"
               style={{ fontFamily: "var(--font-quicksand)" }}
             >
-              No products yet
+              {search.trim() ? `No products matching "${search.trim()}"` : "No products yet"}
             </p>
-            <p
-              className="text-xs text-stone-300"
-              style={{ fontFamily: "var(--font-inter)" }}
-            >
-              Click &ldquo;+ New Product&rdquo; to add your first item.
-            </p>
+            {!search.trim() && (
+              <p
+                className="text-xs text-stone-300"
+                style={{ fontFamily: "var(--font-inter)" }}
+              >
+                Click &ldquo;+ New Product&rdquo; to add your first item.
+              </p>
+            )}
           </div>
         ) : (
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-stone-100">
-                {["Image", "Name", "Type", "Active"].map((h) => (
+                {(["Image", "Name", "Type", "Active"] as const).map((h) => (
                   <th
                     key={h}
                     className="px-6 py-4 text-xs font-black uppercase tracking-wider text-stone-400"
                     style={{ fontFamily: "var(--font-quicksand)" }}
                   >
-                    {h}
+                    {h === "Name" ? (
+                      <button
+                        type="button"
+                        onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+                        className="inline-flex items-center gap-1 transition-colors hover:text-zinc-700"
+                      >
+                        Name
+                        {sortDir === "asc" ? (
+                          <ChevronUp className="h-3 w-3" />
+                        ) : (
+                          <ChevronDown className="h-3 w-3" />
+                        )}
+                      </button>
+                    ) : (
+                      h
+                    )}
                   </th>
                 ))}
               </tr>

@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { order_items, orders } from "../../../drizzle/schema";
-import { desc } from "drizzle-orm";
+import { and, desc, inArray, lt, or, sql } from "drizzle-orm";
 
 export type AdminOrderItem = {
   id: string;
@@ -27,13 +27,39 @@ export type AdminOrder = {
   items: AdminOrderItem[];
 };
 
-export async function getAdminOrders(): Promise<AdminOrder[]> {
-  const [orderRows, itemRows] = await Promise.all([
-    db.select().from(orders).orderBy(desc(orders.created_at)),
-    db.select().from(order_items),
-  ]);
+export type OrdersCursor = { created_at: string; id: string };
+
+export async function getAdminOrders(opts?: {
+  limit?: number;
+  cursor?: OrdersCursor;
+}): Promise<AdminOrder[]> {
+  // Keyset pagination: rows AFTER cursor in (created_at DESC, id DESC) order.
+  // Tie-break on id so identical timestamps don't drop or duplicate rows.
+  const cursorCondition = opts?.cursor
+    ? or(
+        lt(orders.created_at, sql`${opts.cursor.created_at}::timestamptz`),
+        and(
+          sql`${orders.created_at} = ${opts.cursor.created_at}::timestamptz`,
+          lt(orders.id, sql`${opts.cursor.id}::uuid`),
+        ),
+      )
+    : undefined;
+
+  const baseQuery = db
+    .select()
+    .from(orders)
+    .where(cursorCondition)
+    .orderBy(desc(orders.created_at), desc(orders.id));
+
+  const orderRows = opts?.limit ? await baseQuery.limit(opts.limit) : await baseQuery;
 
   if (orderRows.length === 0) return [];
+
+  const orderIds = orderRows.map((o) => o.id);
+  const itemRows = await db
+    .select()
+    .from(order_items)
+    .where(inArray(order_items.order_id, orderIds));
 
   const itemsByOrderId = new Map<string, AdminOrderItem[]>();
   for (const it of itemRows) {

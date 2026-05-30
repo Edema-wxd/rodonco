@@ -12,6 +12,14 @@ vi.mock("sonner", () => ({
   toast: { error: vi.fn() },
 }));
 
+vi.mock("@/app/admin/orders/_actions", () => ({
+  loadMoreOrdersAction: vi.fn(async () => []),
+}));
+
+vi.mock("@/app/admin/orders/_constants", () => ({
+  ORDERS_PAGE_SIZE: 25,
+}));
+
 import type { AdminOrder } from "@/lib/admin/orders";
 import { OrdersTable } from "./OrdersTable";
 

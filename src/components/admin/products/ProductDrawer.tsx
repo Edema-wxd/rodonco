@@ -44,7 +44,7 @@ export function ProductDrawer({
   const form = useForm<ProductPayload>({
     resolver: zodResolver(productPayloadSchema),
     defaultValues: EMPTY_DEFAULTS,
-    mode: "onSubmit",
+    mode: "onBlur",
   });
 
   const variants = useFieldArray({ control: form.control, name: "variants" });
@@ -131,7 +131,7 @@ export function ProductDrawer({
       <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-[480px] flex-col bg-stone-50 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-5">
-          <div>
+          <div className="min-w-0 flex-1 pr-4">
             <p
               className="text-xs font-black uppercase tracking-wider text-red-600"
               style={{ fontFamily: "var(--font-quicksand)" }}
@@ -139,10 +139,10 @@ export function ProductDrawer({
               {product ? "Edit" : "New"}
             </p>
             <h2
-              className="mt-0.5 text-xl font-black text-zinc-800"
+              className="mt-0.5 truncate text-xl font-black text-zinc-800"
               style={{ fontFamily: "var(--font-quicksand)" }}
             >
-              {product ? product.name : "Product"}
+              {form.watch("name") || (product ? product.name : "Product")}
             </h2>
           </div>
           <button
@@ -171,10 +171,15 @@ export function ProductDrawer({
                 </label>
                 <input
                   id="prod-name"
-                  className={inputCls}
+                  className={`${inputCls} ${form.formState.errors.name ? "border-red-400 ring-2 ring-red-100" : ""}`}
                   style={{ fontFamily: "var(--font-inter)" }}
                   {...form.register("name")}
                 />
+                {form.formState.errors.name && (
+                  <p className="text-xs text-red-500" style={{ fontFamily: "var(--font-inter)" }}>
+                    {form.formState.errors.name.message ?? "Name is required"}
+                  </p>
+                )}
               </div>
 
               {/* Description */}

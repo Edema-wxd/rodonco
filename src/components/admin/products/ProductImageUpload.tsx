@@ -19,9 +19,14 @@ export function ProductImageUpload() {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const dragIndex = React.useRef<number | null>(null);
   const [dragOver, setDragOver] = React.useState<number | null>(null);
+  const [uploadProgress, setUploadProgress] = React.useState(0);
 
   const { startUpload, isUploading } = useUploadThing("productImage", {
+    onUploadProgress(p) {
+      setUploadProgress(p);
+    },
     onClientUploadComplete(res) {
+      setUploadProgress(0);
       const current = watch("images") ?? [];
       const incoming: ImageItem[] = res.map((file, i) => ({
         url: file.url,
@@ -33,6 +38,7 @@ export function ProductImageUpload() {
       toast.success(`${res.length} image${res.length > 1 ? "s" : ""} uploaded`);
     },
     onUploadError(err) {
+      setUploadProgress(0);
       toast.error(`Upload failed: ${err.message}`);
     },
   });
@@ -96,6 +102,38 @@ export function ProductImageUpload() {
 
   const canAddMore = images.length < MAX_IMAGES && !isUploading;
 
+  const [isFileDragOver, setIsFileDragOver] = React.useState(false);
+
+  function handleZoneDragOver(e: React.DragEvent) {
+    if (!canAddMore || !e.dataTransfer.types.includes("Files")) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setIsFileDragOver(true);
+  }
+
+  function handleZoneDragLeave(e: React.DragEvent) {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsFileDragOver(false);
+    }
+  }
+
+  async function handleZoneDrop(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsFileDragOver(false);
+    if (!canAddMore || !e.dataTransfer.types.includes("Files")) return;
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/"),
+    );
+    if (!files.length) return;
+    const toUpload = files.slice(0, MAX_IMAGES - images.length);
+    try {
+      await startUpload(toUpload);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed. Please try again.");
+    }
+  }
+
   return (
     <div className="space-y-3" data-testid="image-upload">
       <div className="flex items-center justify-between">
@@ -115,7 +153,27 @@ export function ProductImageUpload() {
         )}
       </div>
 
-      <div className="grid grid-cols-5 gap-2">
+      <div
+        className={[
+          "relative grid grid-cols-5 gap-2 rounded-xl p-1 transition-all",
+          isFileDragOver
+            ? "border-2 border-dashed border-red-400 bg-red-50"
+            : "border-2 border-transparent",
+        ].join(" ")}
+        onDragOver={handleZoneDragOver}
+        onDragLeave={handleZoneDragLeave}
+        onDrop={(e) => void handleZoneDrop(e)}
+      >
+        {isFileDragOver && (
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-red-50/80">
+            <p
+              className="text-xs font-bold uppercase tracking-wider text-red-500"
+              style={{ fontFamily: "var(--font-quicksand)" }}
+            >
+              Drop to upload
+            </p>
+          </div>
+        )}
         {images.map((img, i) => (
           <div
             key={img.url}
@@ -200,7 +258,24 @@ export function ProductImageUpload() {
         )}
       </div>
 
-      {/* Hidden file input — triggered by the Add tile */}
+      {isUploading && (
+        <div className="space-y-1">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
+            <div
+              className="h-full rounded-full bg-red-500 transition-[width] duration-200"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+          <p
+            className="text-right text-[10px] text-stone-400"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            {uploadProgress}%
+          </p>
+        </div>
+      )}
+
+      {/* Hidden file input — triggered by the Add tile or drag-and-drop */}
       <input
         ref={fileInputRef}
         type="file"
