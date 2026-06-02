@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-const STATUS_OPTIONS = ["paid", "processing", "delivered"] as const;
+const STATUS_OPTIONS = ["paid", "processing", "delivered", "refunded"] as const;
 
 export function OrderStatusSelect({
   orderId,

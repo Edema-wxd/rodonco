@@ -1,0 +1,23 @@
+-- Migration: 0007_order_status_refunded
+--
+-- Introduces the "refunded" order status, set by the Paystack webhook when a
+-- refund.processed event is received for a paid order.
+--
+-- The orders.status column is TEXT (not an enum), so no schema change is
+-- required. This file documents the new valid value and adds it to the
+-- check constraint (if one exists) or simply records intent.
+--
+-- Valid order status values after this migration:
+--   pending     — payment initiated, awaiting confirmation
+--   paid        — charge.success received and verified
+--   processing  — admin is preparing the order
+--   delivered   — order has been delivered
+--   refunded    — NEW: refund.processed received; money returned to customer
+--
+-- No DDL needed — status is unconstrained TEXT.
+-- This file exists for audit trail and documentation purposes only.
+
+-- If a CHECK constraint is ever added, extend it here:
+-- ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check;
+-- ALTER TABLE orders ADD CONSTRAINT orders_status_check
+--   CHECK (status IN ('pending','paid','processing','delivered','refunded'));

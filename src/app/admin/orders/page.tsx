@@ -2,16 +2,29 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { OrdersTable } from "@/components/admin/orders/OrdersTable";
-import { getAdminOrders } from "@/lib/admin/orders";
+import { getAdminOrders, type OrderFilters } from "@/lib/admin/orders";
 import { ORDERS_PAGE_SIZE } from "./_constants";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string; weekOf?: string; search?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/admin");
 
-  const initialOrders = await getAdminOrders({ limit: ORDERS_PAGE_SIZE });
+  const params = await searchParams;
+  const filters: OrderFilters = {
+    status: params.status,
+    weekOf: params.weekOf,
+    search: params.search,
+  };
+
+  const initialOrders = await getAdminOrders({ limit: ORDERS_PAGE_SIZE, filters });
+  // Key forces OrdersTable to remount (reset pagination) when filters change.
+  const filterKey = `${filters.status ?? ""}-${filters.weekOf ?? ""}-${filters.search ?? ""}`;
 
   return (
     <div className="min-h-screen bg-stone-100 p-4 sm:p-8">
@@ -30,7 +43,7 @@ export default async function AdminOrdersPage() {
         </h1>
       </div>
 
-      <OrdersTable initialOrders={initialOrders} />
+      <OrdersTable key={filterKey} initialOrders={initialOrders} />
     </div>
   );
 }

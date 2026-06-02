@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CheckoutCartSummary } from "./CheckoutCartSummary";
+import { setOrderViewCookie } from "@/app/(customer)/order/[ref]/_actions";
 
 type Step = "info" | "payment";
 
@@ -108,11 +109,20 @@ export function CheckoutExperience({ deliveryFeeNgn }: { deliveryFeeNgn: number 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
+  // Holds the remove-listener fn for the active focus poll; called on unmount.
+  const focusCleanupRef = useRef<(() => void) | null>(null);
+
   useEffect(() => {
     if (hasHydrated && items.length === 0 && !isSubmitting) {
       router.push("/shop");
     }
   }, [hasHydrated, items.length, router, isSubmitting]);
+
+  useEffect(() => {
+    return () => {
+      focusCleanupRef.current?.();
+    };
+  }, []);
 
   const {
     register,
@@ -160,18 +170,52 @@ export function CheckoutExperience({ deliveryFeeNgn }: { deliveryFeeNgn: number 
       const { default: PaystackPop } = await import("@paystack/inline-js");
       const paystack = new PaystackPop();
 
+      // Track whether the popup is still active so the focus handler is a no-op
+      // after any of the three terminal callbacks fire.
+      let popupActive = true;
+
+      const stopFocusPoll = () => {
+        popupActive = false;
+        window.removeEventListener("focus", onWindowFocus);
+        focusCleanupRef.current = null;
+      };
+
+      const onWindowFocus = async () => {
+        if (!popupActive) return;
+        try {
+          const res = await fetch(`/api/orders/status?ref=${result.reference}`);
+          if (!res.ok) return;
+          const data = (await res.json()) as { status: string };
+          if (data.status === "paid") {
+            stopFocusPoll();
+            clearCart();
+            await setOrderViewCookie(result.reference);
+            router.push(`/order/${result.reference}`);
+          }
+        } catch {
+          // network blip — next focus event will retry
+        }
+      };
+
+      window.addEventListener("focus", onWindowFocus);
+      focusCleanupRef.current = stopFocusPoll;
+
       paystack.resumeTransaction(result.access_code, {
-        onSuccess: (transaction: unknown) => {
+        onSuccess: async (transaction: unknown) => {
+          stopFocusPoll();
           const txn = transaction as { reference?: string };
           const ref = txn?.reference ?? result.reference;
           clearCart();
+          await setOrderViewCookie(ref);
           router.push(`/order/${ref}`);
         },
         onCancel: () => {
+          stopFocusPoll();
           toast("Payment cancelled — your cart is still saved.", { duration: 5000 });
           setIsSubmitting(false);
         },
         onError: (err: unknown) => {
+          stopFocusPoll();
           const msg = (err as { message?: string })?.message ?? "Payment failed. Please try again.";
           setServerError(msg);
           setIsSubmitting(false);

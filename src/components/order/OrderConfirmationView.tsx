@@ -1,7 +1,7 @@
 // src/components/order/OrderConfirmationView.tsx
-// Presentation-only component for /order/[ref].
-// Renders either the confirmed order card or the error state (CONTEXT D-09, D-10).
-// No client-side interactivity — pure Server Component.
+// Presentation component for /order/[ref].
+// Renders confirmed order, pending state, or error state (CONTEXT D-09, D-10).
+"use client";
 
 import Link from "next/link";
 import { CheckCircle, AlertCircle } from "lucide-react";
@@ -49,7 +49,7 @@ function formatNGN(kobo: number): string {
 
 // ── Error states ──────────────────────────────────────────────────────────────
 
-type ErrorVariant = "not-found" | "not-paid";
+type ErrorVariant = "not-found" | "not-paid" | "pending";
 
 interface ErrorStateProps {
   variant: ErrorVariant;
@@ -57,6 +57,36 @@ interface ErrorStateProps {
 }
 
 function ErrorState({ variant, contactEmail }: ErrorStateProps) {
+  if (variant === "pending") {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-12 text-center">
+        <AlertCircle
+          className="mx-auto mb-4 h-12 w-12"
+          style={{ color: "var(--accent)" }}
+          aria-hidden="true"
+        />
+        <h1 className="font-heading text-2xl">Payment being confirmed</h1>
+        <p className="mt-3 text-muted-foreground">
+          Your payment is being confirmed. Refresh in a moment or check your email.
+        </p>
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <button
+            onClick={() => window.location.reload()}
+            className={cn(buttonVariants({ variant: "default" }))}
+          >
+            Refresh
+          </button>
+          <a
+            href={`mailto:${contactEmail}`}
+            className={cn(buttonVariants({ variant: "ghost" }))}
+          >
+            Contact Support
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   const heading =
     variant === "not-found" ? "Order not found" : "Payment not confirmed";
   const body =
@@ -83,6 +113,49 @@ function ErrorState({ variant, contactEmail }: ErrorStateProps) {
         >
           Contact Support
         </a>
+      </div>
+    </div>
+  );
+}
+
+// ── Stripped confirmed order (no PII) ────────────────────────────────────────
+
+interface StrippedOrderProps {
+  order: Order;
+}
+
+function StrippedOrder({ order }: StrippedOrderProps) {
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-12 text-center">
+      <CheckCircle
+        className="mx-auto mb-6 h-12 w-12"
+        style={{ color: "var(--accent)" }}
+        aria-hidden="true"
+      />
+      <h1 className="font-heading text-2xl">Order Confirmed</h1>
+      <p className="mt-3 text-muted-foreground">
+        Thank you for your order. A confirmation has been sent to your email.
+      </p>
+      <div className="mx-auto mt-8 max-w-xs rounded-md border p-6 space-y-4 text-left">
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-sm text-muted-foreground">Reference</span>
+          <Badge
+            variant="outline"
+            className="font-mono text-xs"
+            style={{ color: "var(--accent)", borderColor: "var(--accent)" }}
+          >
+            {order.reference}
+          </Badge>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-sm text-muted-foreground">Total</span>
+          <span className="font-heading text-xl">{formatNGN(order.total_ngn)}</span>
+        </div>
+      </div>
+      <div className="mt-8">
+        <Link href="/shop" className={cn(buttonVariants({ variant: "outline" }))}>
+          Continue Shopping →
+        </Link>
       </div>
     </div>
   );
@@ -215,6 +288,8 @@ interface OrderConfirmationViewProps {
   data: { order: Order; items: OrderItem[] } | null;
   /** Which error to display when data is null */
   errorVariant?: OrderConfirmationErrorVariant;
+  /** When true, renders reference + total only — no PII (viewer lacks the post-payment cookie) */
+  stripped?: boolean;
   /** `ordering_config.next_delivery_date` — passed from server page */
   nextDeliveryDate: string | null;
   /** Contact email from site_settings; falls back to DEFAULT_CONTACT_EMAIL */
@@ -224,11 +299,16 @@ interface OrderConfirmationViewProps {
 export function OrderConfirmationView({
   data,
   errorVariant = "not-found",
+  stripped = false,
   nextDeliveryDate,
   contactEmail = DEFAULT_CONTACT_EMAIL,
 }: OrderConfirmationViewProps) {
   if (!data) {
     return <ErrorState variant={errorVariant} contactEmail={contactEmail} />;
+  }
+
+  if (stripped) {
+    return <StrippedOrder order={data.order} />;
   }
 
   return (

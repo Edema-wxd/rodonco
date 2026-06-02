@@ -146,7 +146,7 @@ export const admins = pgTable("admins", {
 export const abandoned_carts = pgTable("abandoned_carts", {
   id: uuid("id").defaultRandom().primaryKey(),
   customer_name: text("customer_name").notNull(),
-  customer_email: text("customer_email").notNull(),
+  customer_email: text("customer_email").notNull().unique(),
   customer_phone: text("customer_phone").notNull(),
   delivery_address: text("delivery_address").notNull(),
   allergy_notes: text("allergy_notes"),

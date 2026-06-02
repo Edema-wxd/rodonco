@@ -69,6 +69,26 @@ const ACTION_META: Record<string, ActionMeta> = {
     color: "text-stone-600 bg-stone-100",
     label: () => "Updated site settings",
   },
+  "system.payment_amount_mismatch": {
+    Icon: Lucide.AlertOctagon,
+    color: "text-red-600 bg-red-50",
+    label: (e) => `Amount mismatch on ${e.entity_label ?? "order"}`,
+  },
+  "system.payment_failed": {
+    Icon: Lucide.XCircle,
+    color: "text-red-500 bg-red-50",
+    label: (e) => `Payment failed for ${e.entity_label ?? "order"}`,
+  },
+  "order.refunded": {
+    Icon: Lucide.RotateCcw,
+    color: "text-slate-600 bg-slate-100",
+    label: (e) => `Refund processed for ${e.entity_label ?? "order"}`,
+  },
+  "system.payment_disputed": {
+    Icon: Lucide.ShieldAlert,
+    color: "text-orange-600 bg-orange-50",
+    label: (e) => `Dispute opened on ${e.entity_label ?? "order"}`,
+  },
 };
 
 function formatTs(iso: string): string {

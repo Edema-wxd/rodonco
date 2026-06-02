@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { order_items, orders } from "../../../drizzle/schema";
-import { and, desc, inArray, lt, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, lt, or, sql } from "drizzle-orm";
 
 export type AdminOrderItem = {
   id: string;
@@ -29,10 +29,19 @@ export type AdminOrder = {
 
 export type OrdersCursor = { created_at: string; id: string };
 
+export type OrderFilters = {
+  status?: string;
+  weekOf?: string;
+  search?: string;
+};
+
 export async function getAdminOrders(opts?: {
   limit?: number;
   cursor?: OrdersCursor;
+  filters?: OrderFilters;
 }): Promise<AdminOrder[]> {
+  const { status, weekOf, search } = opts?.filters ?? {};
+
   // Keyset pagination: rows AFTER cursor in (created_at DESC, id DESC) order.
   // Tie-break on id so identical timestamps don't drop or duplicate rows.
   const cursorCondition = opts?.cursor
@@ -45,10 +54,25 @@ export async function getAdminOrders(opts?: {
       )
     : undefined;
 
+  const searchTerm = search?.trim();
+  const filterConditions = [
+    status && status !== "all" ? eq(orders.status, status) : undefined,
+    weekOf ? eq(orders.week_of, weekOf) : undefined,
+    searchTerm
+      ? or(
+          ilike(orders.customer_name, `%${searchTerm}%`),
+          ilike(orders.customer_email, `%${searchTerm}%`),
+          ilike(orders.customer_phone, `%${searchTerm}%`),
+        )
+      : undefined,
+  ].filter((c): c is NonNullable<typeof c> => c != null);
+
+  const whereClause = and(cursorCondition, ...filterConditions);
+
   const baseQuery = db
     .select()
     .from(orders)
-    .where(cursorCondition)
+    .where(whereClause)
     .orderBy(desc(orders.created_at), desc(orders.id));
 
   const orderRows = opts?.limit ? await baseQuery.limit(opts.limit) : await baseQuery;

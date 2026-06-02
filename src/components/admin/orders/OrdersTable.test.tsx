@@ -1,11 +1,14 @@
 import React from "react";
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { fireEvent, render, screen, act } from "@testing-library/react";
 
 (globalThis as any).scrollTo = () => {};
 
+const mockReplace = vi.fn();
+
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ refresh: vi.fn() }),
+  useRouter: () => ({ refresh: vi.fn(), replace: mockReplace }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock("sonner", () => ({
@@ -51,6 +54,10 @@ function makeOrder(partial: Partial<AdminOrder> & Pick<AdminOrder, "id" | "refer
 }
 
 describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
+  beforeEach(() => {
+    mockReplace.mockClear();
+  });
+
   it("ORD-01: renders table headers and Export CSV button", () => {
     render(<OrdersTable initialOrders={[makeOrder({ id: "o1", reference: "REF-001" })]} />);
 
@@ -72,7 +79,7 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
     expect(screen.queryByText(/Tomatoes/)).not.toBeNull();
   });
 
-  it("ORD-03: status filter narrows visible rows", () => {
+  it("ORD-03: status filter navigates with ?status= param", () => {
     render(
       <OrdersTable
         initialOrders={[
@@ -82,14 +89,21 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
       />,
     );
 
-    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
-    expect(screen.queryAllByText("REF-002").length).toBeGreaterThan(0);
-
     for (const el of screen.getAllByLabelText("Status")) {
       fireEvent.change(el, { target: { value: "processing" } });
     }
-    expect(screen.queryAllByText("REF-001").length).toBe(0);
-    expect(screen.queryAllByText("REF-002").length).toBeGreaterThan(0);
+
+    const statusCall = mockReplace.mock.calls[0]?.[0] as string;
+    expect(statusCall).toContain("status=processing");
+  });
+
+  it("ORD-03: selecting 'all' removes status param from URL", () => {
+    render(<OrdersTable initialOrders={[makeOrder({ id: "o1", reference: "REF-001" })]} />);
+
+    fireEvent.change(screen.getByLabelText("Status"), { target: { value: "all" } });
+    // "all" is the empty/remove case — URL should not contain status=all
+    const call = mockReplace.mock.calls[0]?.[0] as string;
+    expect(call).not.toContain("status=all");
   });
 
   it("ORD-05: changing status triggers PATCH and refresh", async () => {
@@ -104,72 +118,67 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
     expect(fetchMock).toHaveBeenCalled();
   });
 
-  // OPS-03: search field
-  it("OPS-03: search field filters by customer_name", () => {
+  // OPS-03: search navigates via URL params (server-side filtering)
+  it("OPS-03: search input debounces and navigates with ?search= param", async () => {
+    vi.useFakeTimers();
+    mockReplace.mockClear();
+
     render(
       <OrdersTable
         initialOrders={[
-          makeOrder({ id: "o1", reference: "REF-001", customer_name: "Ada Lovelace", customer_email: "ada@test.com", customer_phone: "+2341111111111" }),
-          makeOrder({ id: "o2", reference: "REF-002", customer_name: "Charles Babbage", customer_email: "charles@test.com", customer_phone: "+2342222222222" }),
+          makeOrder({ id: "o1", reference: "REF-001", customer_name: "Ada Lovelace" }),
+          makeOrder({ id: "o2", reference: "REF-002", customer_name: "Charles Babbage" }),
         ]}
       />,
     );
 
     const searchInput = screen.getByPlaceholderText("Name, phone, or email");
     fireEvent.change(searchInput, { target: { value: "ada" } });
-    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
-    expect(screen.queryAllByText("REF-002").length).toBe(0);
+
+    // Before debounce fires, router.replace should not have been called
+    expect(mockReplace).not.toHaveBeenCalled();
+
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
+
+    const searchCall = mockReplace.mock.calls[0]?.[0] as string;
+    expect(searchCall).toContain("search=ada");
+
+    vi.useRealTimers();
   });
 
-  it("OPS-03: search field filters by customer_phone", () => {
+  it("OPS-03: clearing search removes the search param", async () => {
+    vi.useFakeTimers();
+    mockReplace.mockClear();
+
     render(
       <OrdersTable
-        initialOrders={[
-          makeOrder({ id: "o1", reference: "REF-001", customer_phone: "+2348012345678" }),
-          makeOrder({ id: "o2", reference: "REF-002", customer_phone: "+2349087654321" }),
-        ]}
-      />,
-    );
-
-    const searchInput = screen.getByPlaceholderText("Name, phone, or email");
-    fireEvent.change(searchInput, { target: { value: "8012345" } });
-    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
-    expect(screen.queryAllByText("REF-002").length).toBe(0);
-  });
-
-  it("OPS-03: search field filters by customer_email", () => {
-    render(
-      <OrdersTable
-        initialOrders={[
-          makeOrder({ id: "o1", reference: "REF-001", customer_email: "ada@example.com" }),
-          makeOrder({ id: "o2", reference: "REF-002", customer_email: "charles@other.com" }),
-        ]}
-      />,
-    );
-
-    const searchInput = screen.getByPlaceholderText("Name, phone, or email");
-    fireEvent.change(searchInput, { target: { value: "ada@example" } });
-    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
-    expect(screen.queryAllByText("REF-002").length).toBe(0);
-  });
-
-  it("OPS-03: search clears when input is empty — shows all orders", () => {
-    render(
-      <OrdersTable
-        initialOrders={[
-          makeOrder({ id: "o1", reference: "REF-001", customer_name: "Ada Lovelace", customer_email: "ada@test.com", customer_phone: "+2341111111111" }),
-          makeOrder({ id: "o2", reference: "REF-002", customer_name: "Charles Babbage", customer_email: "charles@test.com", customer_phone: "+2342222222222" }),
-        ]}
+        initialOrders={[makeOrder({ id: "o1", reference: "REF-001" })]}
       />,
     );
 
     const searchInput = screen.getByPlaceholderText("Name, phone, or email");
     fireEvent.change(searchInput, { target: { value: "ada" } });
-    expect(screen.queryAllByText("REF-002").length).toBe(0);
+    await act(async () => { vi.advanceTimersByTime(300); });
+    mockReplace.mockClear();
 
     fireEvent.change(searchInput, { target: { value: "" } });
-    expect(screen.queryAllByText("REF-001").length).toBeGreaterThan(0);
-    expect(screen.queryAllByText("REF-002").length).toBeGreaterThan(0);
+    await act(async () => { vi.advanceTimersByTime(300); });
+
+    const call = mockReplace.mock.calls[0]?.[0] as string;
+    expect(call).not.toContain("search=");
+
+    vi.useRealTimers();
+  });
+
+  it("OPS-03: week filter navigates with ?weekOf= param", () => {
+    render(<OrdersTable initialOrders={[makeOrder({ id: "o1", reference: "REF-001" })]} />);
+
+    const weekInput = screen.getByLabelText("Delivery week");
+    fireEvent.change(weekInput, { target: { value: "2026-05-03" } });
+
+    const weekCall = mockReplace.mock.calls[0]?.[0] as string;
+    expect(weekCall).toContain("weekOf=2026-05-03");
   });
 });
-

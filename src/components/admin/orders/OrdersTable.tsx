@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Download, Loader2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 
-import type { AdminOrder } from "@/lib/admin/orders";
+import type { AdminOrder, OrderFilters } from "@/lib/admin/orders";
 import { serializeOrdersCsv } from "@/lib/admin/csv";
 import { loadMoreOrdersAction } from "@/app/admin/orders/_actions";
 import { ORDERS_PAGE_SIZE } from "@/app/admin/orders/_constants";
@@ -12,37 +13,52 @@ import { ORDERS_PAGE_SIZE } from "@/app/admin/orders/_constants";
 import { OrderRow } from "./OrderRow";
 
 export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) {
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [weekFilter, setWeekFilter] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const statusFilter = searchParams.get("status") ?? "all";
+  const weekFilter = searchParams.get("weekOf") ?? "";
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("search") ?? "");
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [expanded, setExpanded] = useState<Map<string, boolean>>(new Map());
   const [orders, setOrders] = useState<AdminOrder[]>(initialOrders);
   const [hasMore, setHasMore] = useState<boolean>(initialOrders.length >= ORDERS_PAGE_SIZE);
   const [isLoadingMore, startLoadMore] = useTransition();
 
-  const filteredOrders = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
-    return orders.filter((o) => {
-      if (statusFilter !== "all" && o.status !== statusFilter) return false;
-      if (weekFilter && o.week_of !== weekFilter) return false;
-      if (q) {
-        const haystack =
-          `${o.customer_name} ${o.customer_phone} ${o.customer_email}`.toLowerCase();
-        if (!haystack.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [orders, statusFilter, weekFilter, searchQuery]);
+  function updateParam(key: string, value: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value && value !== "all") {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+    const qs = params.toString();
+    router.replace(qs ? `?${qs}` : "?");
+  }
+
+  function handleSearchChange(value: string) {
+    setSearchQuery(value);
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      updateParam("search", value);
+    }, 300);
+  }
 
   function loadMore() {
     const last = orders[orders.length - 1];
     if (!last) return;
+    const filters: OrderFilters = {
+      status: statusFilter !== "all" ? statusFilter : undefined,
+      weekOf: weekFilter || undefined,
+      search: searchQuery.trim() || undefined,
+    };
     startLoadMore(async () => {
       try {
-        const next = await loadMoreOrdersAction({
-          created_at: last.created_at,
-          id: last.id,
-        });
+        const next = await loadMoreOrdersAction(
+          { created_at: last.created_at, id: last.id },
+          filters,
+        );
         setOrders((prev) => {
           const seen = new Set(prev.map((o) => o.id));
           const deduped = next.filter((o) => !seen.has(o.id));
@@ -65,7 +81,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
 
   function exportCsv() {
     const csv = serializeOrdersCsv(
-      filteredOrders.map((o) => ({
+      orders.map((o) => ({
         reference: o.reference,
         customer_name: o.customer_name,
         customer_phone: o.customer_phone,
@@ -105,7 +121,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
             className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 sm:w-56"
             style={{ fontFamily: "var(--font-inter)" }}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
           />
         </div>
 
@@ -123,12 +139,13 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
             className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 sm:w-44"
             style={{ fontFamily: "var(--font-inter)" }}
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => updateParam("status", e.target.value)}
           >
             <option value="all">All statuses</option>
             <option value="paid">Paid</option>
             <option value="processing">Processing</option>
             <option value="delivered">Delivered</option>
+            <option value="refunded">Refunded</option>
           </select>
         </div>
 
@@ -146,7 +163,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
             className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 sm:w-44"
             style={{ fontFamily: "var(--font-inter)" }}
             value={weekFilter}
-            onChange={(e) => setWeekFilter(e.target.value)}
+            onChange={(e) => updateParam("weekOf", e.target.value)}
           />
         </div>
 
@@ -166,7 +183,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
       {/* Table */}
       <div>
       <div className="overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white shadow-sm outline outline-1 outline-stone-200/60">
-        {filteredOrders.length === 0 ? (
+        {orders.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
             <ShoppingBag className="h-8 w-8 text-stone-300" />
             <p
@@ -207,7 +224,7 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-50">
-              {filteredOrders.map((o) => (
+              {orders.map((o) => (
                 <OrderRow
                   key={o.id}
                   order={o}

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { count, desc, isNull } from "drizzle-orm";
+import { and, count, desc, isNull, lt, or, sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { abandoned_carts } from "../../../drizzle/schema";
@@ -28,11 +28,31 @@ export type AbandonedCart = {
   contacted_at: string | null;
 };
 
-export async function getAbandonedCarts(): Promise<AbandonedCart[]> {
-  const rows = await db
+export type AbandonedCartsCursor = { created_at: string; id: string };
+
+export async function getAbandonedCarts(opts?: {
+  limit?: number;
+  cursor?: AbandonedCartsCursor;
+}): Promise<AbandonedCart[]> {
+  // Keyset pagination: rows AFTER cursor in (created_at DESC, id DESC) order.
+  // Tie-break on id so identical timestamps don't drop or duplicate rows.
+  const cursorCondition = opts?.cursor
+    ? or(
+        lt(abandoned_carts.created_at, sql`${opts.cursor.created_at}::timestamptz`),
+        and(
+          sql`${abandoned_carts.created_at} = ${opts.cursor.created_at}::timestamptz`,
+          lt(abandoned_carts.id, sql`${opts.cursor.id}::uuid`),
+        ),
+      )
+    : undefined;
+
+  const baseQuery = db
     .select()
     .from(abandoned_carts)
-    .orderBy(desc(abandoned_carts.created_at));
+    .where(cursorCondition)
+    .orderBy(desc(abandoned_carts.created_at), desc(abandoned_carts.id));
+
+  const rows = opts?.limit ? await baseQuery.limit(opts.limit) : await baseQuery;
 
   return rows.map((r) => ({
     id: r.id,

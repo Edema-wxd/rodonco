@@ -11,6 +11,7 @@ export type ActivityAction =
   | "order.status_changed"
   | "order.deleted"
   | "order.bulk_status_changed"
+  | "order.refunded"
   | "product.created"
   | "product.updated"
   | "product.deleted"
@@ -20,7 +21,14 @@ export type ActivityAction =
   | "abandoned_cart.marked_not_contacted"
   | "abandoned_cart.deleted"
   | "abandoned_cart.bulk_marked_contacted"
-  | "abandoned_cart.bulk_deleted";
+  | "abandoned_cart.bulk_deleted"
+  | "admin.created"
+  | "admin.removed"
+  | "system.rate_limit_degraded"
+  | "system.payment_amount_mismatch"
+  | "system.payment_failed"
+  | "system.payment_disputed"
+  | "system.email_send_failed";
 
 export interface LogActivityInput {
   adminEmail: string;

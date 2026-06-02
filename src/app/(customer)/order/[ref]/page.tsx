@@ -6,6 +6,7 @@
 // CONF-03: unknown ref renders error state
 
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { getOrderForConfirmation } from "@/lib/orders/getOrderForConfirmation";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { getSiteSettings } from "@/lib/admin/config";
@@ -24,25 +25,32 @@ export default async function OrderConfirmationPage({
 }) {
   const { ref } = await params;
 
-  // Parallel-fetch order data, ordering config, and site settings
-  const [data, orderingConfig, siteSettings] = await Promise.all([
+  const [data, orderingConfig, siteSettings, cookieStore] = await Promise.all([
     getOrderForConfirmation(ref),
     getOrderingConfig(),
     getSiteSettings(),
+    cookies(),
   ]);
 
-  // Determine which error variant to show when data is null.
-  // We can't tell the difference between "not found" and "not paid" from the
-  // outside without a second query — but the UI spec provides distinct copy
-  // for both. For simplicity at MVP: use "not-found" as the default (covers
-  // both cases). A future enhancement could do a second status-only query to
-  // pick the appropriate variant.
-  const errorVariant = "not-found" as const;
+  const hasViewCookie = cookieStore.has(`order_view_${ref}`);
+
+  const errorVariant =
+    data.kind === "pending"
+      ? "pending"
+      : data.kind === "not-found"
+        ? "not-found"
+        : data.kind === "error"
+          ? "not-found"
+          : undefined;
+
+  // Strip PII from the view when the viewer didn't arrive via the post-payment redirect
+  const stripped = data.kind === "paid" && !hasViewCookie;
 
   return (
     <OrderConfirmationView
-      data={data}
+      data={data.kind === "paid" ? { order: data.order, items: data.items } : null}
       errorVariant={errorVariant}
+      stripped={stripped}
       nextDeliveryDate={orderingConfig.next_delivery_date}
       contactEmail={siteSettings?.contact_email ?? undefined}
     />

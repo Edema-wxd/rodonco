@@ -67,5 +67,37 @@ describe("getAdminOrders", () => {
     expect(res[0]?.items).toHaveLength(1);
     expect(res[0]?.items[0]?.product_name).toBe("Tomatoes");
   });
-});
 
+  it("accepts status filter without throwing", async () => {
+    const res = await getAdminOrders({ filters: { status: "paid" } });
+    expect(res).toHaveLength(1);
+    expect(res[0]?.reference).toBe("REF-001");
+  });
+
+  it("accepts weekOf filter without throwing", async () => {
+    const res = await getAdminOrders({ filters: { weekOf: "2026-05-03" } });
+    expect(res).toHaveLength(1);
+  });
+
+  it("accepts search filter without throwing", async () => {
+    const res = await getAdminOrders({ filters: { search: "ada" } });
+    expect(res).toHaveLength(1);
+  });
+
+  it("accepts all filters together without throwing", async () => {
+    const res = await getAdminOrders({
+      filters: { status: "paid", weekOf: "2026-05-03", search: "ada" },
+    });
+    expect(res).toHaveLength(1);
+  });
+
+  it("ignores 'all' status value (treats as no filter)", async () => {
+    const res = await getAdminOrders({ filters: { status: "all" } });
+    expect(res).toHaveLength(1);
+  });
+
+  it("trims whitespace from search", async () => {
+    const res = await getAdminOrders({ filters: { search: "  ada  " } });
+    expect(res).toHaveLength(1);
+  });
+});

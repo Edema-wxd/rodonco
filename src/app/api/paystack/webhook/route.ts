@@ -22,6 +22,7 @@ import { db, schema } from "@/lib/db";
 import { sendOrderEmails } from "@/lib/email/sendOrderEmails";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
+import { logActivity } from "@/lib/admin/activityLog";
 
 // ─── Paystack payload types ───────────────────────────────────────────────────
 // Minimal shapes covering the fields we actually use.
@@ -33,6 +34,7 @@ interface PaystackChargeData {
   };
   amount: number; // kobo
   status: string; // "success" when charge.success fires
+  gateway_response?: string; // reason string on charge.failed
 }
 
 interface PaystackWebhookPayload {
@@ -82,8 +84,64 @@ export async function POST(req: Request): Promise<NextResponse> {
   }
 
   // ── Step 4: Route on event type ───────────────────────────────────────────
+  if (payload.event === "charge.failed") {
+    const ref = payload.data?.reference;
+    if (ref) {
+      const [order] = await db
+        .select()
+        .from(schema.orders)
+        .where(and(eq(schema.orders.reference, ref), eq(schema.orders.status, "pending")))
+        .limit(1);
+      if (order) {
+        logActivity({
+          adminEmail: "system",
+          action: "system.payment_failed",
+          entityLabel: ref,
+          details: { reason: payload.data.gateway_response ?? null },
+        }).catch(() => {});
+      }
+    }
+    return NextResponse.json({ received: true });
+  }
+
+  if (payload.event === "refund.processed") {
+    const ref = payload.data?.reference;
+    if (ref) {
+      const [order] = await db
+        .select()
+        .from(schema.orders)
+        .where(and(eq(schema.orders.reference, ref), eq(schema.orders.status, "paid")))
+        .limit(1);
+      if (order) {
+        await db
+          .update(schema.orders)
+          .set({ status: "refunded" })
+          .where(eq(schema.orders.id, order.id));
+        logActivity({
+          adminEmail: "system",
+          action: "order.refunded",
+          entityId: order.id,
+          entityLabel: ref,
+          details: { amount_kobo: payload.data.amount },
+        }).catch(() => {});
+      }
+    }
+    return NextResponse.json({ received: true });
+  }
+
+  if (payload.event === "charge.dispute.create") {
+    const ref = payload.data?.reference;
+    logActivity({
+      adminEmail: "system",
+      action: "system.payment_disputed",
+      entityLabel: ref ?? undefined,
+      details: { amount_kobo: payload.data.amount },
+    }).catch(() => {});
+    return NextResponse.json({ received: true });
+  }
+
   if (payload.event !== "charge.success") {
-    // Silently acknowledge unhandled event types — Paystack sends various events
+    // Silently acknowledge all other unhandled event types
     return NextResponse.json({ received: true });
   }
 
@@ -126,10 +184,18 @@ export async function POST(req: Request): Promise<NextResponse> {
   // ── Step 6b: Verify charged amount matches stored order total ─────────────
   // total_ngn is stored in NGN; Paystack sends amount in kobo — multiply by 100.
   if (payload.data.amount !== pendingOrder.total_ngn * 100) {
+    const expected_kobo = pendingOrder.total_ngn * 100;
+    const received_kobo = payload.data.amount;
     console.error(
       `[webhook] Amount mismatch for ${reference}: ` +
-        `expected ${pendingOrder.total_ngn * 100} kobo, got ${payload.data.amount} kobo`
+        `expected ${expected_kobo} kobo, got ${received_kobo} kobo`
     );
+    logActivity({
+      adminEmail: "system",
+      action: "system.payment_amount_mismatch",
+      entityLabel: reference,
+      details: { expected_kobo, received_kobo },
+    }).catch(() => {});
     // Return 200 so Paystack does not retry; mismatch flagged for ops monitoring.
     return NextResponse.json({ received: true, mismatch: true });
   }

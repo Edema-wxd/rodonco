@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { Download, ShoppingCart, CheckCheck, Trash2, X } from "lucide-react";
+import { Download, Loader2, ShoppingCart, CheckCheck, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import type { AbandonedCart, AbandonedCartItem } from "@/lib/admin/abandonedCarts";
 import { serializeAbandonedCartsCsv } from "@/lib/admin/csv";
+import { loadMoreAbandonedCartsAction } from "@/app/admin/abandoned-carts/_actions";
+import { ABANDONED_CARTS_PAGE_SIZE } from "@/app/admin/abandoned-carts/_constants";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -89,6 +91,7 @@ export function AbandonedCartsTable({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [isLoadingMore, startLoadMore] = useTransition();
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -101,8 +104,30 @@ export function AbandonedCartsTable({
   // Confirm dialog
   const [confirmDelete, setConfirmDelete] = useState<{ ids: string[]; label: string } | null>(null);
 
-  // Optimistic local state
+  // Pagination + optimistic local state
   const [localCarts, setLocalCarts] = useState<AbandonedCart[]>(initialCarts);
+  const [hasMore, setHasMore] = useState<boolean>(initialCarts.length >= ABANDONED_CARTS_PAGE_SIZE);
+
+  function loadMore() {
+    const last = localCarts[localCarts.length - 1];
+    if (!last) return;
+    startLoadMore(async () => {
+      try {
+        const next = await loadMoreAbandonedCartsAction({
+          created_at: last.created_at,
+          id: last.id,
+        });
+        setLocalCarts((prev) => {
+          const seen = new Set(prev.map((c) => c.id));
+          const deduped = next.filter((c) => !seen.has(c.id));
+          return [...prev, ...deduped];
+        });
+        setHasMore(next.length >= ABANDONED_CARTS_PAGE_SIZE);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Failed to load more carts.");
+      }
+    });
+  }
 
   const filteredCarts = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
@@ -416,6 +441,7 @@ export function AbandonedCartsTable({
       )}
 
       {/* Table */}
+      <div>
       <div className="overflow-hidden rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white shadow-sm outline outline-1 outline-stone-200/60">
         {filteredCarts.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
@@ -571,6 +597,34 @@ export function AbandonedCartsTable({
             </table>
           </div>
         )}
+      </div>
+
+      {hasMore && (
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={loadMore}
+            disabled={isLoadingMore}
+            className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-6 py-2.5 text-sm font-bold text-zinc-800 shadow-sm transition-colors hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-60"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            {isLoadingMore ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading…
+              </>
+            ) : (
+              <>Load more</>
+            )}
+          </button>
+          <p
+            className="text-xs text-stone-400"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Showing {localCarts.length} cart{localCarts.length === 1 ? "" : "s"}
+          </p>
+        </div>
+      )}
       </div>
     </div>
   );

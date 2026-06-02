@@ -48,6 +48,7 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; dot: string }> =
   paid: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-600" },
   processing: { bg: "bg-amber-100", text: "text-amber-800", dot: "bg-amber-500" },
   delivered: { bg: "bg-stone-100", text: "text-stone-600", dot: "bg-stone-400" },
+  refunded: { bg: "bg-slate-100", text: "text-slate-600", dot: "bg-slate-400" },
 };
 
 function statusStyle(s: string) {

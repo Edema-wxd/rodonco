@@ -6,6 +6,8 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { sql } from "drizzle-orm";
+
 import { db, schema } from "@/lib/db";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
 
@@ -56,15 +58,29 @@ export async function POST(req: Request): Promise<NextResponse> {
   const subtotalNgn = cart.reduce((sum, item) => sum + item.subtotalNgn, 0);
 
   try {
-    await db.insert(schema.abandoned_carts).values({
-      customer_name: name,
-      customer_email: email,
-      customer_phone: phone,
-      delivery_address,
-      allergy_notes: allergy_notes ?? null,
-      cart_items: cart,
-      subtotal_ngn: subtotalNgn,
-    });
+    await db.insert(schema.abandoned_carts)
+      .values({
+        customer_name: name,
+        customer_email: email,
+        customer_phone: phone,
+        delivery_address,
+        allergy_notes: allergy_notes ?? null,
+        cart_items: cart,
+        subtotal_ngn: subtotalNgn,
+      })
+      .onConflictDoUpdate({
+        target: schema.abandoned_carts.customer_email,
+        set: {
+          customer_name: name,
+          customer_phone: phone,
+          delivery_address,
+          allergy_notes: allergy_notes ?? null,
+          cart_items: cart,
+          subtotal_ngn: subtotalNgn,
+          contacted_at: null,
+          created_at: sql`NOW()`,
+        },
+      });
   } catch (err) {
     console.error("[/api/orders/draft] DB insert error:", err);
     return NextResponse.json(

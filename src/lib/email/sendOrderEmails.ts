@@ -7,12 +7,15 @@ import "server-only";
 
 import { render } from "react-email";
 import React from "react";
+import { eq, sql } from "drizzle-orm";
 
 import { resend } from "./resendClient";
 import { CustomerOrderReceipt } from "./templates/CustomerOrderReceipt";
 import { AdminNewOrderAlert } from "./templates/AdminNewOrderAlert";
 import { DEFAULT_CONTACT_EMAIL } from "./emailConfig";
 import { getSiteSettings } from "@/lib/admin/config";
+import { db, schema } from "@/lib/db";
+import { logActivity } from "@/lib/admin/activityLog";
 import type { Order, OrderItem } from "@/types";
 
 // ─── Env ─────────────────────────────────────────────────────────────────────
@@ -34,6 +37,25 @@ export interface SendOrderEmailsInput {
   nextDeliveryDate: string;
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function errorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "object" && err !== null && "message" in err) {
+    return String((err as { message: unknown }).message);
+  }
+  return String(err);
+}
+
+function logEmailFailure(reference: string, err: unknown): void {
+  logActivity({
+    adminEmail: "system",
+    action: "system.email_send_failed",
+    entityLabel: reference,
+    details: { error: errorMessage(err) },
+  }).catch(() => {});
+}
+
 // ─── Implementation ──────────────────────────────────────────────────────────
 
 /**
@@ -47,61 +69,86 @@ export async function sendOrderEmails({
   items,
   nextDeliveryDate,
 }: SendOrderEmailsInput): Promise<void> {
-  const from = getFromAddress();
-  const adminEmail = getAdminEmail();
-
-  // Fetch contact_email fresh from DB — no cache so admin updates take effect immediately
-  let contactEmail = DEFAULT_CONTACT_EMAIL;
   try {
-    const settings = await getSiteSettings();
-    if (settings?.contact_email) contactEmail = settings.contact_email;
-  } catch (err) {
-    console.warn("[sendOrderEmails] Could not fetch site_settings contact_email — using default:", err);
-  }
+    const from = getFromAddress();
+    const adminEmail = getAdminEmail();
 
-  // ── Customer receipt ───────────────────────────────────────────────────────
-  try {
-    const customerHtml = await render(
-      React.createElement(CustomerOrderReceipt, { order, items, nextDeliveryDate, contactEmail })
-    );
+    // Fetch contact_email fresh from DB — no cache so admin updates take effect immediately
+    let contactEmail = DEFAULT_CONTACT_EMAIL;
+    try {
+      const settings = await getSiteSettings();
+      if (settings?.contact_email) contactEmail = settings.contact_email;
+    } catch (err) {
+      console.warn("[sendOrderEmails] Could not fetch site_settings contact_email — using default:", err);
+    }
 
-    const { error: customerError } = await resend.emails.send({
-      from: `Rodo & Co <${from}>`,
-      to: order.customer_email,
-      replyTo: contactEmail,
-      subject: `Order confirmed: ${order.reference}`,
-      html: customerHtml,
-    });
+    let allSent = true;
 
-    if (customerError) {
-      console.error("[sendOrderEmails] Resend customer receipt error:", customerError);
+    // ── Customer receipt ───────────────────────────────────────────────────────
+    try {
+      const customerHtml = await render(
+        React.createElement(CustomerOrderReceipt, { order, items, nextDeliveryDate, contactEmail })
+      );
+
+      const { error: customerError } = await resend.emails.send({
+        from: `Rodo & Co <${from}>`,
+        to: order.customer_email,
+        replyTo: contactEmail,
+        subject: `Order confirmed: ${order.reference}`,
+        html: customerHtml,
+      });
+
+      if (customerError) {
+        allSent = false;
+        console.error("[sendOrderEmails] Resend customer receipt error:", customerError);
+        logEmailFailure(order.reference, customerError);
+      }
+    } catch (err) {
+      allSent = false;
+      console.error("[sendOrderEmails] Unexpected error sending customer receipt:", err);
+      logEmailFailure(order.reference, err);
+    }
+
+    // ── Admin alert ───────────────────────────────────────────────────────────
+    if (!adminEmail) {
+      console.warn("[sendOrderEmails] ADMIN_NOTIFICATION_EMAIL not set — skipping admin alert.");
+    } else {
+      try {
+        const adminHtml = await render(
+          React.createElement(AdminNewOrderAlert, { order, items })
+        );
+
+        const { error: adminError } = await resend.emails.send({
+          from: `Rodo & Co <${from}>`,
+          to: adminEmail,
+          subject: `[Admin] New order: ${order.reference} — ${order.customer_name}`,
+          html: adminHtml,
+        });
+
+        if (adminError) {
+          allSent = false;
+          console.error("[sendOrderEmails] Resend admin alert error:", adminError);
+          logEmailFailure(order.reference, adminError);
+        }
+      } catch (err) {
+        allSent = false;
+        console.error("[sendOrderEmails] Unexpected error sending admin alert:", err);
+        logEmailFailure(order.reference, err);
+      }
+    }
+
+    if (allSent) {
+      try {
+        await db
+          .update(schema.orders)
+          .set({ notified_at: sql`NOW()` })
+          .where(eq(schema.orders.id, order.id));
+      } catch (err) {
+        console.error("[sendOrderEmails] Failed to write notified_at:", err);
+      }
     }
   } catch (err) {
-    console.error("[sendOrderEmails] Unexpected error sending customer receipt:", err);
-  }
-
-  // ── Admin alert ───────────────────────────────────────────────────────────
-  if (!adminEmail) {
-    console.warn("[sendOrderEmails] ADMIN_NOTIFICATION_EMAIL not set — skipping admin alert.");
-    return;
-  }
-
-  try {
-    const adminHtml = await render(
-      React.createElement(AdminNewOrderAlert, { order, items })
-    );
-
-    const { error: adminError } = await resend.emails.send({
-      from: `Rodo & Co <${from}>`,
-      to: adminEmail,
-      subject: `[Admin] New order: ${order.reference} — ${order.customer_name}`,
-      html: adminHtml,
-    });
-
-    if (adminError) {
-      console.error("[sendOrderEmails] Resend admin alert error:", adminError);
-    }
-  } catch (err) {
-    console.error("[sendOrderEmails] Unexpected error sending admin alert:", err);
+    console.error("[sendOrderEmails] Unexpected error:", err);
+    logEmailFailure(order.reference, err);
   }
 }
