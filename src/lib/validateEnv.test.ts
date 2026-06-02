@@ -16,7 +16,11 @@ describe("validateEnv", () => {
       ...originalEnv,
       AUTH_SECRET: "valid-secret-abc",
       RESEND_API_KEY: "re_test_123",
+      PAYSTACK_SECRET_KEY: "sk_test_123",
+      DATABASE_URL: "postgres://user:pass@localhost:5432/db",
       NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: "pk_live_validkey",
+      UPSTASH_REDIS_REST_URL: "https://test.upstash.io",
+      UPSTASH_REDIS_REST_TOKEN: "test-token",
       NODE_ENV: "production",
     } as NodeJS.ProcessEnv;
   });
@@ -51,8 +55,40 @@ describe("validateEnv", () => {
     expect(() => validateEnv()).toThrow("RESEND_API_KEY");
   });
 
+  it("throws when PAYSTACK_SECRET_KEY is empty or missing", async () => {
+    delete (process.env as Record<string, string | undefined>).PAYSTACK_SECRET_KEY;
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).toThrow("PAYSTACK_SECRET_KEY");
+  });
+
+  it("throws when DATABASE_URL is empty or missing", async () => {
+    delete (process.env as Record<string, string | undefined>).DATABASE_URL;
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).toThrow("DATABASE_URL");
+  });
+
   it("does not throw when all required vars are set correctly in production", async () => {
     // All vars set in beforeEach with valid values
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).not.toThrow();
+  });
+
+  it("throws in production when UPSTASH_REDIS_REST_URL is missing", async () => {
+    delete (process.env as Record<string, string | undefined>).UPSTASH_REDIS_REST_URL;
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).toThrow("UPSTASH_REDIS_REST_URL");
+  });
+
+  it("throws in production when UPSTASH_REDIS_REST_TOKEN is missing", async () => {
+    delete (process.env as Record<string, string | undefined>).UPSTASH_REDIS_REST_TOKEN;
+    const { validateEnv } = await import("./validateEnv");
+    expect(() => validateEnv()).toThrow("UPSTASH_REDIS_REST_TOKEN");
+  });
+
+  it("does not throw in development when Upstash vars are missing", async () => {
+    (process.env as Record<string, string>).NODE_ENV = "development";
+    delete (process.env as Record<string, string | undefined>).UPSTASH_REDIS_REST_URL;
+    delete (process.env as Record<string, string | undefined>).UPSTASH_REDIS_REST_TOKEN;
     const { validateEnv } = await import("./validateEnv");
     expect(() => validateEnv()).not.toThrow();
   });
