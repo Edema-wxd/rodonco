@@ -36,12 +36,13 @@ export function MenuPreview() {
     <section className="bg-stone-100 py-32">
       <div className="mx-auto max-w-7xl px-8">
         {/* Centered header */}
-        <div className="mx-auto mb-16 max-w-2xl text-center">
+        <div className="mx-auto mb-16 max-w-2xl text-start sm:text-center">
           <h2
-            className="text-5xl font-black text-zinc-800"
+            className="text-4xl font-black text-zinc-800"
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
-            Ready for the Pot
+            Ready for the <span className="text-red-600">Pot.</span>
+       
           </h2>
           <p
             className="mt-4 text-base leading-6 text-stone-600"

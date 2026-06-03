@@ -7,7 +7,7 @@ export function Hero() {
       <div className="mx-auto max-w-7xl px-8 pt-8 pb-0 lg:pt-28">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:gap-8 items-start">
           {/* Left — text content */}
-          <div className="flex flex-col items-start gap-8 pt-8">
+          <div className="flex flex-col items-center sm:items-start gap-8 pt-0 sm:pt-8">
             {/* Badge */}
             <div
               className="flex items-center gap-2 rounded-full bg-green-300 px-4 py-1.5 justify-center sm:justify-start transition-transform duration-700 ease-in-out animate-bounce-in"

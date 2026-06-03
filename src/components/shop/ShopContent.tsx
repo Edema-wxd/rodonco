@@ -180,18 +180,13 @@ export function ShopContent({
                 <div className="flex flex-wrap items-end justify-between gap-4">
                   <div>
                     <h2
-                      className="text-4xl font-black uppercase leading-10 text-zinc-800"
+                      className="sm:text-4xl text-2xl font-black uppercase leading-10 text-zinc-800"
                       style={{ fontFamily: "var(--font-quicksand)" }}
                     >
                       Fresh{" "}
                       <span className="text-green-800">Produce</span>
                     </h2>
-                    <p
-                      className="mt-2 text-sm text-stone-600"
-                      style={{ fontFamily: "var(--font-inter)" }}
-                    >
-                      {filteredFresh.length} items
-                    </p>
+                    
                   </div>
 
                   {/* Category filter pills */}
@@ -240,18 +235,13 @@ export function ShopContent({
             <section id="cooking-kits">
               <div className="pb-6">
                 <h2
-                  className="text-4xl font-black uppercase leading-10 text-zinc-800"
+                  className="sm:text-4xl text-2xl font-black uppercase leading-10 text-zinc-800"
                   style={{ fontFamily: "var(--font-quicksand)" }}
                 >
                   Cooking{" "}
                   <span className="text-red-700">Kits</span>
                 </h2>
-                <p
-                  className="mt-2 text-sm text-stone-600"
-                  style={{ fontFamily: "var(--font-inter)" }}
-                >
-                  {filteredKits.length} items
-                </p>
+                
               </div>
               {filteredKits.length ? (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">

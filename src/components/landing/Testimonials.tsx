@@ -70,7 +70,7 @@ export function Testimonials() {
               Wall of Love
             </p>
             <h2
-              className="text-5xl font-black text-zinc-800"
+              className="text-4xl sm:text-5xl font-black text-zinc-800"
               style={{ fontFamily: "var(--font-quicksand)" }}
             >
               Join the soft cooking life.

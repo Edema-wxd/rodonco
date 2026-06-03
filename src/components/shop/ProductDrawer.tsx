@@ -81,6 +81,16 @@ export function ProductDrawer({
 
   const baseProducePriceKobo = useMemo(() => getCheapestVariantPriceKobo(variants), [variants]);
 
+  const activeImageUrl = useMemo(() => {
+    if (!product.images.length) return null;
+    if (isProduce && selectedPrepId) {
+      const prepIdx = prepOptions.findIndex((p) => p.id === selectedPrepId);
+      const img = product.images[prepIdx];
+      return img?.url ?? product.images[0].url;
+    }
+    return product.images[0].url;
+  }, [isProduce, selectedPrepId, prepOptions, product.images]);
+
   const unitPriceKobo = useMemo(() => {
     if (isKit) return selectedVariant?.price_ngn ?? 0;
     const extra = selectedPrep?.extra_cost_ngn ?? 0;
@@ -193,15 +203,21 @@ export function ProductDrawer({
 
           <div className="flex-1 overflow-auto px-4 py-4">
             <div className="space-y-6">
-              {product.images.length > 0 && (
-                <div className="overflow-hidden rounded-2xl bg-stone-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={product.images[0].url}
-                    alt={product.name}
-                    loading="lazy"
-                    className="h-52 w-full object-cover"
-                  />
+              {activeImageUrl && (
+                <div className="relative h-52 overflow-hidden rounded-2xl bg-stone-100">
+                  <AnimatePresence mode="sync">
+                    <motion.img
+                      key={activeImageUrl}
+                      src={activeImageUrl}
+                      alt={product.name}
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.25 }}
+                    />
+                  </AnimatePresence>
                 </div>
               )}
               {isKit ? (

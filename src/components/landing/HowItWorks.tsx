@@ -45,7 +45,7 @@ export function HowItWorks() {
         <div className="mb-16 flex items-end justify-between">
           <div className="flex flex-col gap-4">
             <h2
-              className="text-4xl font-black uppercase text-zinc-800"
+              className="text-4xl font-black  text-zinc-800"
               style={{ fontFamily: "var(--font-quicksand)" }}
             >
               How It{" "}
