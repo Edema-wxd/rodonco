@@ -44,24 +44,25 @@ export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessa
   }
 
   return (
-    <div className="rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
+    <div className="rounded-tl-[28px] rounded-tr-xl rounded-bl-xl rounded-br-[28px] bg-white p-6 shadow-sm outline outline-1 outline-stone-200/60 flex flex-col">
       <p
-        className="text-xs font-black uppercase tracking-wider text-stone-400"
+        className="text-[10px] font-black uppercase tracking-widest text-stone-400"
         style={{ fontFamily: "var(--font-quicksand)" }}
       >
-        Delivery Configuration
+        Delivery Config
       </p>
       <h2
-        className="mt-1 text-lg font-black text-zinc-800"
+        className="mt-1.5 text-lg font-black text-zinc-800"
         style={{ fontFamily: "var(--font-quicksand)" }}
       >
-        Customer-facing delivery date &amp; message
+        Schedule & messaging
       </h2>
-      <div className="mt-6 space-y-4">
+
+      <div className="mt-5 flex flex-col gap-4 flex-1">
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="next-delivery-date"
-            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            className="text-[10px] font-black uppercase tracking-widest text-stone-400"
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Next delivery date
@@ -75,13 +76,14 @@ export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessa
             style={{ fontFamily: "var(--font-inter)" }}
           />
         </div>
+
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="cutoff-message"
-            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            className="text-[10px] font-black uppercase tracking-widest text-stone-400"
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
-            Cutoff message (shown to customers when ordering is closed)
+            Closed message
           </label>
           <input
             id="cutoff-message"
@@ -93,14 +95,18 @@ export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessa
             className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
             style={{ fontFamily: "var(--font-inter)" }}
           />
+          <p className="text-xs text-stone-400" style={{ fontFamily: "var(--font-inter)" }}>
+            Shown when ordering is closed.
+          </p>
         </div>
+
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="delivery-fee"
-            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            className="text-[10px] font-black uppercase tracking-widest text-stone-400"
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
-            Delivery fee (₦)
+            Flat delivery fee (₦)
           </label>
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-stone-400">
@@ -119,20 +125,21 @@ export function DeliveryConfigForm({ initialNextDeliveryDate, initialCutoffMessa
             />
           </div>
           <p className="text-xs text-stone-400" style={{ fontFamily: "var(--font-inter)" }}>
-            Set to 0 for free delivery. Added to every order at checkout.
+            Used when no zone pricing applies. Set 0 for free.
           </p>
         </div>
       </div>
+
       <div className="mt-6">
         <button
           type="button"
           onClick={() => void handleSave()}
           disabled={submitting}
-          className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
           style={{ fontFamily: "var(--font-quicksand)" }}
         >
-          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          {submitting ? "Saving…" : "Save Settings"}
+          {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+          {submitting ? "Saving…" : "Save"}
         </button>
       </div>
     </div>

@@ -63,44 +63,52 @@ export function DeliveryZonesForm({ initialZones }: Props) {
   }
 
   return (
-    <div className="rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
+    <div className="rounded-tl-[28px] rounded-tr-xl rounded-bl-xl rounded-br-[28px] bg-white p-6 shadow-sm outline outline-1 outline-stone-200/60 flex flex-col">
       <p
-        className="text-xs font-black uppercase tracking-wider text-stone-400"
+        className="text-[10px] font-black uppercase tracking-widest text-stone-400"
         style={{ fontFamily: "var(--font-quicksand)" }}
       >
         Delivery Zones
       </p>
       <h2
-        className="mt-1 text-lg font-black text-zinc-800"
+        className="mt-1.5 text-lg font-black text-zinc-800"
         style={{ fontFamily: "var(--font-quicksand)" }}
       >
-        Per-area delivery pricing
+        Area pricing
       </h2>
-      <p className="mt-1 text-xs text-stone-400" style={{ fontFamily: "var(--font-inter)" }}>
-        Set a delivery fee for each area you serve. Customers outside these areas will be prompted to contact you on WhatsApp for a quote.
+      <p className="mt-1 text-sm text-stone-500 leading-relaxed" style={{ fontFamily: "var(--font-inter)" }}>
+        Set per-area fees shown at checkout. Customers outside these areas are directed to WhatsApp.
       </p>
 
-      <div className="mt-6 space-y-3">
+      <div className="mt-5 flex flex-col gap-2 flex-1">
+        {/* Column headers */}
+        {zones.length > 0 && (
+          <div className="grid grid-cols-[1fr_88px_32px] gap-2 px-0.5">
+            <span className="text-[10px] font-black uppercase tracking-widest text-stone-400" style={{ fontFamily: "var(--font-quicksand)" }}>Area</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-stone-400" style={{ fontFamily: "var(--font-quicksand)" }}>Fee (₦)</span>
+            <span />
+          </div>
+        )}
+
         {zones.length === 0 && (
-          <p className="text-sm text-stone-400 italic" style={{ fontFamily: "var(--font-inter)" }}>
-            No zones added yet. Add one below.
+          <p className="text-sm text-stone-400 italic py-2" style={{ fontFamily: "var(--font-inter)" }}>
+            No zones yet — add one below.
           </p>
         )}
+
         {zones.map((zone, index) => (
-          <div key={index} className="flex items-center gap-2">
+          <div key={index} className="grid grid-cols-[1fr_88px_32px] gap-2 items-center">
             <input
               type="text"
               value={zone.area}
               onChange={(e) => updateZone(index, "area", e.target.value)}
               placeholder="e.g. Yaba"
               maxLength={100}
-              className="h-10 flex-1 rounded-xl border border-stone-200 bg-white px-3 text-sm text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+              className="h-9 rounded-xl border border-stone-200 bg-white px-3 text-sm text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
               style={{ fontFamily: "var(--font-inter)" }}
             />
             <div className="relative">
-              <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-stone-400">
-                ₦
-              </span>
+              <span className="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-xs text-stone-400">₦</span>
               <input
                 type="number"
                 min={0}
@@ -108,17 +116,17 @@ export function DeliveryZonesForm({ initialZones }: Props) {
                 value={zone.fee_ngn}
                 onChange={(e) => updateZone(index, "fee_ngn", e.target.value)}
                 placeholder="0"
-                className="h-10 w-28 rounded-xl border border-stone-200 bg-white pl-7 pr-3 text-sm text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                className="h-9 w-full rounded-xl border border-stone-200 bg-white pl-6 pr-2 text-sm text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
                 style={{ fontFamily: "var(--font-inter)" }}
               />
             </div>
             <button
               type="button"
               onClick={() => removeZone(index)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-stone-200 text-stone-400 transition-colors hover:border-red-300 hover:text-red-500"
+              className="flex h-9 w-8 items-center justify-center rounded-lg text-stone-300 transition-colors hover:text-red-400"
               aria-label={`Remove ${zone.area || "zone"}`}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>
         ))}
@@ -126,10 +134,10 @@ export function DeliveryZonesForm({ initialZones }: Props) {
         <button
           type="button"
           onClick={addZone}
-          className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-stone-300 px-4 py-2 text-sm font-medium text-stone-500 transition-colors hover:border-stone-400 hover:text-stone-700"
+          className="mt-1 inline-flex w-fit items-center gap-1.5 rounded-full border border-dashed border-stone-300 px-4 py-1.5 text-xs font-semibold text-stone-400 transition-colors hover:border-stone-400 hover:text-stone-600"
           style={{ fontFamily: "var(--font-quicksand)" }}
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-3 w-3" />
           Add area
         </button>
       </div>
@@ -139,11 +147,11 @@ export function DeliveryZonesForm({ initialZones }: Props) {
           type="button"
           onClick={() => void handleSave()}
           disabled={submitting}
-          className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
           style={{ fontFamily: "var(--font-quicksand)" }}
         >
-          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          {submitting ? "Saving…" : "Save Zones"}
+          {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+          {submitting ? "Saving…" : "Save"}
         </button>
       </div>
     </div>

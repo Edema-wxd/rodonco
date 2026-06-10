@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CheckoutCartSummary } from "./CheckoutCartSummary";
 import { setOrderViewCookie } from "@/app/(customer)/order/[ref]/_actions";
+import type { DeliveryZone } from "@/lib/shop/orderingConfig";
 
 type Step = "info" | "payment";
 
@@ -97,7 +98,15 @@ function StepIndicator({ current }: { current: Step }) {
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function CheckoutExperience({ deliveryFeeNgn }: { deliveryFeeNgn: number }) {
+const OTHER_AREA = "__other__";
+
+interface CheckoutExperienceProps {
+  deliveryFeeNgn: number;
+  deliveryZones: DeliveryZone[];
+  whatsappNumber: string | null;
+}
+
+export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumber }: CheckoutExperienceProps) {
   const router = useRouter();
   const hasHydrated = useHasHydrated();
   const items = useCartStore((s) => s.items);
@@ -108,6 +117,7 @@ export function CheckoutExperience({ deliveryFeeNgn }: { deliveryFeeNgn: number 
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [selectedArea, setSelectedArea] = useState<string>("");
 
   // Holds the remove-listener fn for the active focus poll; called on unmount.
   const focusCleanupRef = useRef<(() => void) | null>(null);
@@ -143,13 +153,29 @@ export function CheckoutExperience({ deliveryFeeNgn }: { deliveryFeeNgn: number 
 
   const termsChecked = watch("terms") ?? false;
 
+  // Resolve which fee to show in cart summary
+  const hasZones = deliveryZones.length > 0;
+  const isOutsideArea = selectedArea === OTHER_AREA;
+  const matchedZone = hasZones
+    ? deliveryZones.find((z) => z.area === selectedArea)
+    : undefined;
+  const effectiveDeliveryFeeNgn: number | null = hasZones
+    ? matchedZone
+      ? matchedZone.fee_ngn
+      : null
+    : deliveryFeeNgn;
+
   // ── Step 1: save draft, advance to payment ─────────────────────────────────
   const onInfoSubmit = handleSubmit(async (data) => {
     setServerError(null);
     setIsSaving(true);
     try {
-      await saveDraft({ ...data, cart: items });
-      setSavedPayload(data);
+      const payload = {
+        ...data,
+        ...(hasZones && matchedZone ? { delivery_area: selectedArea } : {}),
+      };
+      await saveDraft({ ...payload, cart: items });
+      setSavedPayload(payload);
       setStep("payment");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -291,6 +317,47 @@ export function CheckoutExperience({ deliveryFeeNgn }: { deliveryFeeNgn: number 
               )}
             </div>
 
+            {/* Delivery area — shown only when zones are configured */}
+            {hasZones && (
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="delivery_area">Delivery Area</Label>
+                <select
+                  id="delivery_area"
+                  value={selectedArea}
+                  onChange={(e) => setSelectedArea(e.target.value)}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                >
+                  <option value="">Select your area…</option>
+                  {deliveryZones.map((z) => (
+                    <option key={z.area} value={z.area}>
+                      {z.area} — {z.fee_ngn === 0 ? "Free delivery" : `₦${z.fee_ngn.toLocaleString()}`}
+                    </option>
+                  ))}
+                  <option value={OTHER_AREA}>Other / Outside listed areas</option>
+                </select>
+                {isOutsideArea && (
+                  <div className="mt-1 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    <p className="font-medium">We don&apos;t currently have a set delivery rate for your area.</p>
+                    <p className="mt-1">
+                      Please reach out on{" "}
+                      <a
+                        href={`https://wa.me/${(whatsappNumber ?? "").replace(/\D/g, "")}?text=${encodeURIComponent("Hi! I'd like to get a delivery quote for my order.")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold underline underline-offset-2 text-green-700 hover:text-green-900"
+                      >
+                        WhatsApp
+                      </a>{" "}
+                      and we&apos;ll give you a delivery quote.
+                    </p>
+                  </div>
+                )}
+                {!isOutsideArea && selectedArea === "" && (
+                  <p className="text-xs text-muted-foreground">Select your area to see the delivery fee.</p>
+                )}
+              </div>
+            )}
+
             {/* Delivery address */}
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="delivery_address">Delivery Address</Label>
@@ -348,7 +415,12 @@ export function CheckoutExperience({ deliveryFeeNgn }: { deliveryFeeNgn: number 
               </p>
             )}
 
-            <Button type="submit" disabled={isSaving} className="w-full" size="lg">
+            <Button
+              type="submit"
+              disabled={isSaving || isOutsideArea || (hasZones && selectedArea === "")}
+              className="w-full"
+              size="lg"
+            >
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -422,7 +494,7 @@ export function CheckoutExperience({ deliveryFeeNgn }: { deliveryFeeNgn: number 
 
         {/* ── Right column: cart summary (always visible) ── */}
         <div className="w-full lg:w-80 xl:w-96">
-          <CheckoutCartSummary items={items} deliveryFeeNgn={deliveryFeeNgn} />
+          <CheckoutCartSummary items={items} deliveryFeeNgn={effectiveDeliveryFeeNgn} />
         </div>
       </div>
     </div>

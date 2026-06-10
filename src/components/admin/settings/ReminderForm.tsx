@@ -24,10 +24,10 @@ export function ReminderForm() {
       if (res.ok) {
         setResult({
           ok: true,
-          message: `${data.sent} reminder email${data.sent === 1 ? "" : "s"} sent.`,
+          message: `${data.sent} reminder${data.sent === 1 ? "" : "s"} sent.`,
         });
       } else {
-        setResult({ ok: false, message: "Failed to send reminders. Check server logs." });
+        setResult({ ok: false, message: "Failed to send. Check server logs." });
       }
     } catch {
       setResult({ ok: false, message: "Network error. Please try again." });
@@ -37,31 +37,31 @@ export function ReminderForm() {
   }
 
   return (
-    <div className="rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
+    <div className="rounded-tl-[28px] rounded-tr-xl rounded-bl-xl rounded-br-[28px] bg-white p-6 shadow-sm outline outline-1 outline-stone-200/60 flex flex-col">
       <p
-        className="text-xs font-black uppercase tracking-wider text-stone-400"
+        className="text-[10px] font-black uppercase tracking-widest text-stone-400"
         style={{ fontFamily: "var(--font-quicksand)" }}
       >
         Delivery Reminders
       </p>
       <h2
-        className="mt-2 text-xl font-black text-zinc-800"
+        className="mt-1.5 text-lg font-black text-zinc-800"
         style={{ fontFamily: "var(--font-quicksand)" }}
       >
-        Send Delivery Reminders
+        Send reminders
       </h2>
       <p
-        className="mt-2 text-sm leading-6 text-stone-500"
+        className="mt-1 text-sm text-stone-500 leading-relaxed"
         style={{ fontFamily: "var(--font-inter)" }}
       >
-        Send reminder emails to all paid orders for a delivery week.
+        Email all paid customers for a given delivery week.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <div className="space-y-2">
+      <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4 flex-1">
+        <div className="flex flex-col gap-1.5">
           <label
             htmlFor="reminder-week-of"
-            className="block text-xs font-black uppercase tracking-wider text-stone-400"
+            className="text-[10px] font-black uppercase tracking-widest text-stone-400"
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Delivery week (Saturday)
@@ -77,33 +77,35 @@ export function ReminderForm() {
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading || !weekOf}
-          className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
-          style={{ fontFamily: "var(--font-quicksand)" }}
-        >
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          {loading ? "Sending…" : "Send Reminders"}
-        </button>
-
-        {result ? (
-          <p
-            className={[
-              "flex items-center gap-2 text-sm font-bold",
-              result.ok ? "text-green-700" : "text-red-600",
-            ].join(" ")}
+        <div className="mt-auto flex items-center gap-3">
+          <button
+            type="submit"
+            disabled={loading || !weekOf}
+            className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
             style={{ fontFamily: "var(--font-quicksand)" }}
-            aria-live="polite"
           >
-            {result.ok ? (
-              <CheckCircle className="h-4 w-4 shrink-0" />
-            ) : (
-              <AlertCircle className="h-4 w-4 shrink-0" />
-            )}
-            {result.message}
-          </p>
-        ) : null}
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+            {loading ? "Sending…" : "Send"}
+          </button>
+
+          {result && (
+            <p
+              className={[
+                "flex items-center gap-1.5 text-sm font-semibold",
+                result.ok ? "text-green-700" : "text-red-600",
+              ].join(" ")}
+              style={{ fontFamily: "var(--font-quicksand)" }}
+              aria-live="polite"
+            >
+              {result.ok ? (
+                <CheckCircle className="h-4 w-4 shrink-0" />
+              ) : (
+                <AlertCircle className="h-4 w-4 shrink-0" />
+              )}
+              {result.message}
+            </p>
+          )}
+        </div>
       </form>
     </div>
   );

@@ -87,7 +87,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     );
   }
 
-  const { name, email, phone, delivery_address, allergy_notes, cart } = parsed.data;
+  const { name, email, phone, delivery_area, delivery_address, allergy_notes, cart } = parsed.data;
 
   // 2. Enforce ordering window (consistent read, no stale cache)
   const config = await getOrderingConfig();
@@ -100,7 +100,13 @@ export async function POST(req: Request): Promise<NextResponse> {
 
   // week_of from DB config (falls back to today's ISO date if missing)
   const weekOf = config.next_delivery_date ?? new Date().toISOString().slice(0, 10);
-  const deliveryFeeNgn = config.delivery_fee_ngn;
+
+  // Resolve delivery fee: zone-specific price takes precedence over the flat fee
+  const zones = (config.delivery_zones ?? []) as { area: string; fee_ngn: number }[];
+  const matchedZone = delivery_area
+    ? zones.find((z) => z.area === delivery_area)
+    : undefined;
+  const deliveryFeeNgn = matchedZone ? matchedZone.fee_ngn : config.delivery_fee_ngn;
 
   // 3. Server-side price authority: fetch canonical prices from DB (CR-02 fix)
   const productIds = [...new Set(cart.map((i) => i.productId))];

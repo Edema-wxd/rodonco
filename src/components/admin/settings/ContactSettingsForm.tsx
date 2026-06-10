@@ -55,29 +55,29 @@ export function ContactSettingsForm({ initialSettings }: Props) {
   }
 
   return (
-    <div className="rounded-tl-[32px] rounded-tr-2xl rounded-bl-2xl rounded-br-[32px] bg-white p-8 shadow-sm outline outline-1 outline-stone-200/60">
+    <div className="rounded-tl-[28px] rounded-tr-xl rounded-bl-xl rounded-br-[28px] bg-white p-6 shadow-sm outline outline-1 outline-stone-200/60">
       <p
-        className="text-xs font-black uppercase tracking-wider text-stone-400"
+        className="text-[10px] font-black uppercase tracking-widest text-stone-400"
         style={{ fontFamily: "var(--font-quicksand)" }}
       >
-        Contact Information
+        Contact
       </p>
       <h2
-        className="mt-1 text-lg font-black text-zinc-800"
+        className="mt-1.5 text-lg font-black text-zinc-800"
         style={{ fontFamily: "var(--font-quicksand)" }}
       >
-        Customer-facing contact details
+        Customer-facing details
       </h2>
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-5 space-y-4">
         {/* WhatsApp */}
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="whatsapp-number"
-            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            className="text-[10px] font-black uppercase tracking-widest text-stone-400"
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
-            WhatsApp Number
+            WhatsApp number
           </label>
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-stone-400">
@@ -103,10 +103,10 @@ export function ContactSettingsForm({ initialSettings }: Props) {
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="contact-email"
-            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            className="text-[10px] font-black uppercase tracking-widest text-stone-400"
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
-            Contact Email
+            Contact email
           </label>
           <input
             id="contact-email"
@@ -131,10 +131,10 @@ export function ContactSettingsForm({ initialSettings }: Props) {
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="instagram-handle"
-            className="text-xs font-black uppercase tracking-wider text-stone-400"
+            className="text-[10px] font-black uppercase tracking-widest text-stone-400"
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
-            Instagram Handle
+            Instagram handle
           </label>
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-stone-400">
@@ -159,11 +159,11 @@ export function ContactSettingsForm({ initialSettings }: Props) {
           type="button"
           onClick={() => void handleSave()}
           disabled={submitting}
-          className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-2 rounded-full bg-zinc-800 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
           style={{ fontFamily: "var(--font-quicksand)" }}
         >
-          {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          {submitting ? "Saving…" : "Save Contact Info"}
+          {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+          {submitting ? "Saving…" : "Save"}
         </button>
       </div>
     </div>

@@ -14,14 +14,14 @@ function formatNgn(kobo: number): string {
 
 interface Props {
   items: CartItem[];
-  deliveryFeeNgn: number;
+  deliveryFeeNgn: number | null;
 }
 
 export function CheckoutCartSummary({ items, deliveryFeeNgn }: Props) {
   const subtotal = items.reduce((sum, item) => sum + item.subtotalNgn, 0);
   // subtotalNgn values are in kobo; deliveryFeeNgn is NGN — convert to kobo for formatNgn
-  const deliveryFeeKobo = deliveryFeeNgn * 100;
-  const total = subtotal + deliveryFeeKobo;
+  const deliveryFeeKobo = deliveryFeeNgn !== null ? deliveryFeeNgn * 100 : null;
+  const total = deliveryFeeKobo !== null ? subtotal + deliveryFeeKobo : null;
 
   return (
     <Card className="sticky top-24">
@@ -70,12 +70,18 @@ export function CheckoutCartSummary({ items, deliveryFeeNgn }: Props) {
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Delivery</span>
             <span className="tabular-nums">
-              {deliveryFeeNgn === 0 ? "Free" : formatNgn(deliveryFeeKobo)}
+              {deliveryFeeNgn === null
+                ? "Select area"
+                : deliveryFeeNgn === 0
+                ? "Free"
+                : formatNgn(deliveryFeeKobo!)}
             </span>
           </div>
           <div className="flex justify-between items-baseline border-t pt-2">
             <span className="text-base font-semibold">Total</span>
-            <span className="font-heading text-2xl tabular-nums">{formatNgn(total)}</span>
+            <span className="font-heading text-2xl tabular-nums">
+              {total !== null ? formatNgn(total) : "—"}
+            </span>
           </div>
         </div>
       </CardContent>

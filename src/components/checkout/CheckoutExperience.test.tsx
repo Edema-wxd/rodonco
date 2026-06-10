@@ -120,7 +120,7 @@ function getCapturedCallbacks() {
 }
 
 function renderCheckout() {
-  return render(<CheckoutExperience deliveryFeeNgn={0} />);
+  return render(<CheckoutExperience deliveryFeeNgn={0} deliveryZones={[]} whatsappNumber={null} />);
 }
 
 // Fills step-1 form and clicks "Continue to Payment", waits for step-2 "Pay Now" button.
