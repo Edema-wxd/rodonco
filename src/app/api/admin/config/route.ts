@@ -37,6 +37,8 @@ export async function PATCH(req: Request) {
     updateFields.cutoff_message = parsed.data.cutoff_message;
   if (parsed.data.delivery_fee_ngn !== undefined)
     updateFields.delivery_fee_ngn = parsed.data.delivery_fee_ngn;
+  if (parsed.data.delivery_zones !== undefined)
+    updateFields.delivery_zones = parsed.data.delivery_zones;
 
   await db
     .update(schema.ordering_config)

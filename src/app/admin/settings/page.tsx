@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ContactSettingsForm } from "@/components/admin/settings/ContactSettingsForm";
 import { DeliveryConfigForm } from "@/components/admin/settings/DeliveryConfigForm";
+import { DeliveryZonesForm } from "@/components/admin/settings/DeliveryZonesForm";
 import { OrderingToggle } from "@/components/admin/settings/OrderingToggle";
 import { ReminderForm } from "@/components/admin/settings/ReminderForm";
 import { getOrderingConfig, getSiteSettings } from "@/lib/admin/config";
@@ -43,6 +44,7 @@ export default async function AdminSettingsPage() {
           initialCutoffMessage={config.cutoff_message}
           initialDeliveryFeeNgn={config.delivery_fee_ngn}
         />
+        <DeliveryZonesForm initialZones={config.delivery_zones} />
         <ContactSettingsForm initialSettings={siteSettings} />
       </div>
     </div>

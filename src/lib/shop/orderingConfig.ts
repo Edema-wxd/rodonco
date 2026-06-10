@@ -4,12 +4,16 @@ import { eq } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 
 import { db, schema } from "@/lib/db";
+import type { DeliveryZone } from "@/lib/admin/config";
+
+export type { DeliveryZone };
 
 export type OrderingConfig = {
   is_ordering_open: boolean;
   cutoff_message: string | null;
   next_delivery_date: string | null;
   delivery_fee_ngn: number;
+  delivery_zones: DeliveryZone[];
 };
 
 const SAFE_DEFAULT: OrderingConfig = {
@@ -19,6 +23,7 @@ const SAFE_DEFAULT: OrderingConfig = {
   cutoff_message: null,
   next_delivery_date: null,
   delivery_fee_ngn: 0,
+  delivery_zones: [],
 };
 
 async function readOrderingConfigFromDb(): Promise<OrderingConfig> {
@@ -41,6 +46,7 @@ async function readOrderingConfigFromDb(): Promise<OrderingConfig> {
       cutoff_message: row.cutoff_message ?? null,
       next_delivery_date: row.next_delivery_date ?? null,
       delivery_fee_ngn: row.delivery_fee_ngn,
+      delivery_zones: (row.delivery_zones as DeliveryZone[] | null) ?? [],
     };
   } catch (err) {
     console.warn("[getOrderingConfig] DB unavailable (likely cold start); defaulting ordering to OPEN");

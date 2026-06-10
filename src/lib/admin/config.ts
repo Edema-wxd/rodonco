@@ -4,12 +4,15 @@ import { eq } from "drizzle-orm";
 
 import { db, schema } from "@/lib/db";
 
+export type DeliveryZone = { area: string; fee_ngn: number };
+
 export type OrderingConfigRow = {
   id: number;
   is_ordering_open: boolean;
   cutoff_message: string | null;
   next_delivery_date: string | null;
   delivery_fee_ngn: number;
+  delivery_zones: DeliveryZone[];
   updated_at: Date;
 };
 
@@ -48,6 +51,7 @@ export async function getOrderingConfig(): Promise<OrderingConfigRow> {
     cutoff_message: row.cutoff_message ?? null,
     next_delivery_date: row.next_delivery_date ?? null,
     delivery_fee_ngn: row.delivery_fee_ngn,
+    delivery_zones: (row.delivery_zones as DeliveryZone[] | null) ?? [],
     updated_at: row.updated_at,
   };
 }

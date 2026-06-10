@@ -35,6 +35,8 @@ const buildNavItems = (
     badge: abandonedBadge,
   },
   { href: "/admin/activity", label: "Activity", Icon: Lucide.Activity },
+  { href: "/admin/email-logs", label: "Email Logs", Icon: Lucide.Mail },
+  { href: "/admin/users", label: "Admin Users", Icon: Lucide.Users },
   { href: "/admin/settings", label: "Settings", Icon: Lucide.Settings2 },
 ];
 

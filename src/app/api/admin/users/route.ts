@@ -11,6 +11,7 @@ import { auth } from "@/auth";
 import { logActivity } from "@/lib/admin/activityLog";
 import { db } from "@/lib/db";
 import { resend } from "@/lib/email/resendClient";
+import { logEmail } from "@/lib/email/logEmail";
 import { AdminInviteEmail } from "@/lib/email/templates/AdminInviteEmail";
 import { admins } from "../../../../../drizzle/schema";
 
@@ -77,11 +78,21 @@ export async function POST(req: Request) {
     );
 
     const from = process.env.RESEND_FROM_EMAIL ?? "orders@rodoandco.com";
-    const { error } = await resend.emails.send({
+    const inviteSubject = "You've been added to the Rodo & Co admin panel";
+    const { data: inviteData, error } = await resend.emails.send({
       from: `Rodo & Co <${from}>`,
       to: email,
-      subject: "You've been added to the Rodo & Co admin panel",
+      subject: inviteSubject,
       html,
+    });
+
+    logEmail({
+      type: "admin_invite",
+      to: email,
+      subject: inviteSubject,
+      status: error ? "failed" : "sent",
+      resendId: inviteData?.id ?? null,
+      error: error ? JSON.stringify(error) : null,
     });
 
     if (error) console.error("[/api/admin/users] Resend error:", error);

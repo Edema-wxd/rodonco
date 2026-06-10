@@ -1,11 +1,13 @@
+import React from "react";
+import { render } from "react-email";
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { z } from "zod";
 
 import { auth } from "@/auth";
 import { getPaidOrdersForWeek } from "@/lib/admin/reminders";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { resend } from "@/lib/email/resendClient";
+import { logEmail } from "@/lib/email/logEmail";
+import { DeliveryReminderEmail } from "@/lib/email/templates/DeliveryReminderEmail";
 
 const reminderBodySchema = z.object({
   week_of: z
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Invalid payload", issues: parsed.error.flatten() },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -44,19 +46,50 @@ export async function POST(req: Request) {
     return NextResponse.json({ sent: 0 });
   }
 
-  const { error } = await resend.batch.send(
-    orders.map((order) => ({
-      from: process.env.RESEND_FROM_EMAIL as string,
-      to: [order.customer_email],
-      subject: "Your Rodo & Co delivery is this Saturday!",
-      html: `<p>Hi ${order.customer_name},</p><p>Just a reminder that your Rodo &amp; Co order is scheduled for delivery this Saturday (${parsed.data.week_of}). We're preparing everything fresh for you!</p><p>Thank you for ordering with us.</p><p>— The Rodo &amp; Co team</p>`,
-    }))
+  const from = process.env.RESEND_FROM_EMAIL ?? "orders@rodoandco.com";
+
+  const emails = await Promise.all(
+    orders.map(async (order) => {
+      const html = await render(
+        React.createElement(DeliveryReminderEmail, {
+          customerName: order.customer_name,
+          weekOf: parsed.data.week_of,
+        }),
+      );
+      return {
+        from: `Rodo & Co <${from}>`,
+        to: [order.customer_email],
+        subject: "Your Rodo & Co delivery is this Saturday!",
+        html,
+      };
+    }),
   );
 
+  const { data: batchData, error } = await resend.batch.send(emails);
+
   if (error) {
+    orders.forEach((order, i) => {
+      logEmail({
+        type: "delivery_reminder",
+        to: order.customer_email,
+        subject: emails[i]?.subject ?? "Your Rodo & Co delivery is this Saturday!",
+        status: "failed",
+        error: JSON.stringify(error),
+      });
+    });
     console.error("[reminders] Resend batch error:", error);
     return NextResponse.json({ error: "Email send failed" }, { status: 500 });
   }
+
+  orders.forEach((order, i) => {
+    logEmail({
+      type: "delivery_reminder",
+      to: order.customer_email,
+      subject: emails[i]?.subject ?? "Your Rodo & Co delivery is this Saturday!",
+      status: "sent",
+      resendId: batchData?.data?.[i]?.id ?? null,
+    });
+  });
 
   return NextResponse.json({ sent: orders.length });
 }

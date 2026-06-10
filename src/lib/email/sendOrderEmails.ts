@@ -10,6 +10,7 @@ import React from "react";
 import { eq, sql } from "drizzle-orm";
 
 import { resend } from "./resendClient";
+import { logEmail } from "./logEmail";
 import { CustomerOrderReceipt } from "./templates/CustomerOrderReceipt";
 import { AdminNewOrderAlert } from "./templates/AdminNewOrderAlert";
 import { DEFAULT_CONTACT_EMAIL } from "./emailConfig";
@@ -90,12 +91,23 @@ export async function sendOrderEmails({
         React.createElement(CustomerOrderReceipt, { order, items, nextDeliveryDate, contactEmail })
       );
 
-      const { error: customerError } = await resend.emails.send({
+      const subject = `Order confirmed: ${order.reference}`;
+      const { data: customerData, error: customerError } = await resend.emails.send({
         from: `Rodo & Co <${from}>`,
         to: order.customer_email,
         replyTo: contactEmail,
-        subject: `Order confirmed: ${order.reference}`,
+        subject,
         html: customerHtml,
+      });
+
+      logEmail({
+        type: "order_receipt",
+        to: order.customer_email,
+        subject,
+        status: customerError ? "failed" : "sent",
+        resendId: customerData?.id ?? null,
+        error: customerError ? JSON.stringify(customerError) : null,
+        orderReference: order.reference,
       });
 
       if (customerError) {
@@ -118,11 +130,22 @@ export async function sendOrderEmails({
           React.createElement(AdminNewOrderAlert, { order, items })
         );
 
-        const { error: adminError } = await resend.emails.send({
+        const adminSubject = `[Admin] New order: ${order.reference} — ${order.customer_name}`;
+        const { data: adminData, error: adminError } = await resend.emails.send({
           from: `Rodo & Co <${from}>`,
           to: adminEmail,
-          subject: `[Admin] New order: ${order.reference} — ${order.customer_name}`,
+          subject: adminSubject,
           html: adminHtml,
+        });
+
+        logEmail({
+          type: "admin_alert",
+          to: adminEmail,
+          subject: adminSubject,
+          status: adminError ? "failed" : "sent",
+          resendId: adminData?.id ?? null,
+          error: adminError ? JSON.stringify(adminError) : null,
+          orderReference: order.reference,
         });
 
         if (adminError) {

@@ -52,6 +52,11 @@ export const orderStatusPatchSchema = z
   })
   .strict();
 
+const deliveryZoneSchema = z.object({
+  area: z.string().min(1).max(100),
+  fee_ngn: z.number().int().nonnegative(),
+});
+
 export const orderingConfigPatchSchema = z
   .object({
     is_ordering_open: z.boolean().optional(),
@@ -62,6 +67,7 @@ export const orderingConfigPatchSchema = z
       .optional(),
     cutoff_message: z.string().max(300).nullable().optional(),
     delivery_fee_ngn: z.coerce.number().int().nonnegative().optional(),
+    delivery_zones: z.array(deliveryZoneSchema).max(50).optional(),
   })
   .strict()
   .refine(

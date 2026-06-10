@@ -1,11 +1,15 @@
 import { OrderingClosedBanner } from "@/components/shop/OrderingClosedBanner";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
+import { getSiteSettings } from "@/lib/admin/config";
 import { CheckoutExperience } from "@/components/checkout/CheckoutExperience";
 
 export const dynamic = "force-dynamic";
 
 export default async function CheckoutPage() {
-  const orderingConfig = await getOrderingConfig();
+  const [orderingConfig, siteSettings] = await Promise.all([
+    getOrderingConfig(),
+    getSiteSettings(),
+  ]);
 
   if (!orderingConfig.is_ordering_open) {
     return (
@@ -28,7 +32,11 @@ export default async function CheckoutPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="font-heading text-2xl mb-8">Ready when you are.</h1>
-      <CheckoutExperience deliveryFeeNgn={orderingConfig.delivery_fee_ngn} />
+      <CheckoutExperience
+        deliveryFeeNgn={orderingConfig.delivery_fee_ngn}
+        deliveryZones={orderingConfig.delivery_zones}
+        whatsappNumber={siteSettings?.whatsapp_number ?? null}
+      />
     </div>
   );
 }

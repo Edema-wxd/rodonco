@@ -98,6 +98,7 @@ export const ordering_config = pgTable("ordering_config", {
   cutoff_message: text("cutoff_message"),
   next_delivery_date: date("next_delivery_date"),
   delivery_fee_ngn: integer("delivery_fee_ngn").notNull().default(0),
+  delivery_zones: jsonb("delivery_zones").notNull().default([]),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -167,4 +168,21 @@ export const activity_logs = pgTable("activity_logs", {
   entity_label: text("entity_label"),
   details: jsonb("details"),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ============================================================
+// EMAIL LOGS
+// Records every outgoing Resend send attempt for monitoring.
+// ============================================================
+export const email_logs = pgTable("email_logs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  // 'order_receipt' | 'admin_alert' | 'admin_invite' | 'delivery_reminder'
+  type: text("type").notNull(),
+  to: text("to").notNull(),
+  subject: text("subject").notNull(),
+  status: text("status").notNull().default("sent"), // 'sent' | 'failed'
+  resend_id: text("resend_id"),
+  error: text("error"),
+  order_reference: text("order_reference"),
+  sent_at: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
 });

@@ -17,6 +17,7 @@ export const checkoutPayloadSchema = z
     phone: z
       .string()
       .regex(nigerianPhoneRegex, "Enter a valid 11-digit Nigerian mobile number (e.g. 08012345678)"),
+    delivery_area: z.string().min(1).max(100).optional(),
     delivery_address: z.string().min(1, "Delivery address is required").max(500),
     allergy_notes: z.string().max(500).optional(),
     terms: z.literal(true, {
