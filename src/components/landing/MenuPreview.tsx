@@ -1,37 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const kits = [
-  {
-    title: "Home Alone Combo (Stir-fry)",
-    price: "₦5,000",
-    description: "Classic sliced burst of colors.",
-    time: "15 Min",
-    difficulty: "Easy",
-    difficultyColor: "text-green-800",
-    priceColor: "text-red-600",
-  },
-  {
-    title: "Weekend Starter Pack (Akara/Moin-moin)",
-    price: "₦3,000",
-    description: "Thoroughly washed and peeled beans.",
-    time: "12 Min",
-    difficulty: "Easy",
-    difficultyColor: "text-green-800",
-    priceColor: "text-red-700",
-  },
-  {
-    title: "Jollof Base / Stew Kit",
-    price: "₦3,500",
-    description: "Juicy tomatoes, rodo, tatashe and onions prepped to proportion.",
-    time: "20 Min",
-    difficulty: "Medium",
-    difficultyColor: "text-green-800",
-    priceColor: "text-red-700",
-  },
-] as const;
+import { getActiveProductsWithStartingPriceForShop } from "@/lib/shop/products";
 
-export function MenuPreview() {
+function formatFromPrice(priceNgnKobo: number): string {
+  const ngn = Math.floor(priceNgnKobo / 100);
+  return `From ₦${ngn.toLocaleString("en-NG")}`;
+}
+
+export async function MenuPreview() {
+  const products = await getActiveProductsWithStartingPriceForShop();
+  const kits = products.filter((p) => p.type === "cooking_kit").slice(0, 3);
+
+  if (kits.length === 0) return null;
+
   return (
     <section className="bg-stone-100 py-32">
       <div className="mx-auto max-w-7xl px-8">
@@ -42,7 +24,7 @@ export function MenuPreview() {
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
             Ready for the <span className="text-red-600">Pot.</span>
-       
+
           </h2>
           <p
             className="mt-4 text-base leading-6 text-stone-600"
@@ -56,138 +38,124 @@ export function MenuPreview() {
         <div>
           {/* Mobile: horizontal swipe, hidden on md+ */}
           <div className="flex -mx-4 overflow-x-auto pb-2 md:hidden" style={{ WebkitOverflowScrolling: "touch" }}>
-            {kits.map((kit) => (
-              <div
-                key={kit.title}
-                className="min-w-[85vw] max-w-xs mx-4 shrink-0 overflow-hidden rounded-[32px] bg-white outline outline-1 outline-stone-200/50"
-              >
-                {/* Image */}
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src="https://placehold.co/382x256"
-                    alt={kit.title}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                  {/* Badges */}
-                  <div className="absolute left-4 top-4 flex gap-2">
-                    <span
-                      className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-red-700 backdrop-blur-sm"
-                      style={{ fontFamily: "var(--font-quicksand)" }}
-                    >
-                      {kit.time}
-                    </span>
-                    <span
-                      className={`rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide backdrop-blur-sm ${kit.difficultyColor}`}
-                      style={{ fontFamily: "var(--font-quicksand)" }}
-                    >
-                      {kit.difficulty}
-                    </span>
+            {kits.map((kit) => {
+              const image = kit.images[0]?.url ?? kit.image_url;
+              return (
+                <div
+                  key={kit.id}
+                  className="min-w-[85vw] max-w-xs mx-4 shrink-0 overflow-hidden rounded-[32px] bg-white outline outline-1 outline-stone-200/50"
+                >
+                  {/* Image */}
+                  <div className="relative h-64 overflow-hidden bg-stone-100">
+                    {image ? (
+                      <Image
+                        src={image}
+                        alt={kit.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : null}
                   </div>
-                </div>
 
-                {/* Content */}
-                <div className="flex flex-col gap-4 p-8">
-                  <div className="flex items-start justify-between">
-                    <h3
-                      className="flex-1 pr-4 text-2xl font-bold leading-8 text-zinc-800"
+                  {/* Content */}
+                  <div className="flex flex-col gap-4 p-8">
+                    <div className="flex items-start justify-between">
+                      <h3
+                        className="flex-1 pr-4 text-2xl font-bold leading-8 text-zinc-800"
+                        style={{ fontFamily: "var(--font-quicksand)" }}
+                      >
+                        {kit.name}
+                      </h3>
+                      <span
+                        className="text-xl font-bold text-red-700"
+                        style={{ fontFamily: "var(--font-inter)" }}
+                      >
+                        {formatFromPrice(kit.starting_price_ngn)}
+                      </span>
+                    </div>
+                    {kit.description ? (
+                      <p
+                        className="text-sm leading-5 text-stone-600"
+                        style={{ fontFamily: "var(--font-inter)" }}
+                      >
+                        {kit.description}
+                      </p>
+                    ) : null}
+                    <Link
+                      href={`/shop/${kit.id}`}
+                      scroll={false}
+                      className="w-full cursor-pointer rounded-full bg-stone-100 py-4 text-center text-base font-bold text-zinc-800 transition-all duration-150 hover:bg-red-600 hover:text-white active:scale-[0.97] active:bg-red-700"
                       style={{ fontFamily: "var(--font-quicksand)" }}
                     >
-                      {kit.title}
-                    </h3>
-                    <span
-                      className={`text-xl font-bold ${kit.priceColor}`}
-                      style={{ fontFamily: "var(--font-inter)" }}
-                    >
-                      {kit.price}
-                    </span>
+                      Add to Box
+                    </Link>
                   </div>
-                  <p
-                    className="text-sm leading-5 text-stone-600"
-                    style={{ fontFamily: "var(--font-inter)" }}
-                  >
-                    {kit.description}
-                  </p>
-                  <button
-                    type="button"
-                    className="w-full cursor-pointer rounded-full bg-stone-100 py-4 text-base font-bold text-zinc-800 transition-all duration-150 hover:bg-red-600 hover:text-white active:scale-[0.97] active:bg-red-700"
-                    style={{ fontFamily: "var(--font-quicksand)" }}
-                  >
-                    Add to Box
-                  </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           {/* Desktop: normal grid, hidden on mobile */}
           <div className="hidden md:grid grid-cols-3 gap-6">
-            {kits.map((kit) => (
-              <div
-                key={kit.title}
-                className="overflow-hidden rounded-[32px] bg-white outline outline-1 outline-stone-200/50"
-              >
-                {/* Image */}
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src="https://placehold.co/382x256"
-                    alt={kit.title}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                  {/* Badges */}
-                  <div className="absolute left-4 top-4 flex gap-2">
-                    <span
-                      className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-red-700 backdrop-blur-sm"
-                      style={{ fontFamily: "var(--font-quicksand)" }}
-                    >
-                      {kit.time}
-                    </span>
-                    <span
-                      className={`rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-wide backdrop-blur-sm ${kit.difficultyColor}`}
-                      style={{ fontFamily: "var(--font-quicksand)" }}
-                    >
-                      {kit.difficulty}
-                    </span>
+            {kits.map((kit) => {
+              const image = kit.images[0]?.url ?? kit.image_url;
+              return (
+                <div
+                  key={kit.id}
+                  className="overflow-hidden rounded-[32px] bg-white outline outline-1 outline-stone-200/50"
+                >
+                  {/* Image */}
+                  <div className="relative h-64 overflow-hidden bg-stone-100">
+                    {image ? (
+                      <Image
+                        src={image}
+                        alt={kit.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : null}
                   </div>
-                </div>
 
-                {/* Content */}
-                <div className="flex flex-col gap-4 p-8">
-                  <div className="flex items-start justify-between">
-                    <h3
-                      className="flex-1 pr-4 text-2xl font-bold leading-8 text-zinc-800"
+                  {/* Content */}
+                  <div className="flex flex-col gap-4 p-8">
+                    <div className="flex items-start justify-between">
+                      <h3
+                        className="flex-1 pr-4 text-2xl font-bold leading-8 text-zinc-800"
+                        style={{ fontFamily: "var(--font-quicksand)" }}
+                      >
+                        {kit.name}
+                      </h3>
+                      <span
+                        className="text-xl font-bold text-red-700"
+                        style={{ fontFamily: "var(--font-inter)" }}
+                      >
+                        {formatFromPrice(kit.starting_price_ngn)}
+                      </span>
+                    </div>
+                    {kit.description ? (
+                      <p
+                        className="text-sm leading-5 text-stone-600"
+                        style={{ fontFamily: "var(--font-inter)" }}
+                      >
+                        {kit.description}
+                      </p>
+                    ) : null}
+                    <Link
+                      href={`/shop/${kit.id}`}
+                      scroll={false}
+                      className="w-full cursor-pointer rounded-full bg-stone-100 py-4 text-center text-base font-bold text-zinc-800 transition-all duration-150 hover:bg-red-600 hover:text-white active:scale-[0.97] active:bg-red-700"
                       style={{ fontFamily: "var(--font-quicksand)" }}
                     >
-                      {kit.title}
-                    </h3>
-                    <span
-                      className={`text-xl font-bold ${kit.priceColor}`}
-                      style={{ fontFamily: "var(--font-inter)" }}
-                    >
-                      {kit.price}
-                    </span>
+                      Add to Box
+                    </Link>
                   </div>
-                  <p
-                    className="text-sm leading-5 text-stone-600"
-                    style={{ fontFamily: "var(--font-inter)" }}
-                  >
-                    {kit.description}
-                  </p>
-                  <button
-                    type="button"
-                    className="w-full cursor-pointer rounded-full bg-stone-100 py-4 text-base font-bold text-zinc-800 transition-all duration-150 hover:bg-red-600 hover:text-white active:scale-[0.97] active:bg-red-700"
-                    style={{ fontFamily: "var(--font-quicksand)" }}
-                  >
-                    Add to Box
-                  </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
- 
+
 
         {/* CTA */}
         <div className="mt-16 flex justify-center">

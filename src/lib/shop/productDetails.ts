@@ -38,8 +38,7 @@ export async function getProductDetailsById(productId: string): Promise<ProductD
         db
           .select()
           .from(schema.product_prep_options)
-          .where(eq(schema.product_prep_options.product_id, productId))
-          .orderBy(asc(schema.product_prep_options.label)),
+          .where(eq(schema.product_prep_options.product_id, productId)),
         db
           .select({ url: schema.product_images.url })
           .from(schema.product_images)

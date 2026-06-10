@@ -63,7 +63,7 @@ export function ProductDrawer({
   const isProduce = product.type === "fresh_produce";
 
   const needsVariant = isKit && variants.length > 0;
-  const needsPrep = isProduce && prepOptions.length > 0;
+  const needsPrep = prepOptions.length > 0;
 
   // D-07: no defaults.
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
@@ -92,15 +92,15 @@ export function ProductDrawer({
   }, [isProduce, selectedPrepId, prepOptions, product.images]);
 
   const unitPriceKobo = useMemo(() => {
-    if (isKit) return selectedVariant?.price_ngn ?? 0;
     const extra = selectedPrep?.extra_cost_ngn ?? 0;
+    if (isKit) return (selectedVariant?.price_ngn ?? 0) + extra;
     return baseProducePriceKobo + extra;
   }, [isKit, baseProducePriceKobo, selectedVariant, selectedPrep]);
 
   const subtotalKobo = useMemo(() => unitPriceKobo * quantity, [unitPriceKobo, quantity]);
 
   const selectionSatisfied = (!needsVariant || !!selectedVariant) && (!needsPrep || !!selectedPrep);
-  const canAddToCart = isOrderingOpen && selectionSatisfied && quantity >= 1;
+  const canAddToCart = selectionSatisfied && quantity >= 1;
 
   const CLOSE_DELAY = 150;
 
@@ -253,40 +253,38 @@ export function ProductDrawer({
                     </p>
                   ) : null}
                 </section>
-              ) : (
+              ) : null}
+
+              {prepOptions.length > 0 ? (
                 <section>
                   <h3 className="text-sm font-semibold text-black">Choose a prep option</h3>
-                  {prepOptions.length === 0 ? (
-                    <p className="mt-2 text-sm text-black/70">No prep options for this item.</p>
-                  ) : (
-                    <div className="mt-3 grid grid-cols-1 gap-2">
-                      {prepOptions.map((p) => {
-                        const active = p.id === selectedPrepId;
-                        return (
-                          <button
-                            key={p.id}
-                            type="button"
-                            onClick={() => setSelectedPrepId(p.id)}
-                            className={[
-                              "rounded-xl border px-3 py-2 text-left text-sm font-semibold",
-                              active
-                                ? "border-black bg-black text-white"
-                                : "border-gray-200 bg-white text-black",
-                            ].join(" ")}
-                          >
-                            <span className="block">{p.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                  <div className="mt-3 grid grid-cols-1 gap-2">
+                    {prepOptions.map((p) => {
+                      const active = p.id === selectedPrepId;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => setSelectedPrepId(p.id)}
+                          className={[
+                            "rounded-xl border px-3 py-2 text-left text-sm font-semibold",
+                            active
+                              ? "border-black bg-black text-white"
+                              : "border-gray-200 bg-white text-black",
+                          ].join(" ")}
+                        >
+                          <span className="block">{p.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                   {needsPrep && !selectedPrep ? (
                     <p className="mt-2 text-xs font-medium text-black/60">
                       Select a prep option to enable Add to cart.
                     </p>
                   ) : null}
                 </section>
-              )}
+              ) : null}
 
               <section className="rounded-2xl border bg-white p-4">
                 <div className="flex items-center justify-between gap-4">
@@ -342,19 +340,17 @@ export function ProductDrawer({
               onClick={onAddToCart}
               disabled={!canAddToCart}
               title={
-                !isOrderingOpen
-                  ? "Ordering is closed"
-                  : !selectionSatisfied
-                    ? "Select the required option to add to cart"
-                    : undefined
+                !selectionSatisfied
+                  ? "Select the required option to add to cart"
+                  : undefined
               }
             >
-              {!isOrderingOpen ? "Ordering closed" : "Add to cart"}
+              Add to cart
             </button>
 
             {!isOrderingOpen ? (
               <p className="mt-2 text-center text-xs text-black/60">
-                Ordering is closed — you can still browse, but you can’t add items right now.
+                Ordering is currently closed — items added now will be saved for when ordering reopens.
               </p>
             ) : null}
           </div>
