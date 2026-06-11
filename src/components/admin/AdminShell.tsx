@@ -61,7 +61,7 @@ export function AdminShell({
         onMobileClose={() => setMobileOpen(false)}
       />
 
-      <main className="flex-1 overflow-y-auto pt-14 md:pt-0 print:w-full">{children}</main>
+      <main className="flex-1 overflow-y-auto pt-14 md:ml-60 md:pt-0 print:ml-0 print:w-full">{children}</main>
     </div>
   );
 }

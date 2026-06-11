@@ -59,7 +59,7 @@ export function AdminSidebar({
     <aside
       className={cn(
         "fixed inset-y-0 left-0 z-50 flex w-60 shrink-0 flex-col border-r border-stone-200 bg-white transition-transform duration-200 print:hidden",
-        "md:static md:translate-x-0",
+        "md:translate-x-0",
         mobileOpen ? "translate-x-0" : "-translate-x-full",
       )}
     >
