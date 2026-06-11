@@ -200,7 +200,7 @@ export function CartSidebar({
             <p className="text-sm font-semibold text-black">Subtotal</p>
             <p className="text-sm font-semibold text-black">{formatNgn(subtotalKobo)}</p>
           </div>
-          <p className="mt-1 text-xs text-black/60">Free delivery on Saturdays</p>
+          <p className="mt-1 text-xs text-black/60">Flat ₦1,000 delivery fee (selected areas only)</p>
           <Link
             href="/checkout"
             onClick={closeCart}

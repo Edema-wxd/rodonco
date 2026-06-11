@@ -3,40 +3,58 @@ import Link from "next/link";
 const testimonials = [
   {
     quote:
-      '"rodo&co literally saved my week. I used to spend 3 hours every Sunday prepping. Now I just pop a kit open after work and I\'m eating restaurant-quality Jollof in 15 mins."',
-    name: "Tunde A.",
-    role: "Lekki, Lagos",
+      '"It was such a seamless experience from start to finish, and the packaging? Chef\'s kiss ✨ In terms of the user experience and interface, I\'d honestly rate it a 9."',
+    name: "Tomison",
+    role: "",
     avatarBg: "bg-red-400",
     cardBg: "bg-stone-100",
     stars: true,
   },
   {
     quote:
-      '"The ingredient freshness is unmatched. Even the scent of the chopped vegetables feels like it just came from the farm. Finally, a service that understands Nigerian flavors!"',
-    name: "Chiamaka O.",
-    role: "Chef & Nutritionist",
+      '"I tried the pepper mix from Rodo & Co. and I was genuinely impressed. Everything tasted incredibly fresh, the blend was just the way I like it, and the aroma when I opened it was amazing. The packaging looked clean, professional, and well put together, and the quantity is VERY worth it 👌🏽 It made cooking feel easy and enjoyable."',
+    name: "Esther",
+    role: "",
     avatarBg: "bg-green-800",
     cardBg: "bg-green-300/20",
     stars: false,
   },
   {
     quote:
-      '"My kids actually help cook now. The visual instructions are so easy to follow. Our new family ritual."',
-    name: "Adebayo S.",
-    role: "Parent of three",
+      '"The ordering process was seamless, and the responses were quite fast. All in all, it was very good."',
+    name: "Adeite",
+    role: "",
     avatarBg: "bg-fuchsia-300",
     cardBg: "bg-stone-100",
     stars: false,
   },
   {
     quote:
-      '"The Suya-Spiced Chicken Bowl is my go-to post-gym meal. Clean, high protein, and tastes incredible."',
-    name: "Banke Y.",
-    role: "Fitness Influencer",
+      '"Tbh, I didn\'t realise how much time prepping actually took until I used Rodo & Co. Everything arrived fresh, neatly packed, and ready to cook. It honestly made the whole cooking process feel lighter."',
+    name: "Zara",
+    role: "",
     avatarBg: "bg-red-700",
     cardBg: "bg-white",
     stars: false,
     outlined: true,
+  },
+  {
+    quote:
+      '"The ingredients looked fresh, the portions were generous, and everything felt thoughtfully prepared. You can tell a lot of care went into both the packaging and the overall experience."',
+    name: "Daniel",
+    role: "",
+    avatarBg: "bg-red-400",
+    cardBg: "bg-stone-100",
+    stars: false,
+  },
+  {
+    quote:
+      '"I loved how easy everything was. No stress, no extra mess (heavy on that extra mess). The ingredients were fresh and prepared exactly how I wanted them. Normally, I hate to cook o, but this one was different."',
+    name: "Mena",
+    role: "",
+    avatarBg: "bg-fuchsia-300",
+    cardBg: "bg-green-300/20",
+    stars: false,
   },
 ] as const;
 

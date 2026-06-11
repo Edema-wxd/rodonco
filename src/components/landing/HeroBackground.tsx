@@ -6,7 +6,7 @@ import Image from "next/image";
 const IMAGES = ["/images/hero1.png", "/images/hero2.png", "/images/hero3.png"];
 const INTERVAL_MS = 5000;
 
-export function HeroMobileBackground({ className }: { className?: string }) {
+export function HeroBackground() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export function HeroMobileBackground({ className }: { className?: string }) {
   }, []);
 
   return (
-    <div className={`absolute inset-0 ${className ?? ""}`}>
+    <div className="absolute inset-0">
       {IMAGES.map((src, i) => (
         <Image
           key={src}
@@ -25,6 +25,7 @@ export function HeroMobileBackground({ className }: { className?: string }) {
           alt=""
           fill
           priority={i === 0}
+          sizes="100vw"
           className={`object-cover transition-opacity duration-1000 ease-in-out ${
             i === activeIndex ? "opacity-100" : "opacity-0"
           }`}
