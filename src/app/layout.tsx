@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import "./globals.css";
-import { Quicksand, Lexend, Inter } from "next/font/google";
+import { Quicksand } from "next/font/google";
 import { extractRouterConfig } from "uploadthing/server";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
@@ -12,18 +12,6 @@ import { cn } from "@/lib/utils";
 const quicksand = Quicksand({
   subsets: ["latin"],
   variable: "--font-quicksand",
-  display: "swap",
-});
-
-const lexend = Lexend({
-  subsets: ["latin"],
-  variable: "--font-quicksand",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
   display: "swap",
 });
 
@@ -39,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn(quicksand.variable, lexend.variable, inter.variable)}>
+    <html lang="en" className={quicksand.variable}>
       <body>
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         {children}
