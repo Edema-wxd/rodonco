@@ -38,5 +38,22 @@ describe("admin productPayloadSchema", () => {
     expect(parsed.data.description == null).toBe(true);
     expect(parsed.data.image_url == null).toBe(true);
   });
+
+  it("allows a blank description (empty string treated as null)", () => {
+    const parsed = productPayloadSchema.safeParse({
+      name: "Tomatoes",
+      description: "",
+      type: "fresh_produce",
+      is_active: true,
+      images: [],
+      variants: [],
+      prep_options: [],
+    });
+
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+
+    expect(parsed.data.description == null).toBe(true);
+  });
 });
 

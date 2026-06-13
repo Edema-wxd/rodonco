@@ -32,10 +32,10 @@ const productImageSchema = z
 export const productPayloadSchema = z
   .object({
     name: z.string().min(1).max(120),
-    description: z
-      .preprocess(emptyStringToUndefined, z.string().max(2000))
-      .nullable()
-      .optional(),
+    description: z.preprocess(
+      emptyStringToUndefined,
+      z.string().max(2000).nullable().optional(),
+    ),
     type: z.enum(["fresh_produce", "cooking_kit"]),
     is_active: z.boolean(),
     images: z.array(productImageSchema).max(5).default([]),
