@@ -44,12 +44,7 @@ export async function Footer() {
               className="h-8 w-auto"
               unoptimized
             />
-            <p
-              className="text-xl font-black uppercase text-zinc-900"
-              style={{ fontFamily: "var(--font-quicksand)" }}
-            >
-              rodo&amp;co
-            </p>
+           
             <p
               className="text-sm leading-6 text-zinc-500"
               style={{ fontFamily: "var(--font-inter)" }}

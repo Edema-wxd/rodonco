@@ -9,7 +9,7 @@ export function Hero() {
       <HeroBackground />
       <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
 
-      <div className="relative z-10 mx-auto flex h-full min-h-[640px] max-w-7xl flex-col justify-between px-6 py-10 sm:px-8 lg:min-h-[760px] lg:py-0">
+      <div className="relative z-10 mx-auto flex h-full min-h-[640px] max-w-7xl flex-col justify-between py-6  px-8 lg:min-h-[760px] lg:py-0">
         {/* Top: Badge */}
         <div className="flex-1 flex items-start">
           <div
@@ -36,24 +36,24 @@ export function Hero() {
         </div>
 
         {/* Middle: Headline + Subtext */}
-        <div className="flex-1 flex flex-col justify-center items-start gap-5">
+        <div className="flex-1 flex flex-col justify-start items-start gap-5">
           <h1
-            className="max-w-2xl text-5xl font-bold leading-[1.05] text-white sm:text-6xl lg:text-7xl"
-            style={{ fontFamily: "var(--font-quicksand)" }}
+            className="max-w-2xl text-5xl font-bold text-white sm:text-6xl lg:text-7xl"
+            style={{ fontFamily: "var(--font-quicksand)", lineHeight: "1.2" }}
           >
-            <span className="text-red-400 lg:text-red-500">Your</span> demure
+            <span className="text-[#ec2d01]">Your</span> demure
             kitchen assistant
           </h1>
           <p
-            className="max-w-lg text-lg leading-8 text-stone-100 sm:text-xl"
-            style={{ fontFamily: "var(--font-inter)" }}
+            className="max-w-lg text-lg text-stone-100 sm:text-xl"
+            style={{ fontFamily: "var(--font-inter)", lineHeight: "1.2" }}
           >
             Fresh ingredients, prepped your way, delivered ready to cook.
           </p>
         </div>
 
         {/* Bottom: CTA */}
-        <div className="flex-1 flex items-end w-full">
+        <div className="flex-1 flex items-start w-full">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2 w-full">
             <Link
               href="/shop"
