@@ -69,7 +69,7 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
             style={{ fontFamily: "var(--font-quicksand)" }}
           >
             <Plus className="h-4 w-4" />
-            + New Product
+           New Product
           </button>
         </div>
       </div>
