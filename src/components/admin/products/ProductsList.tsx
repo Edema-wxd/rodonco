@@ -25,6 +25,14 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
     );
   }, [initialProducts, search, sortDir]);
 
+  const existingCategories = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of initialProducts) {
+      if (p.category) set.add(p.category);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [initialProducts]);
+
   const open = creating || editing !== null;
 
   function close() {
@@ -178,7 +186,12 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
         )}
       </div>
 
-      <ProductDrawer open={open} product={editing} onClose={close} />
+      <ProductDrawer
+        open={open}
+        product={editing}
+        existingCategories={existingCategories}
+        onClose={close}
+      />
     </div>
   );
 }

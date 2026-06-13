@@ -37,6 +37,10 @@ export const productPayloadSchema = z
       z.string().max(2000).nullable().optional(),
     ),
     type: z.enum(["fresh_produce", "cooking_kit"]),
+    category: z.preprocess(
+      emptyStringToUndefined,
+      z.string().max(50).nullable().optional(),
+    ),
     is_active: z.boolean(),
     images: z.array(productImageSchema).max(5).default([]),
     variants: z.array(variantSchema).max(20),

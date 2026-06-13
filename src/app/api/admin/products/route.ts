@@ -33,12 +33,19 @@ export async function POST(req: Request) {
     );
   }
 
-  const { name, description, type, is_active, images, variants, prep_options } = parsed.data;
+  const { name, description, type, category, is_active, images, variants, prep_options } = parsed.data;
   const primaryImageUrl = images[0]?.url ?? null;
 
   const [created] = await db
     .insert(products)
-    .values({ name, description: description ?? null, type, image_url: primaryImageUrl, is_active })
+    .values({
+      name,
+      description: description ?? null,
+      type,
+      category: type === "fresh_produce" ? category ?? null : null,
+      image_url: primaryImageUrl,
+      is_active,
+    })
     .returning({ id: products.id });
 
   if (images.length > 0) {

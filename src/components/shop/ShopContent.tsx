@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Search, X } from "lucide-react";
 import type { ProduceCategory } from "@/types";
 import type { ActiveProductWithStartingPrice } from "@/lib/shop/products";
@@ -11,13 +11,25 @@ const sections = [
   { id: "cooking-kits", label: "Cooking Kits", accent: "text-red-700" },
 ] as const;
 
-const categoryFilters: { value: ProduceCategory | "all"; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "vegetable", label: "Vegetables" },
-  { value: "tuber", label: "Tubers" },
-  { value: "herb_spice", label: "Herbs & Spices" },
-  { value: "legume", label: "Legumes" },
-];
+// Friendlier labels for the original built-in categories; any admin-created
+// category falls back to a title-cased version of its slug.
+const KNOWN_CATEGORY_LABELS: Record<string, string> = {
+  vegetable: "Vegetables",
+  tuber: "Tubers",
+  herb_spice: "Herbs & Spices",
+  legume: "Legumes",
+};
+
+function formatCategoryLabel(slug: string): string {
+  return (
+    KNOWN_CATEGORY_LABELS[slug] ??
+    slug
+      .split("_")
+      .filter(Boolean)
+      .map((word) => word[0]!.toUpperCase() + word.slice(1))
+      .join(" ")
+  );
+}
 
 function filterProducts(
   products: ActiveProductWithStartingPrice[],
@@ -49,6 +61,17 @@ export function ShopContent({
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<ProduceCategory | "all">("all");
   const [activeSection, setActiveSection] = useState<string>("fresh-produce");
+
+  const categoryFilters = useMemo(() => {
+    const slugs = new Set<string>();
+    for (const p of freshProduce) {
+      if (p.category) slugs.add(p.category);
+    }
+    return [
+      { value: "all" as const, label: "All" },
+      ...[...slugs].sort().map((slug) => ({ value: slug, label: formatCategoryLabel(slug) })),
+    ];
+  }, [freshProduce]);
 
   const filteredFresh = filterProducts(freshProduce, query, activeCategory);
   const filteredKits = filterProducts(cookingKits, query, "all");

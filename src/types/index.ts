@@ -9,7 +9,9 @@ export interface ProductImage {
   url: string;
 }
 
-export type ProduceCategory = "vegetable" | "tuber" | "herb_spice" | "legume";
+// Admins can create new categories from the product editor, so this is an
+// open string (slug-formatted, e.g. "leafy_greens") rather than a fixed union.
+export type ProduceCategory = string;
 
 export interface Product {
   id: string;

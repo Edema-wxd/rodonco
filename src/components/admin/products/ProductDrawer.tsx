@@ -16,11 +16,28 @@ const EMPTY_DEFAULTS: ProductPayload = {
   name: "",
   description: null,
   type: "fresh_produce",
+  category: null,
   is_active: true,
   images: [],
   variants: [],
   prep_options: [],
 };
+
+function formatCategoryLabel(slug: string): string {
+  return slug
+    .split("_")
+    .filter(Boolean)
+    .map((word) => word[0]!.toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function slugifyCategory(label: string): string {
+  return label
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
 
 const inputCls =
   "h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm text-zinc-800 outline-none placeholder:text-stone-300 focus:border-red-400 focus:ring-2 focus:ring-red-100";
@@ -31,15 +48,24 @@ const labelCls =
 export function ProductDrawer({
   open,
   product,
+  existingCategories,
   onClose,
 }: {
   open: boolean;
   product: AdminProduct | null;
+  existingCategories: string[];
   onClose: () => void;
 }) {
   const router = useRouter();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState(existingCategories);
+
+  useEffect(() => {
+    setCategories(existingCategories);
+  }, [existingCategories]);
 
   const form = useForm<ProductPayload>({
     resolver: zodResolver(productPayloadSchema),
@@ -59,6 +85,7 @@ export function ProductDrawer({
             name: product.name,
             description: product.description ?? null,
             type: product.type as ProductPayload["type"],
+            category: product.category ?? null,
             is_active: product.is_active,
             images: product.images.map((img) => ({
               id: img.id,
@@ -82,6 +109,8 @@ export function ProductDrawer({
     );
 
     setConfirmingDelete(false);
+    setAddingCategory(false);
+    setNewCategory("");
   }, [open, product, form]);
 
   async function onSubmit(values: ProductPayload) {
@@ -216,6 +245,71 @@ export function ProductDrawer({
                   <option value="cooking_kit">Cooking Kit</option>
                 </select>
               </div>
+
+              {/* Category (fresh produce only) */}
+              {form.watch("type") === "fresh_produce" && (
+                <div className="space-y-2">
+                  <label htmlFor="prod-category" className={labelCls} style={{ fontFamily: "var(--font-quicksand)" }}>
+                    Category
+                  </label>
+                  {addingCategory ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="prod-category"
+                        autoFocus
+                        className={`${inputCls} flex-1`}
+                        style={{ fontFamily: "var(--font-inter)" }}
+                        placeholder="New category name"
+                        value={newCategory}
+                        onChange={(e) => setNewCategory(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key !== "Enter") return;
+                          e.preventDefault();
+                          const slug = slugifyCategory(newCategory);
+                          if (!slug) return;
+                          form.setValue("category", slug, { shouldDirty: true });
+                          setCategories((prev) => (prev.includes(slug) ? prev : [...prev, slug].sort()));
+                          setAddingCategory(false);
+                          setNewCategory("");
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="rounded-full bg-stone-100 px-4 py-2 text-xs font-bold text-stone-500 transition-colors hover:bg-stone-200"
+                        style={{ fontFamily: "var(--font-quicksand)" }}
+                        onClick={() => {
+                          setAddingCategory(false);
+                          setNewCategory("");
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <select
+                      id="prod-category"
+                      className={inputCls}
+                      style={{ fontFamily: "var(--font-inter)" }}
+                      value={form.watch("category") ?? ""}
+                      onChange={(e) => {
+                        if (e.target.value === "__new__") {
+                          setAddingCategory(true);
+                          return;
+                        }
+                        form.setValue("category", e.target.value || null, { shouldDirty: true });
+                      }}
+                    >
+                      <option value="">No category</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {formatCategoryLabel(cat)}
+                        </option>
+                      ))}
+                      <option value="__new__">+ Add new category…</option>
+                    </select>
+                  )}
+                </div>
+              )}
 
               {/* Active toggle */}
               <div className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white px-4 py-3">

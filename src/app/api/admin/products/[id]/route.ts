@@ -38,13 +38,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   }
 
   const { id } = await params;
-  const { name, description, type, is_active, images, variants, prep_options } = parsed.data;
+  const { name, description, type, category, is_active, images, variants, prep_options } = parsed.data;
   const primaryImageUrl = images[0]?.url ?? null;
 
   // Update core product fields
   await db
     .update(products)
-    .set({ name, description: description ?? null, type, image_url: primaryImageUrl, is_active })
+    .set({
+      name,
+      description: description ?? null,
+      type,
+      category: type === "fresh_produce" ? category ?? null : null,
+      image_url: primaryImageUrl,
+      is_active,
+    })
     .where(eq(products.id, id));
 
   // ── Images diff ───────────────────────────────────────────────────
