@@ -23,10 +23,12 @@ export function HeroBackground() {
           key={src}
           src={src}
           alt=""
+          unoptimized
+          quality={100}
           fill
           priority={i === 0}
           sizes="100vw"
-          className={`object-cover transition-opacity duration-1000 ease-in-out ${
+          className={`object-cover  transition-opacity duration-1000 ease-in-out ${
             i === activeIndex ? "opacity-100" : "opacity-0"
           }`}
         />
