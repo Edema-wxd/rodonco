@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Leaf } from "lucide-react";
 
 import { HeroBackground } from "./HeroBackground";
 
@@ -11,17 +12,19 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex h-full min-h-[640px] max-w-7xl flex-col items-start justify-start gap-6 px-6 pt-10 sm:px-8 lg:min-h-[760px] lg:justify-center lg:gap-8 lg:pt-0">
         {/* Badge */}
         <div
-          className="flex items-center gap-2 rounded-full bg-green-300 px-4 py-1.5"
+          className="flex items-center gap-2 rounded-full bg-green-300 px-4 py-1.5 "
           style={{
             animation: "badge-bounce-in 1s cubic-bezier(0.23, 1, 0.32, 1) 0.05s",
           }}
         >
           <span
-            className="h-2.5 w-2.5 rounded-full bg-green-900"
+            className="h-2.5 w-2.5 rounded-full bg-green-300"
             style={{
               animation: "badge-pulse 1.6s infinite cubic-bezier(0.4, 0, 0.6, 1)",
             }}
-          />
+          >
+            <Leaf className="h-3 w-3" />
+          </span>
           <span
             className="text-xs font-bold uppercase tracking-wider text-green-900"
             style={{ fontFamily: "var(--font-quicksand)" }}
