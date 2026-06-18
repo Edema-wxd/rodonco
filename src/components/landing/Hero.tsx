@@ -13,7 +13,7 @@ export function Hero() {
         {/* Top: Badge */}
         <div className="flex-1 flex items-start">
           <div
-            className="flex w-full justify-center md:justify-start items-center gap-2 rounded-full bg-[#d0f1c3] px-4 py-1.5"
+            className="flex w-full md:w-auto justify-center md:justify-start items-center gap-2 rounded-full bg-[#d0f1c3] px-4 py-1.5"
             style={{
               animation: "badge-bounce-in 1s cubic-bezier(0.23, 1, 0.32, 1) 0.05s",
             }}

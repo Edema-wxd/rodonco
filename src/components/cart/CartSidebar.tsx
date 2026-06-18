@@ -178,11 +178,10 @@ export function CartSidebar({
 
                         <button
                           type="button"
-                          className="text-sm font-medium text-black/70 underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
+                          className="text-sm font-medium text-black/70 underline-offset-4 hover:underline"
                           onClick={() =>
                             removeItem(item.productId, item.variantLabel, item.prepOption)
                           }
-                          disabled={isViewOnly}
                         >
                           Remove
                         </button>
