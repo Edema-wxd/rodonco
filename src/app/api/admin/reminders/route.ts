@@ -75,6 +75,7 @@ export async function POST(req: Request) {
         subject: emails[i]?.subject ?? "Your Rodo & Co delivery is this Saturday!",
         status: "failed",
         error: JSON.stringify(error),
+        orderReference: order.reference,
       });
     });
     console.error("[reminders] Resend batch error:", error);
@@ -88,6 +89,7 @@ export async function POST(req: Request) {
       subject: emails[i]?.subject ?? "Your Rodo & Co delivery is this Saturday!",
       status: "sent",
       resendId: batchData?.data?.[i]?.id ?? null,
+      orderReference: order.reference,
     });
   });
 

@@ -6,6 +6,7 @@ import { db, schema } from "@/lib/db";
 
 export type PaidOrderForReminder = {
   id: string;
+  reference: string;
   customer_name: string;
   customer_email: string;
 };
@@ -14,6 +15,7 @@ export async function getPaidOrdersForWeek(weekOf: string): Promise<PaidOrderFor
   return db
     .select({
       id: schema.orders.id,
+      reference: schema.orders.reference,
       customer_name: schema.orders.customer_name,
       customer_email: schema.orders.customer_email,
     })

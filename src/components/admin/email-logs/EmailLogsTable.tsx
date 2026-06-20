@@ -4,6 +4,25 @@ import * as React from "react";
 import * as Lucide from "lucide-react";
 import { cn } from "@/lib/utils";
 
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = React.useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void navigator.clipboard.writeText(value).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        });
+      }}
+      className="ml-1 inline-flex items-center text-stone-300 hover:text-stone-500 transition-colors"
+      title="Copy"
+    >
+      {copied ? <Lucide.Check className="h-3 w-3 text-green-500" /> : <Lucide.Copy className="h-3 w-3" />}
+    </button>
+  );
+}
+
 export type EmailLog = {
   id: string;
   type: string;
@@ -44,6 +63,7 @@ export function EmailLogsTable({ logs }: { logs: EmailLog[] }) {
   const [search, setSearch] = React.useState("");
   const [typeFilter, setTypeFilter] = React.useState("all");
   const [statusFilter, setStatusFilter] = React.useState("all");
+  const [expandedId, setExpandedId] = React.useState<string | null>(null);
 
   const filtered = logs.filter((log) => {
     if (typeFilter !== "all" && log.type !== typeFilter) return false;
@@ -119,12 +139,20 @@ export function EmailLogsTable({ logs }: { logs: EmailLog[] }) {
                   <th className="px-4 py-3" style={{ fontFamily: "var(--font-quicksand)" }}>Subject</th>
                   <th className="px-4 py-3" style={{ fontFamily: "var(--font-quicksand)" }}>Status</th>
                   <th className="px-4 py-3" style={{ fontFamily: "var(--font-quicksand)" }}>Reference</th>
+                  <th className="px-4 py-3" style={{ fontFamily: "var(--font-quicksand)" }}>Resend ID</th>
                   <th className="px-4 py-3" style={{ fontFamily: "var(--font-quicksand)" }}>Sent</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {filtered.map((log) => (
-                  <tr key={log.id} className="hover:bg-stone-50 transition-colors">
+                {filtered.map((log) => {
+                  const isExpanded = expandedId === log.id;
+                  const isFailed = log.status !== "sent";
+                  return (
+                  <React.Fragment key={log.id}>
+                  <tr
+                    className={cn("transition-colors", isFailed ? "cursor-pointer hover:bg-red-50/50" : "hover:bg-stone-50")}
+                    onClick={() => isFailed && setExpandedId(isExpanded ? null : log.id)}
+                  >
                     <td className="px-4 py-3">
                       <span
                         className={cn(
@@ -151,22 +179,29 @@ export function EmailLogsTable({ logs }: { logs: EmailLog[] }) {
                       {log.subject}
                     </td>
                     <td className="px-4 py-3">
-                      {log.status === "sent" ? (
+                      {isFailed ? (
+                        <span className="flex items-center gap-1.5 text-red-600">
+                          <Lucide.XCircle className="h-3.5 w-3.5 shrink-0" />
+                          <span className="font-bold text-xs" style={{ fontFamily: "var(--font-quicksand)" }}>Failed</span>
+                          <Lucide.ChevronDown className={cn("h-3 w-3 ml-0.5 transition-transform", isExpanded && "rotate-180")} />
+                        </span>
+                      ) : (
                         <span className="flex items-center gap-1.5 text-green-700">
                           <Lucide.CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                           <span className="font-bold text-xs" style={{ fontFamily: "var(--font-quicksand)" }}>Sent</span>
                         </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5 text-red-600" title={log.error ?? ""}>
-                          <Lucide.XCircle className="h-3.5 w-3.5 shrink-0" />
-                          <span className="font-bold text-xs" style={{ fontFamily: "var(--font-quicksand)" }}>Failed</span>
-                        </span>
                       )}
                     </td>
-                    <td
-                      className="px-4 py-3 font-mono text-xs text-stone-500"
-                    >
+                    <td className="px-4 py-3 font-mono text-xs text-stone-500">
                       {log.order_reference ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-stone-400">
+                      {log.resend_id ? (
+                        <span className="flex items-center">
+                          <span className="truncate max-w-[120px]" title={log.resend_id}>{log.resend_id}</span>
+                          <CopyButton value={log.resend_id} />
+                        </span>
+                      ) : "—"}
                     </td>
                     <td
                       className="px-4 py-3 text-xs text-stone-400 whitespace-nowrap"
@@ -175,7 +210,17 @@ export function EmailLogsTable({ logs }: { logs: EmailLog[] }) {
                       {formatDate(log.sent_at)}
                     </td>
                   </tr>
-                ))}
+                  {isExpanded && log.error && (
+                    <tr className="bg-red-50/60">
+                      <td colSpan={7} className="px-4 py-3">
+                        <p className="text-xs font-bold text-red-700 mb-1" style={{ fontFamily: "var(--font-quicksand)" }}>Error detail</p>
+                        <pre className="text-xs text-red-800 whitespace-pre-wrap break-all font-mono bg-red-50 rounded-lg p-3 border border-red-100">{log.error}</pre>
+                      </td>
+                    </tr>
+                  )}
+                  </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
