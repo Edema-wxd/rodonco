@@ -13,6 +13,8 @@ export interface PaystackInitializeInput {
   amount: number;
   /** Our server-generated reference (e.g. "RDC-{nanoid}") stored as orders.reference */
   reference: string;
+  /** URL Paystack redirects the customer to after payment (redirect flow) */
+  callback_url?: string;
   /** Optional metadata forwarded to Paystack; available in webhook data.metadata */
   metadata?: Record<string, unknown>;
 }
@@ -55,6 +57,7 @@ export async function initializePaystackTransaction(
     amount: input.amount, // integer kobo
     currency: "NGN",
     reference: input.reference,
+    ...(input.callback_url ? { callback_url: input.callback_url } : {}),
     ...(input.metadata ? { metadata: input.metadata } : {}),
   };
 

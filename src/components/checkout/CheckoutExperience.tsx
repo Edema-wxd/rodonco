@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 import { useCartStore } from "@/store/cart";
 import { useHasHydrated } from "@/hooks/useHasHydrated";
@@ -40,7 +39,7 @@ async function saveDraft(payload: CheckoutPayload & { cart: unknown[] }): Promis
 
 async function initOrder(payload: CheckoutPayload & { cart: unknown[] }): Promise<{
   reference: string;
-  access_code: string;
+  authorization_url: string;
   amount_kobo: number;
 }> {
   const res = await fetch("/api/orders/init", {
@@ -119,20 +118,11 @@ export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumb
   const [serverError, setServerError] = useState<string | null>(null);
   const [selectedArea, setSelectedArea] = useState<string>("");
 
-  // Holds the remove-listener fn for the active focus poll; called on unmount.
-  const focusCleanupRef = useRef<(() => void) | null>(null);
-
   useEffect(() => {
     if (hasHydrated && items.length === 0 && !isSubmitting) {
       router.push("/shop");
     }
   }, [hasHydrated, items.length, router, isSubmitting]);
-
-  useEffect(() => {
-    return () => {
-      focusCleanupRef.current?.();
-    };
-  }, []);
 
   const {
     register,
@@ -172,7 +162,7 @@ export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumb
     try {
       const payload = {
         ...data,
-        ...(hasZones && matchedZone ? { delivery_area: selectedArea } : {}),
+        ...(matchedZone ? { delivery_area: selectedArea } : {}),
       };
       await saveDraft({ ...payload, cart: items });
       setSavedPayload(payload);
@@ -185,7 +175,7 @@ export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumb
     }
   });
 
-  // ── Step 2: initialise Paystack and open payment modal ────────────────────
+  // ── Step 2: create order then redirect to Paystack hosted payment page ───────
   const onPay = async () => {
     if (!savedPayload) return;
     setServerError(null);
@@ -193,60 +183,10 @@ export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumb
 
     try {
       const result = await initOrder({ ...savedPayload, cart: items });
-      const { default: PaystackPop } = await import("@paystack/inline-js");
-      const paystack = new PaystackPop();
-
-      // Track whether the popup is still active so the focus handler is a no-op
-      // after any of the three terminal callbacks fire.
-      let popupActive = true;
-
-      const stopFocusPoll = () => {
-        popupActive = false;
-        window.removeEventListener("focus", onWindowFocus);
-        focusCleanupRef.current = null;
-      };
-
-      const onWindowFocus = async () => {
-        if (!popupActive) return;
-        try {
-          const res = await fetch(`/api/orders/status?ref=${result.reference}`);
-          if (!res.ok) return;
-          const data = (await res.json()) as { status: string };
-          if (data.status === "paid") {
-            stopFocusPoll();
-            clearCart();
-            await setOrderViewCookie(result.reference);
-            router.push(`/order/${result.reference}`);
-          }
-        } catch {
-          // network blip — next focus event will retry
-        }
-      };
-
-      window.addEventListener("focus", onWindowFocus);
-      focusCleanupRef.current = stopFocusPoll;
-
-      paystack.resumeTransaction(result.access_code, {
-        onSuccess: async (transaction: unknown) => {
-          stopFocusPoll();
-          const txn = transaction as { reference?: string };
-          const ref = txn?.reference ?? result.reference;
-          clearCart();
-          await setOrderViewCookie(ref);
-          router.push(`/order/${ref}`);
-        },
-        onCancel: () => {
-          stopFocusPoll();
-          toast("Payment cancelled — your cart is still saved.", { duration: 5000 });
-          setIsSubmitting(false);
-        },
-        onError: (err: unknown) => {
-          stopFocusPoll();
-          const msg = (err as { message?: string })?.message ?? "Payment failed. Please try again.";
-          setServerError(msg);
-          setIsSubmitting(false);
-        },
-      });
+      // Set the view cookie before leaving so the confirmation page shows full details.
+      clearCart();
+      await setOrderViewCookie(result.reference);
+      window.location.href = result.authorization_url;
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
       setServerError(msg);
@@ -293,12 +233,14 @@ export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumb
               <Input
                 id="phone"
                 type="tel"
-                placeholder="+234 XXX XXX XXXX"
+                placeholder="08012345678"
                 aria-invalid={!!errors.phone}
                 {...register("phone")}
               />
-              {errors.phone && (
+              {errors.phone ? (
                 <p className="text-xs text-destructive">{errors.phone.message}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">Enter your 11-digit Nigerian number (e.g. 08012345678)</p>
               )}
             </div>
 
@@ -317,46 +259,44 @@ export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumb
               )}
             </div>
 
-            {/* Delivery area — shown only when zones are configured */}
-            {hasZones && (
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="delivery_area">Delivery Area</Label>
-                <select
-                  id="delivery_area"
-                  value={selectedArea}
-                  onChange={(e) => setSelectedArea(e.target.value)}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <option value="">Select your area…</option>
-                  {deliveryZones.map((z) => (
-                    <option key={z.area} value={z.area}>
-                      {z.area} — {z.fee_ngn === 0 ? "Free delivery" : `₦${z.fee_ngn.toLocaleString()}`}
-                    </option>
-                  ))}
-                  <option value={OTHER_AREA}>Other / Outside listed areas</option>
-                </select>
-                {isOutsideArea && (
-                  <div className="mt-1 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                    <p className="font-medium">We don&apos;t currently have a set delivery rate for your area.</p>
-                    <p className="mt-1">
-                      Please reach out on{" "}
-                      <a
-                        href={`https://wa.me/${(whatsappNumber ?? "").replace(/\D/g, "")}?text=${encodeURIComponent("Hi! I'd like to get a delivery quote for my order.")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-semibold underline underline-offset-2 text-green-700 hover:text-green-900"
-                      >
-                        WhatsApp
-                      </a>{" "}
-                      and we&apos;ll give you a delivery quote.
-                    </p>
-                  </div>
-                )}
-                {!isOutsideArea && selectedArea === "" && (
-                  <p className="text-xs text-muted-foreground">Select your area to see the delivery fee.</p>
-                )}
-              </div>
-            )}
+            {/* Delivery area */}
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="delivery_area">Delivery Area</Label>
+              <select
+                id="delivery_area"
+                value={selectedArea}
+                onChange={(e) => setSelectedArea(e.target.value)}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value="">Select your area…</option>
+                {deliveryZones.map((z) => (
+                  <option key={z.area} value={z.area}>
+                    {z.area} — {z.fee_ngn === 0 ? "Free delivery" : `₦${z.fee_ngn.toLocaleString()}`}
+                  </option>
+                ))}
+                <option value={OTHER_AREA}>Other / Outside listed areas</option>
+              </select>
+              {isOutsideArea && (
+                <div className="mt-1 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                  <p className="font-medium">We don&apos;t currently have a set delivery rate for your area.</p>
+                  <p className="mt-1">
+                    Please reach out on{" "}
+                    <a
+                      href={`https://wa.me/${(whatsappNumber ?? "").replace(/\D/g, "")}?text=${encodeURIComponent("Hi! I'd like to get a delivery quote for my order.")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold underline underline-offset-2 text-green-700 hover:text-green-900"
+                    >
+                      WhatsApp
+                    </a>{" "}
+                    and we&apos;ll give you a delivery quote.
+                  </p>
+                </div>
+              )}
+              {!isOutsideArea && selectedArea === "" && (
+                <p className="text-xs text-muted-foreground">Select your area to see the delivery fee.</p>
+              )}
+            </div>
 
             {/* Delivery address */}
             <div className="flex flex-col gap-1.5">
@@ -417,7 +357,7 @@ export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumb
 
             <Button
               type="submit"
-              disabled={isSaving || isOutsideArea || (hasZones && selectedArea === "")}
+              disabled={isSaving || isOutsideArea || selectedArea === ""}
               className="w-full"
               size="lg"
             >
@@ -456,6 +396,12 @@ export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumb
                   <dd>{savedPayload!.phone}</dd>
                   <dt className="text-muted-foreground">Email</dt>
                   <dd className="break-all">{savedPayload!.email}</dd>
+                  {savedPayload!.delivery_area && (
+                    <>
+                      <dt className="text-muted-foreground">Area</dt>
+                      <dd>{savedPayload!.delivery_area}</dd>
+                    </>
+                  )}
                   <dt className="text-muted-foreground">Address</dt>
                   <dd>{savedPayload!.delivery_address}</dd>
                   {savedPayload!.allergy_notes && (

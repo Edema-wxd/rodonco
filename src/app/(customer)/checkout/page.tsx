@@ -34,7 +34,7 @@ export default async function CheckoutPage() {
       <h1 className="font-heading text-2xl mb-8">Ready when you are.</h1>
       <CheckoutExperience
         deliveryFeeNgn={orderingConfig.delivery_fee_ngn}
-        deliveryZones={orderingConfig.delivery_zones}
+        deliveryZones={orderingConfig.delivery_zones ?? []}
         whatsappNumber={siteSettings?.whatsapp_number ?? null}
       />
     </div>

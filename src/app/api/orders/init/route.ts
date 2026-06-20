@@ -171,6 +171,8 @@ export async function POST(req: Request): Promise<NextResponse> {
   // 4. Try to reuse existing pending order (D-05)
   const existingOrder = await findPendingReuse(email, pricedCart);
 
+  const origin = req.headers.get("origin") ?? req.headers.get("x-forwarded-host") ?? "";
+
   if (existingOrder) {
     // Reuse: skip DB insert, go straight to Paystack init.
     // Always use the freshly computed totalNgn so the delivery fee and current
@@ -180,12 +182,13 @@ export async function POST(req: Request): Promise<NextResponse> {
         email,
         amount: totalNgn * 100,
         reference: existingOrder.reference,
+        callback_url: `${origin}/order/${existingOrder.reference}`,
         metadata: { customer_name: name, phone },
       });
 
       return NextResponse.json({
         reference: existingOrder.reference,
-        access_code: paystackResult.access_code,
+        authorization_url: paystackResult.authorization_url,
         amount_kobo: totalNgn * 100,
       });
     } catch (err) {
@@ -245,12 +248,13 @@ export async function POST(req: Request): Promise<NextResponse> {
       email,
       amount: totalNgn * 100,
       reference,
+      callback_url: `${origin}/order/${reference}`,
       metadata: { customer_name: name, phone },
     });
 
     return NextResponse.json({
       reference,
-      access_code: paystackResult.access_code,
+      authorization_url: paystackResult.authorization_url,
       amount_kobo: totalNgn * 100,
     });
   } catch (err) {

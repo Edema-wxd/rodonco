@@ -56,13 +56,15 @@ async function readOrderingConfigFromDb(): Promise<OrderingConfig> {
 
 const getOrderingConfigCached = unstable_cache(
   async () => readOrderingConfigFromDb(),
-  ["shop-ordering-config-v1"],
+  ["shop-ordering-config-v2"],
   {
     tags: ["ordering-config"],
   }
 );
 
 export async function getOrderingConfig(): Promise<OrderingConfig> {
-  return getOrderingConfigCached();
+  const config = await getOrderingConfigCached();
+  // Guard against stale cache entries written before delivery_zones was added.
+  return { ...config, delivery_zones: config.delivery_zones ?? [] };
 }
 
