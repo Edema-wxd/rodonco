@@ -51,6 +51,7 @@ export async function getPendingOrders(): Promise<AdminOrder[]> {
     customer_email: o.customer_email,
     customer_phone: o.customer_phone,
     delivery_address: o.delivery_address,
+    delivery_area: o.delivery_area ?? null,
     allergy_notes: o.allergy_notes ?? null,
     status: o.status,
     total_ngn: o.total_ngn,

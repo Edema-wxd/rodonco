@@ -125,7 +125,7 @@ export function OrderRow({
                       style={{ fontFamily: "var(--font-inter)" }}
                     >
                       <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-stone-400" />
-                      Delivers to: {order.delivery_address}
+                      Delivers to: {order.delivery_area ? `${order.delivery_area} — ` : ""}{order.delivery_address}
                     </p>
 
                     {order.allergy_notes ? (

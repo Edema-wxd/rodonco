@@ -62,6 +62,7 @@ export const orders = pgTable("orders", {
   customer_email: text("customer_email").notNull(),
   customer_phone: text("customer_phone").notNull(),
   delivery_address: text("delivery_address").notNull(),
+  delivery_area: text("delivery_area"),
   allergy_notes: text("allergy_notes"),
   status: text("status").notNull().default("pending"), // 'pending'|'paid'|'processing'|'delivered'|'cancelled'
   total_ngn: integer("total_ngn").notNull(),

@@ -12,6 +12,7 @@ export type ManifestOrder = {
   customer_name: string;
   customer_phone: string;
   delivery_address: string;
+  delivery_area: string | null;
   allergy_notes: string | null;
   total_ngn: number;
   items: AdminOrderItem[];
@@ -59,6 +60,7 @@ export async function getManifestOrders(weekOf?: string): Promise<ManifestOrder[
     customer_name: o.customer_name,
     customer_phone: o.customer_phone,
     delivery_address: o.delivery_address,
+    delivery_area: o.delivery_area ?? null,
     allergy_notes: o.allergy_notes ?? null,
     total_ngn: o.total_ngn,
     items: itemsByOrderId.get(o.id) ?? [],

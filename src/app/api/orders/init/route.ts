@@ -18,6 +18,7 @@ import { nanoid } from "nanoid";
 import { eq, inArray } from "drizzle-orm";
 
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
+import { snapToWeekStart } from "@/lib/admin/week";
 import { db, schema } from "@/lib/db";
 import { findPendingReuse } from "@/lib/orders/findPendingReuse";
 import { initializePaystackTransaction } from "@/lib/paystack/initialize";
@@ -98,8 +99,8 @@ export async function POST(req: Request): Promise<NextResponse> {
     );
   }
 
-  // week_of from DB config (falls back to today's ISO date if missing)
-  const weekOf = config.next_delivery_date ?? new Date().toISOString().slice(0, 10);
+  // week_of snapped to Sunday so it aligns with prep-list / manifest queries
+  const weekOf = snapToWeekStart(config.next_delivery_date ?? new Date().toISOString().slice(0, 10));
 
   // Resolve delivery fee: zone-specific price takes precedence over the flat fee
   const zones = (config.delivery_zones ?? []) as { area: string; fee_ngn: number }[];
@@ -171,7 +172,17 @@ export async function POST(req: Request): Promise<NextResponse> {
   // 4. Try to reuse existing pending order (D-05)
   const existingOrder = await findPendingReuse(email, pricedCart);
 
-  const origin = req.headers.get("origin") ?? req.headers.get("x-forwarded-host") ?? "";
+  // Prefer explicit env var (set in Vercel to https://www.rodoandco.com).
+  // Fall back to the request Origin header (always has protocol).
+  // x-forwarded-host is a last resort but lacks the scheme, so we prepend https.
+  const rawHost =
+    req.headers.get("origin") ??
+    req.headers.get("x-forwarded-host") ??
+    req.headers.get("host") ??
+    "";
+  const origin =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
+    (rawHost.startsWith("http") ? rawHost : `https://${rawHost}`);
 
   if (existingOrder) {
     // Reuse: skip DB insert, go straight to Paystack init.
@@ -192,7 +203,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         amount_kobo: totalNgn * 100,
       });
     } catch (err) {
-      console.error("[/api/orders/init] Paystack error on reused order:", err);
+      console.error("[/api/orders/init] Paystack error on reused order:", err instanceof Error ? err.message : err);
       return NextResponse.json(
         { error: "Payment provider unavailable. Please try again." },
         { status: 503 }
@@ -214,6 +225,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         customer_email: email,
         customer_phone: phone,
         delivery_address,
+        delivery_area: delivery_area ?? null,
         allergy_notes: allergy_notes ?? null,
         status: "pending",
         total_ngn: totalNgn,
@@ -258,7 +270,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       amount_kobo: totalNgn * 100,
     });
   } catch (err) {
-    console.error("[/api/orders/init] Paystack initialization error:", err);
+    console.error("[/api/orders/init] Paystack initialization error:", err instanceof Error ? err.message : err);
     return NextResponse.json(
       { error: "Payment provider unavailable. Please try again." },
       { status: 503 }
