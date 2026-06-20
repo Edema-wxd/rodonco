@@ -9,16 +9,6 @@ import { cn } from "@/lib/utils";
 
 import { OrderStatusSelect } from "./OrderStatusSelect";
 
-const STATUS_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
-  paid: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
-  processing: { bg: "bg-amber-100", text: "text-amber-800", dot: "bg-amber-500" },
-  delivered: { bg: "bg-stone-100", text: "text-stone-600", dot: "bg-stone-400" },
-};
-
-function statusStyle(s: string) {
-  return STATUS_STYLES[s] ?? { bg: "bg-gray-100", text: "text-gray-600", dot: "bg-gray-400" };
-}
-
 export function OrderRow({
   order,
   expanded,
@@ -28,7 +18,6 @@ export function OrderRow({
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const st = statusStyle(order.status);
 
   return (
     <>
@@ -70,14 +59,7 @@ export function OrderRow({
           {new Date(order.created_at).toLocaleDateString("en-NG")}
         </td>
 
-        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-          <span
-            className={`mb-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold capitalize ${st.bg} ${st.text}`}
-            style={{ fontFamily: "var(--font-quicksand)" }}
-          >
-            <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
-            {order.status}
-          </span>
+        <td className="px-6 py-4">
           <OrderStatusSelect orderId={order.id} initial={order.status} />
         </td>
 

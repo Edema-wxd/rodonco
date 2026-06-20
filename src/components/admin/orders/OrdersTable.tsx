@@ -142,10 +142,11 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
             onChange={(e) => updateParam("status", e.target.value)}
           >
             <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
             <option value="paid">Paid</option>
             <option value="processing">Processing</option>
             <option value="delivered">Delivered</option>
-            <option value="refunded">Refunded</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
 

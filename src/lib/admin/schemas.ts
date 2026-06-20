@@ -52,7 +52,7 @@ export type ProductPayload = z.infer<typeof productPayloadSchema>;
 
 export const orderStatusPatchSchema = z
   .object({
-    status: z.enum(["paid","processing","delivered"]),
+    status: z.enum(["pending", "paid", "processing", "delivered", "cancelled"]),
   })
   .strict();
 
