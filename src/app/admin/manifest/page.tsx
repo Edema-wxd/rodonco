@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ManifestTable } from "@/components/admin/manifest/ManifestTable";
 import { getManifestOrders } from "@/lib/admin/manifest";
-import { currentWeekOf } from "@/lib/admin/week";
+import { currentWeekOf, formatWeekRange } from "@/lib/admin/week";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +38,7 @@ export default async function AdminManifestPage({
           className="mt-2 text-base text-stone-500"
           style={{ fontFamily: "var(--font-inter)" }}
         >
-          Week of {weekOf} — {orders.length} deliveries
+          Week of {formatWeekRange(weekOf)} — {orders.length} deliveries
         </p>
       </div>
 

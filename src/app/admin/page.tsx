@@ -6,6 +6,7 @@ import { AdminLogin } from "@/components/admin/AdminLogin";
 import { getWeeklyAnalytics } from "@/lib/admin/analytics";
 import { getAdminOrders } from "@/lib/admin/orders";
 import { formatNgn } from "@/lib/admin/format";
+import { formatWeekRange } from "@/lib/admin/week";
 
 export const dynamic = "force-dynamic";
 
@@ -103,7 +104,7 @@ export default async function AdminDashboardPage({
           className="mt-2 text-base text-stone-500"
           style={{ fontFamily: "var(--font-inter)" }}
         >
-          Week of {analytics.week}
+          Week of {formatWeekRange(analytics.week)}
         </p>
       </div>
 

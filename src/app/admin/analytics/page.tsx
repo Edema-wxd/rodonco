@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { StatCard } from "@/components/admin/analytics/StatCard";
 import { WeekPickerBar } from "@/components/admin/analytics/WeekPickerBar";
 import { getWeeklyAnalytics } from "@/lib/admin/analytics";
+import { formatWeekRange } from "@/lib/admin/week";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,7 @@ export default async function AdminAnalyticsPage({
           className="mt-2 text-base text-stone-500"
           style={{ fontFamily: "var(--font-inter)" }}
         >
-          Week of {analytics.week}
+          Week of {formatWeekRange(analytics.week)}
         </p>
       </div>
 

@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { BulkTransitionPanel } from "@/components/admin/prep-list/BulkTransitionPanel";
 import { PrepListTable, PrepListWeekInput } from "@/components/admin/prep-list/PrepListTable";
 import { getPrepList } from "@/lib/admin/prepList";
-import { currentWeekOf } from "@/lib/admin/week";
+import { currentWeekOf, formatWeekRange } from "@/lib/admin/week";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +39,7 @@ export default async function AdminPrepListPage({
           className="mt-2 text-base text-stone-500"
           style={{ fontFamily: "var(--font-inter)" }}
         >
-          Week of {weekOf} — paid &amp; processing orders
+          Week of {formatWeekRange(weekOf)} — paid &amp; processing orders
         </p>
       </div>
 
