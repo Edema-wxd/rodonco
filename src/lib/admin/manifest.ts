@@ -20,24 +20,24 @@ export type ManifestOrder = {
 export async function getManifestOrders(weekOf?: string): Promise<ManifestOrder[]> {
   const week = weekOf ?? currentWeekOf();
 
-  const [orderRows, itemRows] = await Promise.all([
-    db
-      .select()
-      .from(orders)
-      .where(
-        and(
-          eq(orders.week_of, week),
-          inArray(orders.status, ["paid", "processing"])
-        )
+  const orderRows = await db
+    .select()
+    .from(orders)
+    .where(
+      and(
+        eq(orders.week_of, week),
+        inArray(orders.status, ["paid", "processing"])
       )
-      .orderBy(desc(orders.created_at)),
-    db.select().from(order_items),
-  ]);
+    )
+    .orderBy(desc(orders.created_at));
 
   if (orderRows.length === 0) return [];
 
-  const orderIds = new Set(orderRows.map((o) => o.id));
-  const relevantItems = itemRows.filter((it) => orderIds.has(it.order_id));
+  const orderIds = orderRows.map((o) => o.id);
+  const relevantItems = await db
+    .select()
+    .from(order_items)
+    .where(inArray(order_items.order_id, orderIds));
 
   const itemsByOrderId = new Map<string, AdminOrderItem[]>();
   for (const it of relevantItems) {
