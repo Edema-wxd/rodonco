@@ -51,7 +51,7 @@ async function initOrder(payload: CheckoutPayload & { cart: unknown[] }): Promis
   if (!res.ok) {
     throw new Error(data?.error ?? "Failed to initialise order. Please try again.");
   }
-  return data as { reference: string; access_code: string; amount_kobo: number };
+  return data as { reference: string; authorization_url: string; amount_kobo: number };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
