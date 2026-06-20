@@ -164,7 +164,14 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
             className="h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-800 outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 sm:w-44"
             style={{ fontFamily: "var(--font-inter)" }}
             value={weekFilter}
-            onChange={(e) => updateParam("weekOf", e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (!val) { updateParam("weekOf", ""); return; }
+              const [y, m, d] = val.split("-").map(Number);
+              const date = new Date(Date.UTC(y, m - 1, d));
+              const sunday = new Date(Date.UTC(y, m - 1, d - date.getUTCDay()));
+              updateParam("weekOf", sunday.toISOString().slice(0, 10));
+            }}
           />
         </div>
 

@@ -8,6 +8,15 @@ export function currentWeekOf(reference: Date = new Date()): string {
 }
 
 /**
+ * Snaps any YYYY-MM-DD date string to the Sunday that starts its week.
+ * Use this before querying week_of so any day within the week matches.
+ */
+export function snapToWeekStart(dateIso: string): string {
+  const [year, month, day] = dateIso.split("-").map(Number);
+  return currentWeekOf(new Date(Date.UTC(year, month - 1, day)));
+}
+
+/**
  * Given a week_of date string (YYYY-MM-DD, always a Sunday),
  * returns a human-readable range label: "Jun 14 – Jun 20, 2026".
  */

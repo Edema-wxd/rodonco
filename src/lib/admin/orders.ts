@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { order_items, orders } from "../../../drizzle/schema";
 import { and, desc, eq, ilike, inArray, lt, or, sql } from "drizzle-orm";
+import { snapToWeekStart } from "./week";
 
 export type AdminOrderItem = {
   id: string;
@@ -57,7 +58,7 @@ export async function getAdminOrders(opts?: {
   const searchTerm = search?.trim();
   const filterConditions = [
     status && status !== "all" ? eq(orders.status, status) : undefined,
-    weekOf ? eq(orders.week_of, weekOf) : undefined,
+    weekOf ? eq(orders.week_of, snapToWeekStart(weekOf)) : undefined,
     searchTerm
       ? or(
           ilike(orders.customer_name, `%${searchTerm}%`),

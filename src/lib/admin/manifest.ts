@@ -4,7 +4,7 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { order_items, orders } from "../../../drizzle/schema";
-import { currentWeekOf } from "./week";
+import { currentWeekOf, snapToWeekStart } from "./week";
 import type { AdminOrderItem } from "./orders";
 
 export type ManifestOrder = {
@@ -18,7 +18,7 @@ export type ManifestOrder = {
 };
 
 export async function getManifestOrders(weekOf?: string): Promise<ManifestOrder[]> {
-  const week = weekOf ?? currentWeekOf();
+  const week = weekOf ? snapToWeekStart(weekOf) : currentWeekOf();
 
   const orderRows = await db
     .select()

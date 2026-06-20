@@ -4,7 +4,7 @@ import { and, eq, inArray, sum } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { order_items, orders } from "../../../drizzle/schema";
-import { currentWeekOf } from "./week";
+import { currentWeekOf, snapToWeekStart } from "./week";
 
 export type PrepListRow = {
   product_name: string;
@@ -14,7 +14,7 @@ export type PrepListRow = {
 };
 
 export async function getPrepList(weekOf?: string): Promise<PrepListRow[]> {
-  const week = weekOf ?? currentWeekOf();
+  const week = weekOf ? snapToWeekStart(weekOf) : currentWeekOf();
 
   const rows = await db
     .select({
