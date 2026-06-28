@@ -53,6 +53,7 @@ export default async function OrderConfirmationPage({
       stripped={stripped}
       nextDeliveryDate={orderingConfig.next_delivery_date}
       contactEmail={siteSettings?.contact_email ?? undefined}
+      reference={ref}
     />
   );
 }

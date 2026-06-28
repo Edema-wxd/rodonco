@@ -357,7 +357,7 @@ export function CheckoutExperience({ deliveryFeeNgn, deliveryZones, whatsappNumb
 
             <Button
               type="submit"
-              disabled={isSaving || isOutsideArea || selectedArea === ""}
+              disabled={isSaving || isOutsideArea || selectedArea === "" || !termsChecked}
               className="w-full"
               size="lg"
             >

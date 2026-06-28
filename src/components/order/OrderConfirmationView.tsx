@@ -3,6 +3,7 @@
 // Renders confirmed order, pending state, or error state (CONTEXT D-09, D-10).
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { CheckCircle, AlertCircle } from "lucide-react";
 
@@ -54,9 +55,40 @@ type ErrorVariant = "not-found" | "not-paid" | "pending";
 interface ErrorStateProps {
   variant: ErrorVariant;
   contactEmail: string;
+  reference?: string;
 }
 
-function ErrorState({ variant, contactEmail }: ErrorStateProps) {
+const POLL_INTERVAL_MS = 3000;
+const POLL_MAX_ATTEMPTS = 10;
+
+function ErrorState({ variant, contactEmail, reference }: ErrorStateProps) {
+  const attemptsRef = useRef(0);
+
+  useEffect(() => {
+    if (variant !== "pending" || !reference) return;
+
+    const timer = setInterval(async () => {
+      attemptsRef.current += 1;
+      if (attemptsRef.current > POLL_MAX_ATTEMPTS) {
+        clearInterval(timer);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/orders/status?ref=${encodeURIComponent(reference)}`);
+        if (!res.ok) return;
+        const { status } = await res.json();
+        if (status === "paid") {
+          clearInterval(timer);
+          window.location.reload();
+        }
+      } catch {
+        // network hiccup — keep polling
+      }
+    }, POLL_INTERVAL_MS);
+
+    return () => clearInterval(timer);
+  }, [variant, reference]);
+
   if (variant === "pending") {
     return (
       <div className="mx-auto max-w-2xl px-4 py-12 text-center">
@@ -67,7 +99,7 @@ function ErrorState({ variant, contactEmail }: ErrorStateProps) {
         />
         <h1 className="font-heading text-2xl">Payment being confirmed</h1>
         <p className="mt-3 text-muted-foreground">
-          Your payment is being confirmed. Refresh in a moment or check your email.
+          Your payment is being confirmed. This page will update automatically.
         </p>
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <button
@@ -149,7 +181,7 @@ function StrippedOrder({ order }: StrippedOrderProps) {
         </div>
         <div className="flex items-center justify-between gap-4">
           <span className="text-sm text-muted-foreground">Total</span>
-          <span className="font-heading text-xl">{formatNGN(order.total_ngn)}</span>
+          <span className="font-heading text-xl">{formatNGN(order.total_ngn * 100)}</span>
         </div>
       </div>
       <div className="mt-8">
@@ -248,7 +280,7 @@ function ConfirmedOrder({ order, items, nextDeliveryDate }: ConfirmedOrderProps)
                       className="shrink-0 text-sm font-semibold"
                       style={{ color: "var(--accent)" }}
                     >
-                      {formatNGN(item.subtotal_ngn)}
+                      {formatNGN(item.subtotal_ngn * 100)}
                     </span>
                   </div>
                 </li>
@@ -259,7 +291,7 @@ function ConfirmedOrder({ order, items, nextDeliveryDate }: ConfirmedOrderProps)
             <div className="mt-4 border-t pt-4 flex justify-between items-center">
               <span className="text-base font-semibold">Total</span>
               <span className="font-heading text-2xl">
-                {formatNGN(order.total_ngn)}
+                {formatNGN(order.total_ngn * 100)}
               </span>
             </div>
           </div>
@@ -294,6 +326,8 @@ interface OrderConfirmationViewProps {
   nextDeliveryDate: string | null;
   /** Contact email from site_settings; falls back to DEFAULT_CONTACT_EMAIL */
   contactEmail?: string;
+  /** Order reference — used by the pending-state poller to auto-refresh when payment lands */
+  reference?: string;
 }
 
 export function OrderConfirmationView({
@@ -302,9 +336,10 @@ export function OrderConfirmationView({
   stripped = false,
   nextDeliveryDate,
   contactEmail = DEFAULT_CONTACT_EMAIL,
+  reference,
 }: OrderConfirmationViewProps) {
   if (!data) {
-    return <ErrorState variant={errorVariant} contactEmail={contactEmail} />;
+    return <ErrorState variant={errorVariant} contactEmail={contactEmail} reference={reference} />;
   }
 
   if (stripped) {

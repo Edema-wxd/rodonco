@@ -13,7 +13,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, desc } from "drizzle-orm";
 
 import { db, schema } from "@/lib/db";
 import { cartFingerprint } from "@/lib/checkout/cartToOrderDraft";
@@ -55,6 +55,7 @@ export async function findPendingReuse(
           eq(schema.orders.status, "pending")
         )
       )
+      .orderBy(desc(schema.orders.created_at))
       .limit(1);
 
     if (!existingOrder) {

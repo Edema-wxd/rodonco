@@ -188,6 +188,18 @@ export async function POST(req: Request): Promise<NextResponse> {
     // Reuse: skip DB insert, go straight to Paystack init.
     // Always use the freshly computed totalNgn so the delivery fee and current
     // prices are reflected even if the stored order pre-dates them.
+    // Sync total_ngn first so the webhook amount-check matches what Paystack charges.
+    if (existingOrder.total_ngn !== totalNgn) {
+      try {
+        await db
+          .update(schema.orders)
+          .set({ total_ngn: totalNgn })
+          .where(eq(schema.orders.id, existingOrder.id));
+      } catch (err) {
+        console.warn("[/api/orders/init] Could not sync total_ngn on reused order:", err);
+      }
+    }
+
     try {
       const paystackResult = await initializePaystackTransaction({
         email,
