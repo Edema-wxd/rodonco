@@ -19,8 +19,7 @@ import { eq, and } from "drizzle-orm";
 
 import { verifyPaystackSignature } from "@/lib/paystack/verifySignature";
 import { db, schema } from "@/lib/db";
-import { sendOrderEmails } from "@/lib/email/sendOrderEmails";
-import { getOrderingConfig } from "@/lib/shop/orderingConfig";
+import { markOrderPaid } from "@/lib/orders/markOrderPaid";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
 import { logActivity } from "@/lib/admin/activityLog";
 
@@ -151,131 +150,32 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "Missing reference" }, { status: 400 });
   }
 
-  // ── Step 5: Idempotency check — bail early if already paid ────────────────
-  const [existingOrder] = await db
-    .select()
-    .from(schema.orders)
-    .where(
-      and(
-        eq(schema.orders.reference, reference),
-        eq(schema.orders.status, "paid")
-      )
-    )
-    .limit(1);
-
-  if (existingOrder) {
-    // Already processed — return 200 without reprocessing
-    return NextResponse.json({ received: true, idempotent: true });
-  }
-
-  // ── Step 6: Fetch pending order for this reference ────────────────────────
-  const [pendingOrder] = await db
-    .select()
-    .from(schema.orders)
-    .where(eq(schema.orders.reference, reference))
-    .limit(1);
-
-  if (!pendingOrder) {
-    // Reference not found in our DB — log and return 200 (no retry value)
-    console.error(`[webhook] Order not found for reference: ${reference}`);
-    return NextResponse.json({ received: true });
-  }
-
-  // ── Step 6b: Verify charged amount matches stored order total ─────────────
-  // total_ngn is stored in NGN; Paystack sends amount in kobo — multiply by 100.
-  if (payload.data.amount !== pendingOrder.total_ngn * 100) {
-    const expected_kobo = pendingOrder.total_ngn * 100;
-    const received_kobo = payload.data.amount;
-    console.error(
-      `[webhook] Amount mismatch for ${reference}: ` +
-        `expected ${expected_kobo} kobo, got ${received_kobo} kobo`
-    );
-    logActivity({
-      adminEmail: "system",
-      action: "system.payment_amount_mismatch",
-      entityLabel: reference,
-      details: { expected_kobo, received_kobo },
-    }).catch(() => {});
-    // Return 200 so Paystack does not retry; mismatch flagged for ops monitoring.
-    return NextResponse.json({ received: true, mismatch: true });
-  }
-
-  // ── Step 7: Transition order to paid ─────────────────────────────────────
-  let updatedOrder: typeof schema.orders.$inferSelect;
-
+  // ── Step 5: Promote to paid via the shared helper (idempotent) ────────────
+  // Same code path the confirmation page uses for its direct-verify fallback,
+  // so the amount check, atomic transition, and receipt emails stay in sync.
   try {
-    const [result] = await db
-      .update(schema.orders)
-      .set({ status: "paid" })
-      .where(
-        and(
-          eq(schema.orders.reference, reference),
-          eq(schema.orders.status, "pending")
-        )
-      )
-      .returning();
+    const result = await markOrderPaid({ reference, amountKobo: payload.data.amount });
 
-    if (!result) {
-      // Race condition: another webhook delivery won the update — idempotent path
-      console.warn(`[webhook] Order ${reference} status update returned no rows (race condition).`);
+    if (result.kind === "not-found") {
+      // Reference not in our DB — 200, no retry value.
+      console.error(`[webhook] Order not found for reference: ${reference}`);
       return NextResponse.json({ received: true });
     }
 
-    updatedOrder = result;
+    if (result.kind === "amount-mismatch") {
+      console.error(
+        `[webhook] Amount mismatch for ${reference}: ` +
+          `expected ${result.expectedKobo} kobo, got ${result.receivedKobo} kobo`
+      );
+      // 200 so Paystack does not retry; mismatch is logged inside the helper.
+      return NextResponse.json({ received: true, mismatch: true });
+    }
+
+    // Paid — emails fired inside the helper only on the winning transition.
+    return NextResponse.json({ received: true, idempotent: !result.transitioned });
   } catch (err) {
-    console.error(`[webhook] DB update failed for reference ${reference}:`, err);
-    // Return 500 so Paystack retries — DB failure is transient
-    return NextResponse.json({ error: "DB update failed" }, { status: 500 });
+    console.error(`[webhook] Failed to process charge.success for ${reference}:`, err);
+    // Return 500 so Paystack retries — DB failure is transient.
+    return NextResponse.json({ error: "Processing failed" }, { status: 500 });
   }
-
-  // ── Step 8: Fetch order items for email ───────────────────────────────────
-  const items = await db
-    .select()
-    .from(schema.order_items)
-    .where(eq(schema.order_items.order_id, updatedOrder.id));
-
-  // ── Step 9: Fire-and-forget emails ────────────────────────────────────────
-  // get next_delivery_date from ordering_config for the customer receipt
-  let nextDeliveryDate: string;
-  try {
-    const config = await getOrderingConfig();
-    nextDeliveryDate = config.next_delivery_date ?? updatedOrder.week_of;
-  } catch {
-    // Fallback to the week_of stored at order creation time
-    nextDeliveryDate = updatedOrder.week_of;
-  }
-
-  // Cast DB row to domain type for email helper
-  const orderForEmail = {
-    id: updatedOrder.id,
-    reference: updatedOrder.reference,
-    customer_name: updatedOrder.customer_name,
-    customer_email: updatedOrder.customer_email,
-    customer_phone: updatedOrder.customer_phone,
-    delivery_address: updatedOrder.delivery_address,
-    allergy_notes: updatedOrder.allergy_notes,
-    status: updatedOrder.status as "paid",
-    total_ngn: updatedOrder.total_ngn,
-    week_of: updatedOrder.week_of,
-    created_at: updatedOrder.created_at.toISOString(),
-    notified_at: updatedOrder.notified_at?.toISOString() ?? null,
-  };
-
-  const itemsForEmail = items.map((item) => ({
-    id: item.id,
-    order_id: item.order_id,
-    product_id: item.product_id,
-    product_name: item.product_name,
-    variant_label: item.variant_label,
-    prep_option: item.prep_option,
-    quantity: item.quantity,
-    unit_price_ngn: item.unit_price_ngn,
-    subtotal_ngn: item.subtotal_ngn,
-  }));
-
-  // Non-blocking: webhook response must not wait on email delivery
-  void sendOrderEmails({ order: orderForEmail, items: itemsForEmail, nextDeliveryDate });
-
-  // ── Step 10: Return 200 ───────────────────────────────────────────────────
-  return NextResponse.json({ received: true });
 }

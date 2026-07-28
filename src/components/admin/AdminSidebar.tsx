@@ -24,6 +24,7 @@ const buildNavItems = (
   { href: "/admin", label: "Dashboard", Icon: Lucide.LayoutDashboard, exact: true },
   { href: "/admin/products", label: "Products", Icon: Lucide.Package },
   { href: "/admin/orders", label: "Orders", Icon: Lucide.ShoppingBag },
+  { href: "/admin/customers", label: "Customers", Icon: Lucide.UserRound },
   { href: "/admin/pending", label: "Pending Orders", Icon: Lucide.Clock, badge: pendingBadge },
   { href: "/admin/prep-list", label: "Prep List", Icon: Lucide.ClipboardList },
   { href: "/admin/manifest", label: "Manifest", Icon: Lucide.Truck },

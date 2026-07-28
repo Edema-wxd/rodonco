@@ -203,9 +203,12 @@ function StrippedOrder({ order, contactEmail }: StrippedOrderProps) {
         </a>
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <Link href="/shop" className={cn(buttonVariants({ variant: "outline" }))}>
           Continue Shopping
+        </Link>
+        <Link href="/orders/my-orders" className={cn(buttonVariants({ variant: "ghost" }))}>
+          View all my orders
         </Link>
       </div>
     </div>
@@ -455,6 +458,12 @@ function ConfirmedOrder({ order, items, nextDeliveryDate, contactEmail }: Confir
             className={cn(buttonVariants({ variant: "default" }), "flex-1 sm:flex-none gap-2")}
           >
             Shop Again <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/orders/my-orders"
+            className={cn(buttonVariants({ variant: "outline" }), "flex-1 sm:flex-none")}
+          >
+            View all my orders
           </Link>
         </div>
       </div>

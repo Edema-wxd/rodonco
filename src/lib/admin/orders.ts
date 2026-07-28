@@ -35,6 +35,8 @@ export type OrderFilters = {
   status?: string;
   weekOf?: string;
   search?: string;
+  /** Exact (case-insensitive) customer email — used by the per-customer admin view. */
+  email?: string;
 };
 
 export async function getAdminOrders(opts?: {
@@ -42,7 +44,7 @@ export async function getAdminOrders(opts?: {
   cursor?: OrdersCursor;
   filters?: OrderFilters;
 }): Promise<AdminOrder[]> {
-  const { status, weekOf, search } = opts?.filters ?? {};
+  const { status, weekOf, search, email } = opts?.filters ?? {};
 
   // Keyset pagination: rows AFTER cursor in (created_at DESC, id DESC) order.
   // Tie-break on id so identical timestamps don't drop or duplicate rows.
@@ -60,6 +62,7 @@ export async function getAdminOrders(opts?: {
   const filterConditions = [
     status && status !== "all" ? eq(orders.status, status) : undefined,
     weekOf ? eq(orders.week_of, snapToWeekStart(weekOf)) : undefined,
+    email ? sql`lower(${orders.customer_email}) = ${email.toLowerCase()}` : undefined,
     searchTerm
       ? or(
           ilike(orders.customer_name, `%${searchTerm}%`),

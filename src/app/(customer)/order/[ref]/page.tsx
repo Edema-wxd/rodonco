@@ -8,6 +8,8 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getOrderForConfirmation } from "@/lib/orders/getOrderForConfirmation";
+import { markOrderPaid } from "@/lib/orders/markOrderPaid";
+import { verifyPaystackTransaction } from "@/lib/paystack/verifyTransaction";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { getSiteSettings } from "@/lib/admin/config";
 import { OrderConfirmationView } from "@/components/order/OrderConfirmationView";
@@ -25,12 +27,32 @@ export default async function OrderConfirmationPage({
 }) {
   const { ref } = await params;
 
-  const [data, orderingConfig, siteSettings, cookieStore] = await Promise.all([
+  const [initialData, orderingConfig, siteSettings, cookieStore] = await Promise.all([
     getOrderForConfirmation(ref),
     getOrderingConfig(),
     getSiteSettings(),
     cookies(),
   ]);
+  let data = initialData;
+
+  // Self-healing fallback: if the async Paystack webhook hasn't marked this
+  // order paid yet (delayed, dropped, or misconfigured), verify the charge
+  // directly with Paystack and promote it here so the customer is never
+  // stranded on the "Confirming your payment…" screen. Runs on every pending
+  // load — including the "Refresh now" button — and is a no-op once paid.
+  if (data.kind === "pending") {
+    try {
+      const verification = await verifyPaystackTransaction(ref);
+      if (verification && verification.status === "success") {
+        await markOrderPaid({ reference: ref, amountKobo: verification.amount });
+        data = await getOrderForConfirmation(ref);
+      }
+    } catch (err) {
+      // Never fail the page render on a verification hiccup — the client-side
+      // poll and the "Refresh now" button will retry.
+      console.error(`[order page] callback verification failed for ${ref}:`, err);
+    }
+  }
 
   const hasViewCookie = cookieStore.has(`order_view_${ref}`);
 
