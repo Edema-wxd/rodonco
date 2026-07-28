@@ -22,12 +22,12 @@ export type ProductDrawerProps = {
   skipEnterAnimation?: boolean;
 };
 
-function formatNgn(kobo: number): string {
+function formatNgn(naira: number): string {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",
     maximumFractionDigits: 0,
-  }).format(kobo / 100);
+  }).format(naira);
 }
 
 function getCheapestVariantPriceKobo(variants: ProductVariant[]): number {

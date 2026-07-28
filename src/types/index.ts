@@ -1,6 +1,7 @@
 // src/types/index.ts
 // Shared domain types. DB column names mirror the legacy SQL schema exactly.
-// All price fields are integer kobo (1 NGN = 100 kobo) — D-10.
+// All price fields are integer NGN (naira). Conversion to kobo (× 100) happens
+// only at the Paystack boundary (order init / webhook); everything else is naira.
 
 // ── Products ──
 export type ProductType = "fresh_produce" | "cooking_kit";
@@ -29,7 +30,7 @@ export interface ProductVariant {
   id: string;
   product_id: string;
   label: string;
-  price_ngn: number; // kobo
+  price_ngn: number; // NGN (naira)
   is_default: boolean;
 }
 
@@ -37,7 +38,7 @@ export interface PrepOption {
   id: string;
   product_id: string;
   label: string;
-  extra_cost_ngn: number; // kobo
+  extra_cost_ngn: number; // NGN (naira)
 }
 
 // ── Orders ──
@@ -52,7 +53,7 @@ export interface Order {
   delivery_address: string;
   allergy_notes: string | null;
   status: OrderStatus;
-  total_ngn: number; // kobo
+  total_ngn: number; // NGN (naira)
   week_of: string;
   created_at: string;
   notified_at: string | null;
@@ -66,8 +67,8 @@ export interface OrderItem {
   variant_label: string | null;
   prep_option: string | null;
   quantity: number;
-  unit_price_ngn: number; // kobo
-  subtotal_ngn: number; // kobo
+  unit_price_ngn: number; // NGN (naira)
+  subtotal_ngn: number; // NGN (naira)
 }
 
 // ── Ordering config (single-row config table, id always 1) ──
@@ -86,6 +87,6 @@ export interface CartItem {
   variantLabel: string | null;
   prepOption: string | null;
   quantity: number;
-  unitPriceNgn: number; // kobo
-  subtotalNgn: number;  // kobo
+  unitPriceNgn: number; // NGN (naira)
+  subtotalNgn: number;  // NGN (naira)
 }

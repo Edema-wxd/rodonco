@@ -27,12 +27,12 @@ import type { Order, OrderItem } from "@/types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatNgn(kobo: number): string {
+function formatNgn(naira: number): string {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",
     minimumFractionDigits: 2,
-  }).format(kobo / 100);
+  }).format(naira);
 }
 
 function formatDatetime(iso: string): string {

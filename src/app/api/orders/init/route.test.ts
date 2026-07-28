@@ -259,7 +259,7 @@ describe("POST /api/orders/init", () => {
   });
 
   describe("success path — new order", () => {
-    it("returns 200 with reference, access_code, amount_kobo", async () => {
+    it("returns 200 with reference, authorization_url, amount_kobo", async () => {
       setupSuccessfulDbSelect();
       setupSuccessfulDbInsert();
 
@@ -269,7 +269,7 @@ describe("POST /api/orders/init", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.reference).toBeDefined();
-      expect(body.access_code).toBe("test_access_code");
+      expect(body.authorization_url).toBe("https://checkout.paystack.com/abc");
       // totalNgn = 150000 * 2 + delivery(0) = 300000; amount_kobo = totalNgn * 100
       expect(body.amount_kobo).toBe(30000000);
     });

@@ -6,7 +6,7 @@
 //  - items:  OrderItem[]
 //  - nextDeliveryDate: ISO date string (YYYY-MM-DD)
 //
-// All prices are in integer kobo; display divides by 100.
+// All prices are stored as integer NGN (naira); display formats directly.
 
 import {
   Body,
@@ -27,12 +27,12 @@ import type { Order, OrderItem } from "@/types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatNgn(kobo: number): string {
+function formatNgn(naira: number): string {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",
     minimumFractionDigits: 2,
-  }).format(kobo / 100);
+  }).format(naira);
 }
 
 function formatDate(iso: string): string {

@@ -3,13 +3,13 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { CartItem } from "@/types";
 
-function formatNgn(kobo: number): string {
+function formatNgn(naira: number): string {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(kobo / 100);
+  }).format(naira);
 }
 
 interface Props {
@@ -18,10 +18,9 @@ interface Props {
 }
 
 export function CheckoutCartSummary({ items, deliveryFeeNgn }: Props) {
+  // All amounts are in NGN (subtotalNgn, deliveryFeeNgn) — no kobo conversion.
   const subtotal = items.reduce((sum, item) => sum + item.subtotalNgn, 0);
-  // subtotalNgn values are in kobo; deliveryFeeNgn is NGN — convert to kobo for formatNgn
-  const deliveryFeeKobo = deliveryFeeNgn !== null ? deliveryFeeNgn * 100 : null;
-  const total = deliveryFeeKobo !== null ? subtotal + deliveryFeeKobo : null;
+  const total = deliveryFeeNgn !== null ? subtotal + deliveryFeeNgn : null;
 
   return (
     <Card className="sticky top-24">
@@ -74,7 +73,7 @@ export function CheckoutCartSummary({ items, deliveryFeeNgn }: Props) {
                 ? "Select area"
                 : deliveryFeeNgn === 0
                 ? "Free"
-                : formatNgn(deliveryFeeKobo!)}
+                : formatNgn(deliveryFeeNgn)}
             </span>
           </div>
           <div className="flex justify-between items-baseline border-t pt-2">

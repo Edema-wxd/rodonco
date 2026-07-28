@@ -14,8 +14,7 @@ export type CartSidebarProps = {
   nextDeliveryDate?: string | null;
 };
 
-function formatNgn(kobo: number): string {
-  const naira = kobo / 100;
+function formatNgn(naira: number): string {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",

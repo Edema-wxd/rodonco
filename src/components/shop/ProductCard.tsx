@@ -3,8 +3,8 @@ import Link from "next/link";
 import type { Product } from "@/types";
 import { AddToOrderButton } from "@/components/shop/AddToOrderButton";
 
-function formatFromPrice(priceNgnKobo: number): string {
-  const ngn = Math.floor(priceNgnKobo / 100);
+function formatFromPrice(priceNgn: number): string {
+  const ngn = Math.floor(priceNgn);
   return `From ₦${ngn.toLocaleString("en-NG")}`;
 }
 

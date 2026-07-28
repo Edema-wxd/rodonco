@@ -50,9 +50,9 @@ function makeProduct(partial: Partial<Product> & Pick<Product, "id" | "name">): 
 describe("ProductCard", () => {
   it("renders price formatting, routes card click to product page, and opens drawer via query param", () => {
     const product = makeProduct({ id: "p1", name: "Tomatoes" });
-    const startingPriceNgnKobo = 250_000; // ₦2,500 in kobo
+    const startingPriceNgn = 2_500; // ₦2,500
 
-    render(<ProductCard product={product} startingPriceNgn={startingPriceNgnKobo} />);
+    render(<ProductCard product={product} startingPriceNgn={startingPriceNgn} />);
 
     expect(screen.getByText("From ₦2,500")).toBeTruthy();
     const ctaButton = screen.getByRole("button", { name: "Add to Order" });

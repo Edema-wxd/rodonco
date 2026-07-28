@@ -98,8 +98,8 @@ const sampleCartItems: CartItem[] = [
     variantLabel: null,
     prepOption: "Diced",
     quantity: 2,
-    unitPriceNgn: 150000, // 1500 NGN in kobo
-    subtotalNgn: 300000,  // 3000 NGN in kobo
+    unitPriceNgn: 1500, // ₦1,500
+    subtotalNgn: 3000,  // ₦3,000 (2 × ₦1,500)
   },
   {
     productId: "prod-2",
@@ -107,8 +107,8 @@ const sampleCartItems: CartItem[] = [
     variantLabel: "Family (4 people)",
     prepOption: null,
     quantity: 1,
-    unitPriceNgn: 800000,
-    subtotalNgn: 800000,
+    unitPriceNgn: 8000, // ₦8,000
+    subtotalNgn: 8000,
   },
 ];
 

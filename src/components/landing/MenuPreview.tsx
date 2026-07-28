@@ -3,8 +3,8 @@ import Link from "next/link";
 
 import { getActiveProductsWithStartingPriceForShop } from "@/lib/shop/products";
 
-function formatFromPrice(priceNgnKobo: number): string {
-  const ngn = Math.floor(priceNgnKobo / 100);
+function formatFromPrice(priceNgn: number): string {
+  const ngn = Math.floor(priceNgn);
   return `From ₦${ngn.toLocaleString("en-NG")}`;
 }
 

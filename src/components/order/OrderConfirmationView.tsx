@@ -46,8 +46,8 @@ function formatDeliveryDate(dateStr: string | null): string {
   });
 }
 
-function formatNGN(kobo: number): string {
-  return `₦${(kobo / 100).toLocaleString("en-NG", {
+function formatNGN(naira: number): string {
+  return `₦${naira.toLocaleString("en-NG", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   })}`;
@@ -191,7 +191,7 @@ function StrippedOrder({ order, contactEmail }: StrippedOrderProps) {
         <div className="flex items-center justify-between gap-4">
           <span className="text-sm text-muted-foreground">Total paid</span>
           <span className="font-heading text-xl" style={{ color: "var(--accent)" }}>
-            {formatNGN(order.total_ngn * 100)}
+            {formatNGN(order.total_ngn)}
           </span>
         </div>
       </div>
@@ -358,7 +358,7 @@ function ConfirmedOrder({ order, items, nextDeliveryDate, contactEmail }: Confir
                     </p>
                   </div>
                   <span className="shrink-0 text-sm font-semibold tabular-nums">
-                    {formatNGN(item.subtotal_ngn * 100)}
+                    {formatNGN(item.subtotal_ngn)}
                   </span>
                 </li>
               ))}
@@ -369,7 +369,7 @@ function ConfirmedOrder({ order, items, nextDeliveryDate, contactEmail }: Confir
             <div className="flex items-center justify-between">
               <span className="font-semibold">Total paid</span>
               <span className="font-heading text-2xl" style={{ color: "var(--accent)" }}>
-                {formatNGN(order.total_ngn * 100)}
+                {formatNGN(order.total_ngn)}
               </span>
             </div>
           </CardContent>

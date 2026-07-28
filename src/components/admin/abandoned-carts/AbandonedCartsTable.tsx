@@ -12,8 +12,8 @@ import { ABANDONED_CARTS_PAGE_SIZE } from "@/app/admin/abandoned-carts/_constant
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function formatNgn(kobo: number): string {
-  return `₦${(kobo / 100).toLocaleString("en-NG", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+function formatNgn(naira: number): string {
+  return `₦${naira.toLocaleString("en-NG", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 }
 
 function formatDate(iso: string): string {

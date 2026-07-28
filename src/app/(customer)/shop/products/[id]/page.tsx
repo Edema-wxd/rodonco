@@ -4,12 +4,12 @@ import { ProductImageCarousel } from "@/components/shop/ProductImageCarousel";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { getProductDetailsById } from "@/lib/shop/productDetails";
 
-function formatNgn(kobo: number): string {
+function formatNgn(naira: number): string {
   return new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",
     maximumFractionDigits: 0,
-  }).format(kobo / 100);
+  }).format(naira);
 }
 
 export default async function ProductPage({
