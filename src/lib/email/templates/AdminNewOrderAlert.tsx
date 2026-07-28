@@ -48,6 +48,24 @@ function formatDatetime(iso: string): string {
   });
 }
 
+/**
+ * Best-effort conversion of a stored phone number into a wa.me-compatible
+ * international number (digits only, no leading "+" or "0"). Nigerian defaults.
+ * Returns null if the input has no digits.
+ */
+function toWhatsAppNumber(phone: string): string | null {
+  const digits = phone.replace(/\D/g, "");
+  if (!digits) return null;
+  // Local format 0XXXXXXXXXX (11 digits) → 234XXXXXXXXXX
+  if (digits.length === 11 && digits.startsWith("0")) return "234" + digits.slice(1);
+  // Already international with Nigeria country code
+  if (digits.startsWith("234")) return digits;
+  // 10 digits with no leading zero (e.g. 8012345678) → assume Nigeria
+  if (digits.length === 10) return "234" + digits;
+  // Otherwise assume it already carries a country code
+  return digits;
+}
+
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const main: React.CSSProperties = {
@@ -116,6 +134,33 @@ const paragraph: React.CSSProperties = {
   fontSize: "14px",
   lineHeight: "22px",
   margin: "0 0 20px",
+};
+
+const ctaWrap: React.CSSProperties = {
+  margin: "0 0 24px",
+};
+
+const ctaButton: React.CSSProperties = {
+  backgroundColor: "#c8501a",
+  borderRadius: "6px",
+  color: "#ffffff",
+  display: "inline-block",
+  fontSize: "15px",
+  fontWeight: "700",
+  padding: "13px 30px",
+  textDecoration: "none",
+};
+
+const phoneLink: React.CSSProperties = {
+  color: "#1a1a2e",
+  fontWeight: 600,
+  textDecoration: "none",
+};
+
+const whatsappLink: React.CSSProperties = {
+  color: "#16a34a",
+  fontWeight: 600,
+  textDecoration: "none",
 };
 
 const sectionHeading: React.CSSProperties = {
@@ -209,9 +254,12 @@ const footer: React.CSSProperties = {
 export interface AdminNewOrderAlertProps {
   order: Order;
   items: OrderItem[];
+  /** Deep link to this order in the admin dashboard. CTA button is hidden when absent. */
+  dashboardUrl?: string;
 }
 
-export function AdminNewOrderAlert({ order, items }: AdminNewOrderAlertProps) {
+export function AdminNewOrderAlert({ order, items, dashboardUrl }: AdminNewOrderAlertProps) {
+  const waNumber = toWhatsAppNumber(order.customer_phone);
   return (
     <Html>
       <Head />
@@ -231,8 +279,18 @@ export function AdminNewOrderAlert({ order, items }: AdminNewOrderAlertProps) {
           <Section style={contentSection}>
             <Heading style={h1}>New Paid Order</Heading>
             <Text style={paragraph}>
-              A payment has been confirmed via Paystack. Order details are below.
+              A payment has been confirmed via Paystack. Full details are below —
+              or open it straight in the dashboard.
             </Text>
+
+            {/* Primary action: jump straight to this order in the dashboard */}
+            {dashboardUrl && (
+              <Section style={ctaWrap}>
+                <a href={dashboardUrl} style={ctaButton}>
+                  Open this order in the dashboard →
+                </a>
+              </Section>
+            )}
 
             {/* Reference + timestamp */}
             <Text style={sectionHeading}>Order Summary</Text>
@@ -260,7 +318,19 @@ export function AdminNewOrderAlert({ order, items }: AdminNewOrderAlertProps) {
             </Text>
 
             <Text style={infoLabel}>Phone</Text>
-            <Text style={infoValue}>{order.customer_phone}</Text>
+            <Text style={infoValue}>
+              <a href={`tel:${order.customer_phone}`} style={phoneLink}>
+                {order.customer_phone}
+              </a>
+              {waNumber && (
+                <>
+                  {"  ·  "}
+                  <a href={`https://wa.me/${waNumber}`} style={whatsappLink}>
+                    Message on WhatsApp
+                  </a>
+                </>
+              )}
+            </Text>
 
             <Text style={infoLabel}>Delivery Address</Text>
             <Text style={infoValue}>{order.delivery_address}</Text>

@@ -29,6 +29,11 @@ function getAdminEmail(): string {
   return process.env.ADMIN_NOTIFICATION_EMAIL ?? "";
 }
 
+/** App base URL with any trailing slashes removed. Empty string when unset. */
+function getAppBaseUrl(): string {
+  return (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/+$/, "");
+}
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface SendOrderEmailsInput {
@@ -126,8 +131,14 @@ export async function sendOrderEmails({
       console.warn("[sendOrderEmails] ADMIN_NOTIFICATION_EMAIL not set — skipping admin alert.");
     } else {
       try {
+        // Deep link that lands the admin on this exact order (orders list filters by ?search=).
+        const baseUrl = getAppBaseUrl();
+        const dashboardUrl = baseUrl
+          ? `${baseUrl}/admin/orders?search=${encodeURIComponent(order.reference)}`
+          : undefined;
+
         const adminHtml = await render(
-          React.createElement(AdminNewOrderAlert, { order, items })
+          React.createElement(AdminNewOrderAlert, { order, items, dashboardUrl })
         );
 
         const adminSubject = `[Admin] New order: ${order.reference} — ${order.customer_name}`;
