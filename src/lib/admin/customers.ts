@@ -6,7 +6,7 @@
 
 import { db } from "@/lib/db";
 import { orders } from "../../../drizzle/schema";
-import { and, ilike, or, sql } from "drizzle-orm";
+import { ilike, or, sql } from "drizzle-orm";
 
 import { getAdminOrders, type AdminOrder } from "./orders";
 
@@ -46,7 +46,7 @@ export async function getAdminCustomers(opts?: {
 }): Promise<AdminCustomer[]> {
   const searchTerm = opts?.search?.trim();
 
-  const whereClause = searchTerm
+  const searchCondition = searchTerm
     ? or(
         ilike(orders.customer_name, `%${searchTerm}%`),
         ilike(orders.customer_email, `%${searchTerm}%`),
@@ -56,7 +56,7 @@ export async function getAdminCustomers(opts?: {
 
   const revenueFilter = sql`${orders.status} in ('paid', 'processing', 'delivered')`;
 
-  const query = db
+  let query = db
     .select({
       email: sql<string>`lower(${orders.customer_email})`.as("email"),
       // Name/phone from the latest order for this email.
@@ -69,11 +69,20 @@ export async function getAdminCustomers(opts?: {
       last_order_at: sql<string>`max(${orders.created_at})`,
     })
     .from(orders)
-    .where(and(whereClause))
     .groupBy(sql`lower(${orders.customer_email})`)
-    .orderBy(sql`max(${orders.created_at}) desc`);
+    .$dynamic();
 
-  const rows = opts?.limit ? await query.limit(opts.limit) : await query;
+  // Search filters WHICH customers appear (a customer matches if ANY of their
+  // orders matches the term) via HAVING, so the returned aggregates still cover
+  // the customer's FULL order history rather than only the matching rows.
+  if (searchCondition) {
+    query = query.having(sql`bool_or(${searchCondition})`);
+  }
+
+  query = query.orderBy(sql`max(${orders.created_at}) desc`);
+  if (opts?.limit) query = query.limit(opts.limit);
+
+  const rows = await query;
 
   return rows.map((r) => ({
     email: r.email,

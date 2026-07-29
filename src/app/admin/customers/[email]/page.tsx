@@ -15,7 +15,15 @@ export default async function AdminCustomerDetailPage({
   if (!session?.user) redirect("/admin");
 
   const { email: rawEmail } = await params;
-  const email = decodeURIComponent(rawEmail);
+  // Next.js already decodes route params; decode again defensively for hosts
+  // that don't, but fall back to the raw value if it isn't valid encoding
+  // (a literal '%' in an email would otherwise throw a URIError).
+  let email = rawEmail;
+  try {
+    email = decodeURIComponent(rawEmail);
+  } catch {
+    email = rawEmail;
+  }
   const customer = await getAdminCustomerByEmail(email);
 
   return (
