@@ -23,8 +23,14 @@ const { mockState, mockDbInsert, mockDbSelect } = vi.hoisted(() => {
       reference: string;
       total_ngn: number;
       week_of: string;
+      payment_method: string;
     } | null,
     paystackError: null as Error | null,
+    flutterwaveResult: {
+      link: "https://checkout.flutterwave.com/v3/hosted/pay/abc",
+      reference: "RDC-test1234567",
+    },
+    flutterwaveError: null as Error | null,
   };
 
   const mockDbInsert = vi.fn();
@@ -54,10 +60,21 @@ vi.mock("@/lib/paystack/initialize", () => ({
   }),
 }));
 
+vi.mock("@/lib/flutterwave/initialize", () => ({
+  initializeFlutterwaveTransaction: vi.fn(async () => {
+    if (mockState.flutterwaveError) throw mockState.flutterwaveError;
+    return mockState.flutterwaveResult;
+  }),
+}));
+
 vi.mock("@/lib/db", () => ({
   db: {
     insert: mockDbInsert,
     select: mockDbSelect,
+    // reused-order sync (total_ngn / payment_method) — chainable, result ignored
+    update: vi.fn().mockReturnValue({
+      set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
+    }),
     // fire-and-forget abandoned_carts cleanup — must exist but result is ignored
     delete: vi.fn().mockReturnValue({
       where: vi.fn().mockResolvedValue({ rowCount: 0 }),
@@ -173,11 +190,17 @@ describe("POST /api/orders/init", () => {
     mockState.deliveryFeeNgn = 0;
     mockState.pendingReuseResult = null;
     mockState.paystackError = null;
+    mockState.flutterwaveError = null;
     mockState.paystackResult = {
       access_code: "test_access_code",
       authorization_url: "https://checkout.paystack.com/abc",
       reference: "RDC-test1234567",
     };
+    mockState.flutterwaveResult = {
+      link: "https://checkout.flutterwave.com/v3/hosted/pay/abc",
+      reference: "RDC-test1234567",
+    };
+    delete process.env.FLW_SECRET_KEY;
   });
 
   describe("validation", () => {
@@ -269,6 +292,8 @@ describe("POST /api/orders/init", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.reference).toBeDefined();
+      expect(body.provider).toBe("paystack");
+      expect(body.access_code).toBe("test_access_code");
       expect(body.authorization_url).toBe("https://checkout.paystack.com/abc");
       // totalNgn = 150000 * 2 + delivery(0) = 300000; amount_kobo = totalNgn * 100
       expect(body.amount_kobo).toBe(30000000);
@@ -306,6 +331,7 @@ describe("POST /api/orders/init", () => {
         reference: "RDC-existing123",
         total_ngn: 300000,
         week_of: "2026-05-09",
+        payment_method: "paystack",
       };
 
       const req = makeRequest(validPayload);
@@ -316,6 +342,34 @@ describe("POST /api/orders/init", () => {
       expect(body.reference).toBe("RDC-existing123");
       // DB insert should NOT be called when reusing
       expect(mockDbInsert).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("provider — Flutterwave (alternative gateway)", () => {
+    it("returns 422 when provider=flutterwave but FLW_SECRET_KEY is not configured", async () => {
+      // FLW_SECRET_KEY is deleted in beforeEach
+      const req = makeRequest({ ...validPayload, provider: "flutterwave" });
+      const res = await POST(req);
+
+      expect(res.status).toBe(422);
+      const body = await res.json();
+      expect(body.error).toMatch(/not available/i);
+    });
+
+    it("returns 200 with a redirect_url when provider=flutterwave and keys are set", async () => {
+      process.env.FLW_SECRET_KEY = "FLWSECK_TEST-xxxx";
+      setupSuccessfulDbSelect();
+      setupSuccessfulDbInsert();
+
+      const req = makeRequest({ ...validPayload, provider: "flutterwave" });
+      const res = await POST(req);
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.provider).toBe("flutterwave");
+      expect(body.redirect_url).toBe("https://checkout.flutterwave.com/v3/hosted/pay/abc");
+      expect(body.access_code).toBeUndefined();
+      expect(body.amount_kobo).toBe(30000000);
     });
   });
 

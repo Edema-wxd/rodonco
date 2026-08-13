@@ -53,11 +53,14 @@ export interface Order {
   delivery_address: string;
   allergy_notes: string | null;
   status: OrderStatus;
+  payment_method?: PaymentMethod; // gateway that created the charge (defaults to paystack)
   total_ngn: number; // NGN (naira)
   week_of: string;
   created_at: string;
   notified_at: string | null;
 }
+
+export type PaymentMethod = "paystack" | "flutterwave";
 
 export interface OrderItem {
   id: string;

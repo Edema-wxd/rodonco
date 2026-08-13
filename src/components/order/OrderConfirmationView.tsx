@@ -15,6 +15,7 @@ import {
   MapPin,
   CalendarDays,
   MessageSquare,
+  MessageCircle,
   ArrowRight,
   Clock,
 } from "lucide-react";
@@ -59,6 +60,40 @@ function maskEmail(email: string): string {
   return `${local[0]}${"•".repeat(Math.min(local.length - 2, 4))}${local[local.length - 1]}@${domain}`;
 }
 
+// ── WhatsApp contact button ────────────────────────────────────────────────────
+// Renders nothing when no WhatsApp number is configured, so callers can drop it
+// in unconditionally.
+
+function WhatsAppButton({
+  number,
+  message,
+  variant = "outline",
+  className,
+}: {
+  number?: string | null;
+  message: string;
+  variant?: "outline" | "ghost";
+  className?: string;
+}) {
+  const digits = (number ?? "").replace(/\D/g, "");
+  if (!digits) return null;
+  return (
+    <a
+      href={`https://wa.me/${digits}?text=${encodeURIComponent(message)}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        buttonVariants({ variant }),
+        "gap-2 border-green-600 text-green-700 hover:bg-green-50 hover:text-green-800",
+        className
+      )}
+    >
+      <MessageCircle className="h-4 w-4" aria-hidden="true" />
+      WhatsApp us
+    </a>
+  );
+}
+
 // ── Error states ──────────────────────────────────────────────────────────────
 
 type ErrorVariant = "not-found" | "not-paid" | "pending";
@@ -66,13 +101,14 @@ type ErrorVariant = "not-found" | "not-paid" | "pending";
 interface ErrorStateProps {
   variant: ErrorVariant;
   contactEmail: string;
+  whatsappNumber?: string | null;
   reference?: string;
 }
 
 const POLL_INTERVAL_MS = 3000;
 const POLL_MAX_ATTEMPTS = 10;
 
-function ErrorState({ variant, contactEmail, reference }: ErrorStateProps) {
+function ErrorState({ variant, contactEmail, whatsappNumber, reference }: ErrorStateProps) {
   const attemptsRef = useRef(0);
 
   useEffect(() => {
@@ -118,6 +154,10 @@ function ErrorState({ variant, contactEmail, reference }: ErrorStateProps) {
           >
             Refresh now
           </button>
+          <WhatsAppButton
+            number={whatsappNumber}
+            message={`Hi! I just paid for order ${reference ?? ""} but I'm not sure it went through. Can you help?`}
+          />
           <a
             href={`mailto:${contactEmail}`}
             className={cn(buttonVariants({ variant: "ghost" }))}
@@ -147,6 +187,10 @@ function ErrorState({ variant, contactEmail, reference }: ErrorStateProps) {
         <Link href="/shop" className={cn(buttonVariants({ variant: "outline" }))}>
           Back to Shop
         </Link>
+        <WhatsAppButton
+          number={whatsappNumber}
+          message={`Hi! I need help with order ${reference ?? ""}.`}
+        />
         <a
           href={`mailto:${contactEmail}`}
           className={cn(buttonVariants({ variant: "ghost" }))}
@@ -163,9 +207,10 @@ function ErrorState({ variant, contactEmail, reference }: ErrorStateProps) {
 interface StrippedOrderProps {
   order: Order;
   contactEmail: string;
+  whatsappNumber?: string | null;
 }
 
-function StrippedOrder({ order, contactEmail }: StrippedOrderProps) {
+function StrippedOrder({ order, contactEmail, whatsappNumber }: StrippedOrderProps) {
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 text-center">
       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-50 ring-4 ring-green-100">
@@ -201,12 +246,17 @@ function StrippedOrder({ order, contactEmail }: StrippedOrderProps) {
         <a href={`mailto:${contactEmail}`} className="underline underline-offset-2">
           {contactEmail}
         </a>
+        {" "}or reach us on WhatsApp.
       </p>
 
       <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <Link href="/shop" className={cn(buttonVariants({ variant: "outline" }))}>
           Continue Shopping
         </Link>
+        <WhatsAppButton
+          number={whatsappNumber}
+          message={`Hi! I have a question about my order ${order.reference}.`}
+        />
         <Link href="/orders/my-orders" className={cn(buttonVariants({ variant: "ghost" }))}>
           View all my orders
         </Link>
@@ -289,9 +339,10 @@ interface ConfirmedOrderProps {
   items: OrderItem[];
   nextDeliveryDate: string | null;
   contactEmail: string;
+  whatsappNumber?: string | null;
 }
 
-function ConfirmedOrder({ order, items, nextDeliveryDate, contactEmail }: ConfirmedOrderProps) {
+function ConfirmedOrder({ order, items, nextDeliveryDate, contactEmail, whatsappNumber }: ConfirmedOrderProps) {
   const deliveryLabel = formatDeliveryDate(nextDeliveryDate);
 
   return (
@@ -431,9 +482,9 @@ function ConfirmedOrder({ order, items, nextDeliveryDate, contactEmail }: Confir
         {/* ── Support footer ── */}
         <div className="rounded-xl border bg-muted/40 px-5 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold">Need to change something?</p>
+            <p className="text-sm font-semibold">Questions or need to change something?</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Reach us at{" "}
+              Message us on WhatsApp or email{" "}
               <a
                 href={`mailto:${contactEmail}`}
                 className="underline underline-offset-2 text-foreground"
@@ -443,12 +494,19 @@ function ConfirmedOrder({ order, items, nextDeliveryDate, contactEmail }: Confir
               as soon as possible — changes can only be made before preparation begins.
             </p>
           </div>
-          <a
-            href={`mailto:${contactEmail}?subject=Order ${order.reference}`}
-            className={cn(buttonVariants({ variant: "outline" }), "shrink-0 text-xs")}
-          >
-            Email Us
-          </a>
+          <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+            <WhatsAppButton
+              number={whatsappNumber}
+              message={`Hi! I have a question about my order ${order.reference}.`}
+              className="text-xs"
+            />
+            <a
+              href={`mailto:${contactEmail}?subject=Order ${order.reference}`}
+              className={cn(buttonVariants({ variant: "outline" }), "shrink-0 text-xs")}
+            >
+              Email Us
+            </a>
+          </div>
         </div>
 
         {/* ── CTA ── */}
@@ -481,6 +539,7 @@ interface OrderConfirmationViewProps {
   stripped?: boolean;
   nextDeliveryDate: string | null;
   contactEmail?: string;
+  whatsappNumber?: string | null;
   reference?: string;
 }
 
@@ -490,14 +549,22 @@ export function OrderConfirmationView({
   stripped = false,
   nextDeliveryDate,
   contactEmail = DEFAULT_CONTACT_EMAIL,
+  whatsappNumber,
   reference,
 }: OrderConfirmationViewProps) {
   if (!data) {
-    return <ErrorState variant={errorVariant} contactEmail={contactEmail} reference={reference} />;
+    return (
+      <ErrorState
+        variant={errorVariant}
+        contactEmail={contactEmail}
+        whatsappNumber={whatsappNumber}
+        reference={reference}
+      />
+    );
   }
 
   if (stripped) {
-    return <StrippedOrder order={data.order} contactEmail={contactEmail} />;
+    return <StrippedOrder order={data.order} contactEmail={contactEmail} whatsappNumber={whatsappNumber} />;
   }
 
   return (
@@ -506,6 +573,7 @@ export function OrderConfirmationView({
       items={data.items}
       nextDeliveryDate={nextDeliveryDate}
       contactEmail={contactEmail}
+      whatsappNumber={whatsappNumber}
     />
   );
 }

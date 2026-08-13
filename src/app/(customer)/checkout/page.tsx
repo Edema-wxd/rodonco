@@ -36,6 +36,7 @@ export default async function CheckoutPage() {
         deliveryFeeNgn={orderingConfig.delivery_fee_ngn}
         deliveryZones={orderingConfig.delivery_zones ?? []}
         whatsappNumber={siteSettings?.whatsapp_number ?? null}
+        flutterwaveEnabled={!!process.env.FLW_SECRET_KEY}
       />
     </div>
   );

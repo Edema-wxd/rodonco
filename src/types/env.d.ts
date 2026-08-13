@@ -16,6 +16,9 @@ declare namespace NodeJS {
     UPLOADTHING_TOKEN: string;
     PAYSTACK_SECRET_KEY: string;
     PAYSTACK_WEBHOOK_SECRET: string;
+    // ── Flutterwave (alternative gateway — optional; features gate on FLW_SECRET_KEY) ──
+    FLW_SECRET_KEY?: string;
+    FLW_WEBHOOK_HASH?: string;
     RESEND_API_KEY: string;
     RESEND_FROM_EMAIL: string;
     ADMIN_NOTIFICATION_EMAIL: string;

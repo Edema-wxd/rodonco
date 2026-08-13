@@ -86,6 +86,12 @@ vi.mock("@/hooks/useHasHydrated", () => ({
   useHasHydrated: () => mockHasHydratedRef.current,
 }));
 
+// setOrderViewCookie is a server action (uses next/headers) — stub it so the
+// success path can run in jsdom without a request scope.
+vi.mock("@/app/(customer)/order/[ref]/_actions", () => ({
+  setOrderViewCookie: vi.fn().mockResolvedValue(undefined),
+}));
+
 // ── Import component AFTER mocks ──────────────────────────────────────────────
 import { CheckoutExperience } from "./CheckoutExperience";
 
@@ -346,8 +352,9 @@ describe("CheckoutExperience — payment success (D-08)", () => {
     });
 
     const callbacks = getCallbacks();
-    act(() => {
-      callbacks?.onSuccess?.({ reference: testRef });
+    // onSuccess is async (awaits the view-cookie server action before navigating).
+    await act(async () => {
+      await callbacks?.onSuccess?.({ reference: testRef });
     });
 
     expect(mockClearCart).toHaveBeenCalled();

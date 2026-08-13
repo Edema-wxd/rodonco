@@ -24,6 +24,7 @@ export interface PendingReuseResult {
   reference: string;
   total_ngn: number;
   week_of: string;
+  payment_method: string;
 }
 
 /**
@@ -47,6 +48,7 @@ export async function findPendingReuse(
         reference: schema.orders.reference,
         total_ngn: schema.orders.total_ngn,
         week_of: schema.orders.week_of,
+        payment_method: schema.orders.payment_method,
       })
       .from(schema.orders)
       .where(
@@ -97,6 +99,7 @@ export async function findPendingReuse(
       reference: existingOrder.reference,
       total_ngn: existingOrder.total_ngn,
       week_of: existingOrder.week_of,
+      payment_method: existingOrder.payment_method,
     };
   } catch (err) {
     // DB unavailable or unexpected error — safe fallback: let caller create a new order.

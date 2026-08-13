@@ -65,6 +65,7 @@ export const orders = pgTable("orders", {
   delivery_area: text("delivery_area"),
   allergy_notes: text("allergy_notes"),
   status: text("status").notNull().default("pending"), // 'pending'|'paid'|'processing'|'delivered'|'cancelled'
+  payment_method: text("payment_method").notNull().default("paystack"), // 'paystack'|'flutterwave'
   total_ngn: integer("total_ngn").notNull(),
   week_of: date("week_of").notNull(),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

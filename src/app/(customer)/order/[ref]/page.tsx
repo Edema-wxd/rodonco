@@ -10,6 +10,7 @@ import { cookies } from "next/headers";
 import { getOrderForConfirmation } from "@/lib/orders/getOrderForConfirmation";
 import { markOrderPaid } from "@/lib/orders/markOrderPaid";
 import { verifyPaystackTransaction } from "@/lib/paystack/verifyTransaction";
+import { verifyFlutterwaveTransaction } from "@/lib/flutterwave/verifyTransaction";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { getSiteSettings } from "@/lib/admin/config";
 import { OrderConfirmationView } from "@/components/order/OrderConfirmationView";
@@ -42,10 +43,19 @@ export default async function OrderConfirmationPage({
   // load — including the "Refresh now" button — and is a no-op once paid.
   if (data.kind === "pending") {
     try {
-      const verification = await verifyPaystackTransaction(ref);
-      if (verification && verification.status === "success") {
-        await markOrderPaid({ reference: ref, amountKobo: verification.amount });
+      // Try Paystack first (the default provider, amounts already in kobo).
+      const ps = await verifyPaystackTransaction(ref);
+      if (ps && ps.status === "success") {
+        await markOrderPaid({ reference: ref, amountKobo: ps.amount });
         data = await getOrderForConfirmation(ref);
+      } else if (process.env.FLW_SECRET_KEY) {
+        // Fall back to Flutterwave when configured. Its verify reports naira, so
+        // convert to kobo before the shared markOrderPaid amount check.
+        const flw = await verifyFlutterwaveTransaction(ref);
+        if (flw && flw.status === "successful") {
+          await markOrderPaid({ reference: ref, amountKobo: Math.round(flw.amountNgn * 100) });
+          data = await getOrderForConfirmation(ref);
+        }
       }
     } catch (err) {
       // Never fail the page render on a verification hiccup — the client-side
@@ -75,6 +85,7 @@ export default async function OrderConfirmationPage({
       stripped={stripped}
       nextDeliveryDate={orderingConfig.next_delivery_date}
       contactEmail={siteSettings?.contact_email ?? undefined}
+      whatsappNumber={siteSettings?.whatsapp_number ?? undefined}
       reference={ref}
     />
   );

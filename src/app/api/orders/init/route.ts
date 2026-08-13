@@ -22,6 +22,7 @@ import { snapToWeekStart } from "@/lib/admin/week";
 import { db, schema } from "@/lib/db";
 import { findPendingReuse } from "@/lib/orders/findPendingReuse";
 import { initializePaystackTransaction } from "@/lib/paystack/initialize";
+import { initializeFlutterwaveTransaction } from "@/lib/flutterwave/initialize";
 import { buildOrderItemsDraftFromCart } from "@/lib/checkout/cartToOrderDraft";
 import { rateLimit, getClientIP } from "@/lib/rate-limit";
 
@@ -53,6 +54,9 @@ const initOrderSchema = z.object({
   terms: z.literal(true, {
     errorMap: () => ({ message: "You must accept the terms to proceed" }),
   }),
+  // Which payment gateway to use. Defaults to Paystack; "flutterwave" is the
+  // alternative provider (only offered when FLW_SECRET_KEY is configured).
+  provider: z.enum(["paystack", "flutterwave"]).optional().default("paystack"),
   cart: z.array(cartItemSchema).min(1, "Cart must not be empty"),
 });
 
@@ -88,7 +92,17 @@ export async function POST(req: Request): Promise<NextResponse> {
     );
   }
 
-  const { name, email, phone, delivery_area, delivery_address, allergy_notes, cart } = parsed.data;
+  const { name, email, phone, delivery_area, delivery_address, allergy_notes, provider, cart } = parsed.data;
+
+  // Guard: the Flutterwave option should only ever reach us when the gateway is
+  // configured. If a client sends provider=flutterwave without a secret key,
+  // fail fast with a clear message rather than a generic 503 later.
+  if (provider === "flutterwave" && !process.env.FLW_SECRET_KEY) {
+    return NextResponse.json(
+      { error: "This payment method is not available right now. Please use card payment." },
+      { status: 422 }
+    );
+  }
 
   // 2. Enforce ordering window (consistent read, no stale cache)
   const config = await getOrderingConfig();
@@ -184,43 +198,74 @@ export async function POST(req: Request): Promise<NextResponse> {
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     (rawHost.startsWith("http") ? rawHost : `https://${rawHost}`);
 
-  if (existingOrder) {
-    // Reuse: skip DB insert, go straight to Paystack init.
-    // Always use the freshly computed totalNgn so the delivery fee and current
-    // prices are reflected even if the stored order pre-dates them.
-    // Sync total_ngn first so the webhook amount-check matches what Paystack charges.
-    if (existingOrder.total_ngn !== totalNgn) {
-      try {
-        await db
-          .update(schema.orders)
-          .set({ total_ngn: totalNgn })
-          .where(eq(schema.orders.id, existingOrder.id));
-      } catch (err) {
-        console.warn("[/api/orders/init] Could not sync total_ngn on reused order:", err);
-      }
-    }
-
+  // Kick off payment with the chosen gateway and return the client-facing payload.
+  // Shared by the reuse path and the new-order path so both providers behave
+  // identically. Returns a NextResponse (success or 503 on gateway failure).
+  async function startPayment(ref: string): Promise<NextResponse> {
+    const amountKobo = totalNgn * 100;
     try {
-      const paystackResult = await initializePaystackTransaction({
+      if (provider === "flutterwave") {
+        const flw = await initializeFlutterwaveTransaction({
+          email,
+          amountNgn: totalNgn,
+          reference: ref,
+          redirect_url: `${origin}/order/${ref}`,
+          name,
+          phone,
+          meta: { customer_name: name, phone },
+        });
+        return NextResponse.json({
+          reference: ref,
+          provider: "flutterwave",
+          redirect_url: flw.link,
+          amount_kobo: amountKobo,
+        });
+      }
+
+      const paystack = await initializePaystackTransaction({
         email,
-        amount: totalNgn * 100,
-        reference: existingOrder.reference,
-        callback_url: `${origin}/order/${existingOrder.reference}`,
+        amount: amountKobo,
+        reference: ref,
+        callback_url: `${origin}/order/${ref}`,
         metadata: { customer_name: name, phone },
       });
-
       return NextResponse.json({
-        reference: existingOrder.reference,
-        authorization_url: paystackResult.authorization_url,
-        amount_kobo: totalNgn * 100,
+        reference: ref,
+        provider: "paystack",
+        access_code: paystack.access_code,
+        authorization_url: paystack.authorization_url,
+        amount_kobo: amountKobo,
       });
     } catch (err) {
-      console.error("[/api/orders/init] Paystack error on reused order:", err instanceof Error ? err.message : err);
+      console.error(
+        `[/api/orders/init] ${provider} initialization error:`,
+        err instanceof Error ? err.message : err
+      );
       return NextResponse.json(
         { error: "Payment provider unavailable. Please try again." },
         { status: 503 }
       );
     }
+  }
+
+  if (existingOrder) {
+    // Reuse: skip DB insert, go straight to Paystack init.
+    // Always use the freshly computed totalNgn so the delivery fee and current
+    // prices are reflected even if the stored order pre-dates them.
+    // Sync total_ngn and payment_method first so the webhook amount-check matches
+    // what the gateway charges and the confirmation-page verify hits the right provider.
+    if (existingOrder.total_ngn !== totalNgn || existingOrder.payment_method !== provider) {
+      try {
+        await db
+          .update(schema.orders)
+          .set({ total_ngn: totalNgn, payment_method: provider })
+          .where(eq(schema.orders.id, existingOrder.id));
+      } catch (err) {
+        console.warn("[/api/orders/init] Could not sync reused order:", err);
+      }
+    }
+
+    return startPayment(existingOrder.reference);
   }
 
   // 5. Create a new pending order
@@ -240,6 +285,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         delivery_area: delivery_area ?? null,
         allergy_notes: allergy_notes ?? null,
         status: "pending",
+        payment_method: provider,
         total_ngn: totalNgn,
         week_of: weekOf,
       })
@@ -266,26 +312,6 @@ export async function POST(req: Request): Promise<NextResponse> {
     );
   }
 
-  // 6. Initialize Paystack transaction
-  try {
-    const paystackResult = await initializePaystackTransaction({
-      email,
-      amount: totalNgn * 100,
-      reference,
-      callback_url: `${origin}/order/${reference}`,
-      metadata: { customer_name: name, phone },
-    });
-
-    return NextResponse.json({
-      reference,
-      authorization_url: paystackResult.authorization_url,
-      amount_kobo: totalNgn * 100,
-    });
-  } catch (err) {
-    console.error("[/api/orders/init] Paystack initialization error:", err instanceof Error ? err.message : err);
-    return NextResponse.json(
-      { error: "Payment provider unavailable. Please try again." },
-      { status: 503 }
-    );
-  }
+  // 6. Initialize the payment with the chosen gateway
+  return startPayment(reference);
 }
