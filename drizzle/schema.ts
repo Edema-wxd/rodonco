@@ -188,3 +188,16 @@ export const email_logs = pgTable("email_logs", {
   order_reference: text("order_reference"),
   sent_at: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ============================================================
+// WAITLIST
+// Pre-launch / area-expansion signups captured from /waitlist.
+// One row per email (unique) — re-signups update name/area.
+// ============================================================
+export const waitlist = pgTable("waitlist", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").unique().notNull(),
+  area: text("area").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

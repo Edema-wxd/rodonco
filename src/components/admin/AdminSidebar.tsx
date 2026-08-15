@@ -35,6 +35,7 @@ const buildNavItems = (
     Icon: Lucide.ShoppingCart,
     badge: abandonedBadge,
   },
+  { href: "/admin/waitlist", label: "Waitlist", Icon: Lucide.Mailbox },
   { href: "/admin/activity", label: "Activity", Icon: Lucide.Activity },
   { href: "/admin/email-logs", label: "Email Logs", Icon: Lucide.Mail },
   { href: "/admin/users", label: "Admin Users", Icon: Lucide.Users },
