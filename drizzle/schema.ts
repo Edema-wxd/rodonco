@@ -199,5 +199,6 @@ export const waitlist = pgTable("waitlist", {
   name: text("name").notNull(),
   email: text("email").unique().notNull(),
   area: text("area").notNull(),
+  cooking_pain: text("cooking_pain"), // "What's the part of cooking you hate most?" (optional)
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

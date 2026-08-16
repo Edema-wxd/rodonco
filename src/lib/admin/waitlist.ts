@@ -12,6 +12,7 @@ export interface WaitlistEntry {
   name: string;
   email: string;
   area: string;
+  cooking_pain: string | null;
   created_at: string; // ISO
 }
 
@@ -31,6 +32,7 @@ export async function getWaitlistSignups(limit = MAX_ROWS): Promise<WaitlistEntr
     name: row.name,
     email: row.email,
     area: row.area,
+    cooking_pain: row.cooking_pain ?? null,
     created_at:
       row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
   }));

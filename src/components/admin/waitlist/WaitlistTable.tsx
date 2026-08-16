@@ -27,16 +27,18 @@ export function WaitlistTable({ initialEntries }: { initialEntries: WaitlistEntr
     const q = searchQuery.toLowerCase().trim();
     if (!q) return initialEntries;
     return initialEntries.filter((e) =>
-      `${e.name} ${e.email} ${e.area}`.toLowerCase().includes(q),
+      `${e.name} ${e.email} ${e.area} ${e.cooking_pain ?? ""}`.toLowerCase().includes(q),
     );
   }, [initialEntries, searchQuery]);
 
   function exportCsv() {
-    const header = ["Name", "Email", "Area", "Joined"];
+    const header = ["Name", "Email", "Area", "Cooking pain", "Joined"];
     const lines = [
       header.join(","),
       ...filtered.map((e) =>
-        [e.name, e.email, e.area, new Date(e.created_at).toISOString()].map(csvCell).join(","),
+        [e.name, e.email, e.area, e.cooking_pain ?? "", new Date(e.created_at).toISOString()]
+          .map(csvCell)
+          .join(","),
       ),
     ];
     const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
@@ -112,6 +114,7 @@ export function WaitlistTable({ initialEntries }: { initialEntries: WaitlistEntr
                     { label: "Name", mobile: true },
                     { label: "Email", mobile: true },
                     { label: "Area", mobile: true },
+                    { label: "Cooking pain", mobile: true },
                   ].map(({ label }) => (
                     <th
                       key={label}
@@ -154,6 +157,16 @@ export function WaitlistTable({ initialEntries }: { initialEntries: WaitlistEntr
                       style={{ fontFamily: "var(--font-inter)" }}
                     >
                       {entry.area}
+                    </td>
+                    <td
+                      className="max-w-xs px-4 py-4 text-sm text-zinc-600"
+                      style={{ fontFamily: "var(--font-inter)" }}
+                    >
+                      {entry.cooking_pain ? (
+                        entry.cooking_pain
+                      ) : (
+                        <span className="text-stone-300">—</span>
+                      )}
                     </td>
                   </tr>
                 ))}

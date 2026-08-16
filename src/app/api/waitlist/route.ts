@@ -14,6 +14,8 @@ const waitlistSchema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(200),
   email: z.string().trim().email("Enter a valid email address").max(320),
   area: z.string().trim().min(1, "Tell us where you live").max(200),
+  // Open-ended, optional: "What's the part of cooking you hate most?"
+  cooking_pain: z.string().trim().max(500).optional(),
 });
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -44,14 +46,16 @@ export async function POST(req: Request): Promise<NextResponse> {
   const { name, area } = parsed.data;
   // Normalise email so casing/spacing never creates duplicate rows.
   const email = parsed.data.email.toLowerCase();
+  // Empty string → null so a blank answer isn't stored as "".
+  const cookingPain = parsed.data.cooking_pain || null;
 
   try {
     await db
       .insert(schema.waitlist)
-      .values({ name, email, area })
+      .values({ name, email, area, cooking_pain: cookingPain })
       .onConflictDoUpdate({
         target: schema.waitlist.email,
-        set: { name, area },
+        set: { name, area, cooking_pain: cookingPain },
       });
   } catch (err) {
     console.error("[/api/waitlist] DB insert error:", err);
