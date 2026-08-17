@@ -71,7 +71,7 @@ export function WaitlistForm() {
     <form
       onSubmit={onSubmit}
       noValidate
-      className="rounded-2xl border border-stone-200/80 bg-white/80 p-5 shadow-[0_20px_40px_-24px_rgba(41,37,36,0.35)] backdrop-blur-sm sm:p-6"
+      className="rounded-2xl border border-white/60 bg-white/95 p-5 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.55)] backdrop-blur-md sm:p-6"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Name */}
