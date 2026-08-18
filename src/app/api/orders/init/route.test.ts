@@ -324,7 +324,7 @@ describe("POST /api/orders/init", () => {
   });
 
   describe("success path — reuse existing pending order", () => {
-    it("reuses existing pending order and returns its reference", async () => {
+    it("reuses the pending order row but issues a FRESH reference (avoids Paystack duplicate-reference)", async () => {
       setupSuccessfulDbSelect();
       mockState.pendingReuseResult = {
         id: "existing-order-id",
@@ -339,9 +339,16 @@ describe("POST /api/orders/init", () => {
 
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.reference).toBe("RDC-existing123");
-      // DB insert should NOT be called when reusing
+      // Must NOT re-use the old reference — Paystack rejects re-initializing it.
+      expect(body.reference).not.toBe("RDC-existing123");
+      expect(body.reference).toMatch(/^RDC-/);
+      // Order row is reused (no new insert), and Paystack is initialised with the
+      // fresh reference we just wrote to that row.
       expect(mockDbInsert).not.toHaveBeenCalled();
+      // Paystack is initialised with the fresh reference (not the stale one).
+      expect(vi.mocked(initializePaystackTransaction).mock.calls[0][0].reference).toBe(
+        body.reference,
+      );
     });
   });
 

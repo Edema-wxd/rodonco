@@ -249,23 +249,28 @@ export async function POST(req: Request): Promise<NextResponse> {
   }
 
   if (existingOrder) {
-    // Reuse: skip DB insert, go straight to Paystack init.
-    // Always use the freshly computed totalNgn so the delivery fee and current
-    // prices are reflected even if the stored order pre-dates them.
-    // Sync total_ngn and payment_method first so the webhook amount-check matches
-    // what the gateway charges and the confirmation-page verify hits the right provider.
-    if (existingOrder.total_ngn !== totalNgn || existingOrder.payment_method !== provider) {
-      try {
-        await db
-          .update(schema.orders)
-          .set({ total_ngn: totalNgn, payment_method: provider })
-          .where(eq(schema.orders.id, existingOrder.id));
-      } catch (err) {
-        console.warn("[/api/orders/init] Could not sync reused order:", err);
-      }
+    // Reuse the pending ORDER row (so retries don't spawn duplicate pending
+    // orders for the same email + cart), but ALWAYS mint a fresh reference.
+    // Paystack rejects re-initializing a reference it has already seen
+    // ("Duplicate Transaction Reference", HTTP 400), so reusing the stored
+    // reference makes every retry fail with a 503. A new reference each attempt
+    // keeps retries working; the previous (unpaid) reference is simply abandoned.
+    // We also sync total_ngn / payment_method to the freshly computed values.
+    const retryReference = `RDC-${nanoid(10)}`;
+    try {
+      await db
+        .update(schema.orders)
+        .set({ reference: retryReference, total_ngn: totalNgn, payment_method: provider })
+        .where(eq(schema.orders.id, existingOrder.id));
+    } catch (err) {
+      console.error("[/api/orders/init] Could not refresh reused order reference:", err);
+      return NextResponse.json(
+        { error: "Could not start your payment. Please try again." },
+        { status: 500 }
+      );
     }
 
-    return startPayment(existingOrder.reference);
+    return startPayment(retryReference);
   }
 
   // 5. Create a new pending order
