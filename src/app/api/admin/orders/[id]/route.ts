@@ -6,6 +6,7 @@ import { logActivity } from "@/lib/admin/activityLog";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { orders } from "../../../../../../drizzle/schema";
+import { sendOrderStatusEmail } from "@/lib/email/sendOrderStatusEmails";
 
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -32,7 +33,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
 
   const [order] = await db
-    .select({ reference: orders.reference, status: orders.status })
+    .select({
+      reference: orders.reference,
+      status: orders.status,
+      customer_name: orders.customer_name,
+      customer_email: orders.customer_email,
+    })
     .from(orders)
     .where(eq(orders.id, id))
     .limit(1);
@@ -47,6 +53,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       entityLabel: `#${order.reference}`,
       details: { from: order.status, to: parsed.data.status, reference: order.reference },
     }).catch(() => {});
+
+    // Fire-and-forget: a send failure must never fail the admin's update.
+    // Skipped when the status didn't actually change, so re-saving the same
+    // status can't re-email the customer.
+    void sendOrderStatusEmail(
+      {
+        reference: order.reference,
+        customer_name: order.customer_name,
+        customer_email: order.customer_email,
+      },
+      order.status,
+      parsed.data.status,
+    );
   }
 
   return NextResponse.json({ ok: true });

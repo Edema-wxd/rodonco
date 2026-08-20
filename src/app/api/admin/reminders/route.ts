@@ -8,6 +8,7 @@ import { getPaidOrdersForWeek } from "@/lib/admin/reminders";
 import { resend } from "@/lib/email/resendClient";
 import { logEmail } from "@/lib/email/logEmail";
 import { DeliveryReminderEmail } from "@/lib/email/templates/DeliveryReminderEmail";
+import { buildOrderTrackingLink } from "@/lib/orders/orderTrackingLink";
 
 const reminderBodySchema = z.object({
   week_of: z
@@ -47,6 +48,7 @@ export async function POST(req: Request) {
   }
 
   const from = process.env.RESEND_FROM_EMAIL ?? "orders@rodoandco.com";
+  const appBaseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/+$/, "");
 
   const emails = await Promise.all(
     orders.map(async (order) => {
@@ -54,6 +56,11 @@ export async function POST(req: Request) {
         React.createElement(DeliveryReminderEmail, {
           customerName: order.customer_name,
           weekOf: parsed.data.week_of,
+          trackUrl: buildOrderTrackingLink({
+            baseUrl: appBaseUrl,
+            customerEmail: order.customer_email,
+            reference: order.reference,
+          }),
         }),
       );
       return {

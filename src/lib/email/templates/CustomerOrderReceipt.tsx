@@ -223,6 +223,29 @@ const footer: React.CSSProperties = {
   margin: "32px 0 0",
 };
 
+const ctaWrap: React.CSSProperties = {
+  textAlign: "center" as const,
+  margin: "0 0 24px",
+};
+
+const ctaButton: React.CSSProperties = {
+  backgroundColor: "#c8501a",
+  borderRadius: "6px",
+  color: "#ffffff",
+  display: "inline-block",
+  fontSize: "15px",
+  fontWeight: "700",
+  padding: "13px 30px",
+  textDecoration: "none",
+};
+
+const ctaHint: React.CSSProperties = {
+  color: "#999",
+  fontSize: "12px",
+  lineHeight: "18px",
+  margin: "10px 0 0",
+};
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export interface CustomerOrderReceiptProps {
@@ -230,6 +253,8 @@ export interface CustomerOrderReceiptProps {
   items: OrderItem[];
   nextDeliveryDate: string; // ISO YYYY-MM-DD
   contactEmail: string;
+  /** One-click link back to this order. Omitted when it can't be built. */
+  trackUrl?: string | null;
 }
 
 export function CustomerOrderReceipt({
@@ -237,6 +262,7 @@ export function CustomerOrderReceipt({
   items,
   nextDeliveryDate,
   contactEmail,
+  trackUrl,
 }: CustomerOrderReceiptProps) {
   return (
     <Html>
@@ -273,6 +299,18 @@ export function CustomerOrderReceipt({
                 Estimated delivery: {formatDate(nextDeliveryDate)}
               </Text>
             </Section>
+
+            {/* Primary action: one-click back into this order's live status */}
+            {trackUrl && (
+              <Section style={ctaWrap}>
+                <a href={trackUrl} style={ctaButton}>
+                  Track your order →
+                </a>
+                <Text style={ctaHint}>
+                  Opens your order status — no password needed. Link valid for 7 days.
+                </Text>
+              </Section>
+            )}
 
             {/* Order items */}
             <Text style={sectionHeading}>Your Order</Text>

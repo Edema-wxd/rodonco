@@ -17,6 +17,7 @@ import { DEFAULT_CONTACT_EMAIL } from "./emailConfig";
 import { getSiteSettings } from "@/lib/admin/config";
 import { db, schema } from "@/lib/db";
 import { logActivity } from "@/lib/admin/activityLog";
+import { buildOrderTrackingLink } from "@/lib/orders/orderTrackingLink";
 import type { Order, OrderItem } from "@/types";
 
 // ─── Env ─────────────────────────────────────────────────────────────────────
@@ -92,8 +93,20 @@ export async function sendOrderEmails({
 
     // ── Customer receipt ───────────────────────────────────────────────────────
     try {
+      const trackUrl = buildOrderTrackingLink({
+        baseUrl: getAppBaseUrl(),
+        customerEmail: order.customer_email,
+        reference: order.reference,
+      });
+
       const customerHtml = await render(
-        React.createElement(CustomerOrderReceipt, { order, items, nextDeliveryDate, contactEmail })
+        React.createElement(CustomerOrderReceipt, {
+          order,
+          items,
+          nextDeliveryDate,
+          contactEmail,
+          trackUrl,
+        })
       );
 
       const subject = `Order confirmed: ${order.reference}`;

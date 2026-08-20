@@ -16,8 +16,21 @@
  */
 
 import React from "react";
-import { describe, it, expect as _expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import {
+  describe,
+  it,
+  expect as _expect,
+  vi,
+  beforeEach,
+  afterEach,
+} from "vitest";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 
 // Re-export with relaxed type so objectContaining / any / anything compile cleanly.
 // The runtime object is the real vitest expect; the cast is purely cosmetic for tsc.
@@ -38,9 +51,12 @@ const {
   let capturedCallbacks: Record<string, (arg?: unknown) => void> = {};
 
   const mockResumeTransaction = vi.fn(
-    (_accessCode: string, callbacks: Record<string, (arg?: unknown) => void>) => {
+    (
+      _accessCode: string,
+      callbacks: Record<string, (arg?: unknown) => void>,
+    ) => {
       capturedCallbacks = callbacks;
-    }
+    },
   );
 
   // Expose capturedCallbacks via the resumeTransaction fn itself for tests
@@ -72,24 +88,21 @@ vi.mock("sonner", () => ({
 
 vi.mock("@paystack/inline-js", () => ({
   // Must use regular function — arrow fns can't be called with `new` in Vitest 4.x.
-  default: vi.fn(function (this: { resumeTransaction: typeof mockResumeTransaction }) {
+  default: vi.fn(function (this: {
+    resumeTransaction: typeof mockResumeTransaction;
+  }) {
     this.resumeTransaction = mockResumeTransaction;
   }),
 }));
 
 vi.mock("@/store/cart", () => ({
-  useCartStore: (selector: (state: { items: CartItem[]; clearCart: () => void }) => unknown) =>
-    selector({ items: mockCartItemsRef.current, clearCart: mockClearCart }),
+  useCartStore: (
+    selector: (state: { items: CartItem[]; clearCart: () => void }) => unknown,
+  ) => selector({ items: mockCartItemsRef.current, clearCart: mockClearCart }),
 }));
 
 vi.mock("@/hooks/useHasHydrated", () => ({
   useHasHydrated: () => mockHasHydratedRef.current,
-}));
-
-// setOrderViewCookie is a server action (uses next/headers) — stub it so the
-// success path can run in jsdom without a request scope.
-vi.mock("@/app/(customer)/order/[ref]/_actions", () => ({
-  setOrderViewCookie: vi.fn().mockResolvedValue(undefined),
 }));
 
 // ── Import component AFTER mocks ──────────────────────────────────────────────
@@ -105,7 +118,7 @@ const sampleCartItems: CartItem[] = [
     prepOption: "Diced",
     quantity: 2,
     unitPriceNgn: 1500, // ₦1,500
-    subtotalNgn: 3000,  // ₦3,000 (2 × ₦1,500)
+    subtotalNgn: 3000, // ₦3,000 (2 × ₦1,500)
   },
   {
     productId: "prod-2",
@@ -126,7 +139,13 @@ function getCapturedCallbacks() {
 }
 
 function renderCheckout() {
-  return render(<CheckoutExperience deliveryFeeNgn={0} deliveryZones={[]} whatsappNumber={null} />);
+  return render(
+    <CheckoutExperience
+      deliveryFeeNgn={0}
+      deliveryZones={[]}
+      whatsappNumber={null}
+    />,
+  );
 }
 
 // Fills step-1 form and clicks "Continue to Payment", waits for step-2 "Pay Now" button.
@@ -137,12 +156,20 @@ async function fillAndAdvanceToPayment(
     phone: "07011223344",
     email: "tunde@example.com",
     address: "22 Allen Avenue, Ikeja, Lagos",
-  }
+  },
 ) {
-  fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: user.name } });
-  fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: user.phone } });
-  fireEvent.change(screen.getByLabelText(/email/i), { target: { value: user.email } });
-  fireEvent.change(screen.getByLabelText(/delivery address/i), { target: { value: user.address } });
+  fireEvent.change(screen.getByLabelText(/full name/i), {
+    target: { value: user.name },
+  });
+  fireEvent.change(screen.getByLabelText(/phone/i), {
+    target: { value: user.phone },
+  });
+  fireEvent.change(screen.getByLabelText(/email/i), {
+    target: { value: user.email },
+  });
+  fireEvent.change(screen.getByLabelText(/delivery address/i), {
+    target: { value: user.address },
+  });
   fireEvent.click(screen.getByRole("checkbox"));
   fireEvent.click(screen.getByRole("button", { name: /continue to payment/i }));
   await waitFor(() => {
@@ -170,16 +197,19 @@ beforeEach(() => {
 
   // Re-wire resumeTransaction after resetAllMocks clears implementations
   mockResumeTransaction.mockImplementation(
-    (_accessCode: string, callbacks: Record<string, (arg?: unknown) => void>) => {
+    (
+      _accessCode: string,
+      callbacks: Record<string, (arg?: unknown) => void>,
+    ) => {
       (mockResumeTransaction as any).__capturedCallbacks = callbacks;
-    }
+    },
   );
 
   // Re-wire PaystackPop constructor after resetAllMocks — regular function required for `new`.
   (PaystackPopMock as unknown as ReturnType<typeof vi.fn>).mockImplementation(
     function (this: { resumeTransaction: typeof mockResumeTransaction }) {
       this.resumeTransaction = mockResumeTransaction;
-    }
+    },
   );
 
   vi.stubEnv("NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY", "pk_test_abc123");
@@ -207,7 +237,9 @@ describe("CheckoutExperience — layout and cart summary", () => {
     expect(screen.getByLabelText(/email/i)).toBeTruthy();
     expect(screen.getByLabelText(/delivery address/i)).toBeTruthy();
     expect(screen.getByRole("checkbox")).toBeTruthy();
-    expect(screen.getByRole("button", { name: /continue to payment/i })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: /continue to payment/i }),
+    ).toBeTruthy();
   });
 
   it("renders cart summary with correct item names and total", () => {
@@ -262,15 +294,23 @@ describe("CheckoutExperience — empty cart redirect", () => {
 describe("CheckoutExperience — Pay Now loading state (D-03)", () => {
   it("disables Pay Now and shows Processing... while init in-flight", async () => {
     let resolveInit!: (value: Response) => void;
-    const initPending = new Promise<Response>((resolve) => { resolveInit = resolve; });
+    const initPending = new Promise<Response>((resolve) => {
+      resolveInit = resolve;
+    });
 
     // Draft (1st fetch) resolves immediately; init (2nd fetch) stays pending.
-    global.fetch = vi.fn()
+    global.fetch = vi
+      .fn()
       .mockResolvedValueOnce(makeDraftOk())
       .mockReturnValueOnce(initPending);
 
     renderCheckout();
-    await fillAndAdvanceToPayment({ name: "Adaeze Obi", phone: "08012345678", email: "adaeze@example.com", address: "15 Banana Island Road, Ikoyi, Lagos" });
+    await fillAndAdvanceToPayment({
+      name: "Adaeze Obi",
+      phone: "08012345678",
+      email: "adaeze@example.com",
+      address: "Isaac John Str, Ikeja, Lagos",
+    });
 
     fireEvent.click(screen.getByRole("button", { name: /pay now/i }));
 
@@ -283,7 +323,7 @@ describe("CheckoutExperience — Pay Now loading state (D-03)", () => {
     // Resolve so no hanging promise
     act(() => {
       resolveInit(
-        new Response(JSON.stringify({ error: "test done" }), { status: 500 })
+        new Response(JSON.stringify({ error: "test done" }), { status: 500 }),
       );
     });
 
@@ -294,10 +334,15 @@ describe("CheckoutExperience — Pay Now loading state (D-03)", () => {
 describe("CheckoutExperience — Paystack cancellation (D-04)", () => {
   it("shows cancellation toast and stays on page when Paystack popup cancelled", async () => {
     const initResponse = new Response(
-      JSON.stringify({ reference: "RDC-abc1234567", access_code: "acc_test_123", amount_kobo: 1100000 }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({
+        reference: "RDC-abc1234567",
+        access_code: "acc_test_123",
+        amount_kobo: 1100000,
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
     );
-    global.fetch = vi.fn()
+    global.fetch = vi
+      .fn()
       .mockResolvedValueOnce(makeDraftOk())
       .mockResolvedValueOnce(initResponse);
 
@@ -309,7 +354,7 @@ describe("CheckoutExperience — Paystack cancellation (D-04)", () => {
     await waitFor(() => {
       expect(mockResumeTransaction).toHaveBeenCalledWith(
         "acc_test_123",
-        expect.objectContaining({ onCancel: expect.any(Function) })
+        expect.objectContaining({ onCancel: expect.any(Function) }),
       );
     });
 
@@ -320,7 +365,7 @@ describe("CheckoutExperience — Paystack cancellation (D-04)", () => {
 
     expect(mockToast).toHaveBeenCalledWith(
       "Payment cancelled — your cart is still saved.",
-      expect.anything()
+      expect.anything(),
     );
     expect(mockPush).not.toHaveBeenCalled();
     expect(mockClearCart).not.toHaveBeenCalled();
@@ -332,22 +377,32 @@ describe("CheckoutExperience — payment success (D-08)", () => {
     const testRef = "RDC-xyz9876543";
 
     const initResponse = new Response(
-      JSON.stringify({ reference: testRef, access_code: "acc_success_456", amount_kobo: 1100000 }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({
+        reference: testRef,
+        access_code: "acc_success_456",
+        amount_kobo: 1100000,
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
     );
-    global.fetch = vi.fn()
+    global.fetch = vi
+      .fn()
       .mockResolvedValueOnce(makeDraftOk())
       .mockResolvedValueOnce(initResponse);
 
     renderCheckout();
-    await fillAndAdvanceToPayment({ name: "Ngozi Adeyemi", phone: "09099887766", email: "ngozi@example.com", address: "3 Marina Road, Lagos Island" });
+    await fillAndAdvanceToPayment({
+      name: "Ngozi Adeyemi",
+      phone: "09099887766",
+      email: "ngozi@example.com",
+      address: "3 Marina Road, Lagos Island",
+    });
 
     fireEvent.click(screen.getByRole("button", { name: /pay now/i }));
 
     await waitFor(() => {
       expect(mockResumeTransaction).toHaveBeenCalledWith(
         "acc_success_456",
-        expect.objectContaining({ onSuccess: expect.any(Function) })
+        expect.objectContaining({ onSuccess: expect.any(Function) }),
       );
     });
 

@@ -9,7 +9,10 @@ import { Check, Loader2 } from "lucide-react";
 
 import { useCartStore } from "@/store/cart";
 import { useHasHydrated } from "@/hooks/useHasHydrated";
-import { checkoutPayloadSchema, type CheckoutPayload } from "@/lib/checkout/schemas";
+import {
+  checkoutPayloadSchema,
+  type CheckoutPayload,
+} from "@/lib/checkout/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +20,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CheckoutCartSummary } from "./CheckoutCartSummary";
-import { setOrderViewCookie } from "@/app/(customer)/order/[ref]/_actions";
 import type { DeliveryZone } from "@/lib/shop/orderingConfig";
 
 type Step = "info" | "payment";
@@ -27,7 +29,9 @@ type Provider = "paystack" | "flutterwave";
 // API helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function saveDraft(payload: CheckoutPayload & { cart: unknown[] }): Promise<void> {
+async function saveDraft(
+  payload: CheckoutPayload & { cart: unknown[] },
+): Promise<void> {
   const res = await fetch("/api/orders/draft", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -35,7 +39,9 @@ async function saveDraft(payload: CheckoutPayload & { cart: unknown[] }): Promis
   });
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data?.error ?? "Could not save your details. Please try again.");
+    throw new Error(
+      data?.error ?? "Could not save your details. Please try again.",
+    );
   }
 }
 
@@ -52,7 +58,7 @@ interface InitOrderResult {
 }
 
 async function initOrder(
-  payload: CheckoutPayload & { cart: unknown[]; provider: Provider }
+  payload: CheckoutPayload & { cart: unknown[]; provider: Provider },
 ): Promise<InitOrderResult> {
   const res = await fetch("/api/orders/init", {
     method: "POST",
@@ -61,7 +67,9 @@ async function initOrder(
   });
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data?.error ?? "Failed to initialise order. Please try again.");
+    throw new Error(
+      data?.error ?? "Failed to initialise order. Please try again.",
+    );
   }
   return data as InitOrderResult;
 }
@@ -74,7 +82,9 @@ function StepIndicator({ current }: { current: Step }) {
   const onPayment = current === "payment";
   return (
     <div className="flex items-center gap-3">
-      <div className={`flex items-center gap-2 ${onPayment ? "text-muted-foreground" : "text-foreground"}`}>
+      <div
+        className={`flex items-center gap-2 ${onPayment ? "text-muted-foreground" : "text-foreground"}`}
+      >
         <span
           className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
             onPayment
@@ -89,7 +99,9 @@ function StepIndicator({ current }: { current: Step }) {
 
       <div className="h-px w-10 bg-border" />
 
-      <div className={`flex items-center gap-2 ${onPayment ? "text-foreground" : "text-muted-foreground"}`}>
+      <div
+        className={`flex items-center gap-2 ${onPayment ? "text-foreground" : "text-muted-foreground"}`}
+      >
         <span
           className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
             onPayment
@@ -131,7 +143,9 @@ export function CheckoutExperience({
   const clearCart = useCartStore((s) => s.clearCart);
 
   const [step, setStep] = useState<Step>("info");
-  const [savedPayload, setSavedPayload] = useState<CheckoutPayload | null>(null);
+  const [savedPayload, setSavedPayload] = useState<CheckoutPayload | null>(
+    null,
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -189,7 +203,11 @@ export function CheckoutExperience({
       setStep("payment");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setServerError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -209,7 +227,10 @@ export function CheckoutExperience({
     try {
       result = await initOrder({ ...savedPayload, cart: items, provider });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.";
       setServerError(msg);
       setIsSubmitting(false);
       return;
@@ -217,26 +238,17 @@ export function CheckoutExperience({
 
     const reference = result.reference;
 
-    // Runs once payment is confirmed. We set the (HttpOnly) view cookie before
-    // navigating so the confirmation page can show full order details, then clear
-    // the cart and route the customer to /order/[ref] ourselves.
-    const completePayment = async () => {
-      try {
-        await setOrderViewCookie(reference);
-      } catch {
-        // Non-fatal: worst case the customer sees the stripped confirmation view.
-      }
+    // Runs once payment is confirmed: clear the cart and route the customer to
+    // /order/[ref] ourselves. Nothing to grant here — /api/orders/init already
+    // set the signed single-order view cookie for this reference, so the
+    // confirmation page shows full detail.
+    const completePayment = () => {
       clearCart();
       router.push(`/order/${reference}`);
     };
 
     // ── Flutterwave: hosted redirect flow ──
     if (result.provider === "flutterwave" && result.redirect_url) {
-      try {
-        await setOrderViewCookie(reference);
-      } catch {
-        /* non-fatal */
-      }
       clearCart();
       window.location.href = result.redirect_url;
       return;
@@ -248,8 +260,8 @@ export function CheckoutExperience({
         const PaystackPop = (await import("@paystack/inline-js")).default;
         const popup = new PaystackPop();
         popup.resumeTransaction(result.access_code, {
-          onSuccess: async () => {
-            await completePayment();
+          onSuccess: () => {
+            completePayment();
           },
           onCancel: () => {
             toast("Payment cancelled — your cart is still saved.", {
@@ -266,16 +278,13 @@ export function CheckoutExperience({
       } catch {
         // Inline JS failed to load (network / ad-blocker). Fall back to the hosted page.
         if (result.authorization_url) {
-          try {
-            await setOrderViewCookie(reference);
-          } catch {
-            /* non-fatal */
-          }
           clearCart();
           window.location.href = result.authorization_url;
           return;
         }
-        setServerError("Could not load the payment window. Please disable any ad blocker and try again.");
+        setServerError(
+          "Could not load the payment window. Please disable any ad blocker and try again.",
+        );
         setIsSubmitting(false);
         return;
       }
@@ -283,17 +292,14 @@ export function CheckoutExperience({
 
     // ── Last-resort fallback: hosted authorization URL if no access_code came back ──
     if (result.authorization_url) {
-      try {
-        await setOrderViewCookie(reference);
-      } catch {
-        /* non-fatal */
-      }
       clearCart();
       window.location.href = result.authorization_url;
       return;
     }
 
-    setServerError("Something went wrong starting your payment. Please try again.");
+    setServerError(
+      "Something went wrong starting your payment. Please try again.",
+    );
     setIsSubmitting(false);
   };
 
@@ -314,7 +320,11 @@ export function CheckoutExperience({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_auto]">
         {/* ── Left column: form or review ── */}
         {step === "info" ? (
-          <form onSubmit={onInfoSubmit} noValidate className="flex flex-col gap-6">
+          <form
+            onSubmit={onInfoSubmit}
+            noValidate
+            className="flex flex-col gap-6"
+          >
             {/* Name */}
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="name">Full Name</Label>
@@ -326,7 +336,9 @@ export function CheckoutExperience({
                 {...register("name")}
               />
               {errors.name && (
-                <p className="text-xs text-destructive">{errors.name.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -341,9 +353,13 @@ export function CheckoutExperience({
                 {...register("phone")}
               />
               {errors.phone ? (
-                <p className="text-xs text-destructive">{errors.phone.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.phone.message}
+                </p>
               ) : (
-                <p className="text-xs text-muted-foreground">Enter your 11-digit Nigerian number (e.g. 08012345678)</p>
+                <p className="text-xs text-muted-foreground">
+                  Enter your 11-digit Nigerian number (e.g. 08012345678)
+                </p>
               )}
             </div>
 
@@ -358,49 +374,61 @@ export function CheckoutExperience({
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-xs text-destructive">{errors.email.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
             {/* Delivery area (only shown when delivery zones are configured) */}
             {hasZones && (
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="delivery_area">Delivery Area</Label>
-              <select
-                id="delivery_area"
-                value={selectedArea}
-                onChange={(e) => setSelectedArea(e.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <option value="">Select your area…</option>
-                {deliveryZones.map((z) => (
-                  <option key={z.area} value={z.area}>
-                    {z.area} — {z.fee_ngn === 0 ? "Free delivery" : `₦${z.fee_ngn.toLocaleString()}`}
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="delivery_area">Delivery Area</Label>
+                <select
+                  id="delivery_area"
+                  value={selectedArea}
+                  onChange={(e) => setSelectedArea(e.target.value)}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                >
+                  <option value="">Select your area…</option>
+                  {deliveryZones.map((z) => (
+                    <option key={z.area} value={z.area}>
+                      {z.area} —{" "}
+                      {z.fee_ngn === 0
+                        ? "Free delivery"
+                        : `₦${z.fee_ngn.toLocaleString()}`}
+                    </option>
+                  ))}
+                  <option value={OTHER_AREA}>
+                    Other / Outside listed areas
                   </option>
-                ))}
-                <option value={OTHER_AREA}>Other / Outside listed areas</option>
-              </select>
-              {isOutsideArea && (
-                <div className="mt-1 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                  <p className="font-medium">We don&apos;t currently have a set delivery rate for your area.</p>
-                  <p className="mt-1">
-                    Please reach out on{" "}
-                    <a
-                      href={`https://wa.me/${(whatsappNumber ?? "").replace(/\D/g, "")}?text=${encodeURIComponent("Hi! I'd like to get a delivery quote for my order.")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold underline underline-offset-2 text-green-700 hover:text-green-900"
-                    >
-                      WhatsApp
-                    </a>{" "}
-                    and we&apos;ll give you a delivery quote.
+                </select>
+                {isOutsideArea && (
+                  <div className="mt-1 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    <p className="font-medium">
+                      We don&apos;t currently have a set delivery rate for your
+                      area.
+                    </p>
+                    <p className="mt-1">
+                      Please reach out on{" "}
+                      <a
+                        href={`https://wa.me/${(whatsappNumber ?? "").replace(/\D/g, "")}?text=${encodeURIComponent("Hi! I'd like to get a delivery quote for my order.")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold underline underline-offset-2 text-green-700 hover:text-green-900"
+                      >
+                        WhatsApp
+                      </a>{" "}
+                      and we&apos;ll give you a delivery quote.
+                    </p>
+                  </div>
+                )}
+                {!isOutsideArea && selectedArea === "" && (
+                  <p className="text-xs text-muted-foreground">
+                    Select your area to see the delivery fee.
                   </p>
-                </div>
-              )}
-              {!isOutsideArea && selectedArea === "" && (
-                <p className="text-xs text-muted-foreground">Select your area to see the delivery fee.</p>
-              )}
-            </div>
+                )}
+              </div>
             )}
 
             {/* Delivery address */}
@@ -409,12 +437,14 @@ export function CheckoutExperience({
               <Textarea
                 id="delivery_address"
                 rows={3}
-                placeholder="15 Banana Island Road, Ikoyi, Lagos"
+                placeholder="Isaac John Str, Ikeja, Lagos"
                 aria-invalid={!!errors.delivery_address}
                 {...register("delivery_address")}
               />
               {errors.delivery_address && (
-                <p className="text-xs text-destructive">{errors.delivery_address.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.delivery_address.message}
+                </p>
               )}
             </div>
 
@@ -422,7 +452,9 @@ export function CheckoutExperience({
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="allergy_notes">
                 Allergy / Dietary Notes{" "}
-                <span className="text-xs text-muted-foreground">(optional)</span>
+                <span className="text-xs text-muted-foreground">
+                  (optional)
+                </span>
               </Label>
               <Textarea
                 id="allergy_notes"
@@ -438,18 +470,27 @@ export function CheckoutExperience({
                 id="terms"
                 checked={termsChecked}
                 onCheckedChange={(checked) => {
-                  setValue("terms", checked === true ? true : (undefined as unknown as true), {
-                    shouldValidate: true,
-                  });
+                  setValue(
+                    "terms",
+                    checked === true ? true : (undefined as unknown as true),
+                    {
+                      shouldValidate: true,
+                    },
+                  );
                 }}
                 aria-invalid={!!errors.terms}
               />
               <div className="flex flex-col gap-0.5">
-                <Label htmlFor="terms" className="text-sm cursor-pointer leading-snug">
+                <Label
+                  htmlFor="terms"
+                  className="text-sm cursor-pointer leading-snug"
+                >
                   I agree to the terms and conditions
                 </Label>
                 {errors.terms && (
-                  <p className="text-xs text-destructive">{errors.terms.message}</p>
+                  <p className="text-xs text-destructive">
+                    {errors.terms.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -462,7 +503,12 @@ export function CheckoutExperience({
 
             <Button
               type="submit"
-              disabled={isSaving || isOutsideArea || (hasZones && selectedArea === "") || !termsChecked}
+              disabled={
+                isSaving ||
+                isOutsideArea ||
+                (hasZones && selectedArea === "") ||
+                !termsChecked
+              }
               className="w-full"
               size="lg"
             >
@@ -526,14 +572,26 @@ export function CheckoutExperience({
                   <h2 className="text-base font-semibold">Payment method</h2>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
-                  {([
-                    { value: "paystack", label: "Card, bank transfer & USSD", hint: "Secured by Paystack" },
-                    { value: "flutterwave", label: "Card, bank & mobile money", hint: "Secured by Flutterwave" },
-                  ] as { value: Provider; label: string; hint: string }[]).map((opt) => (
+                  {(
+                    [
+                      {
+                        value: "paystack",
+                        label: "Card, bank transfer & USSD",
+                        hint: "Secured by Paystack",
+                      },
+                      {
+                        value: "flutterwave",
+                        label: "Card, bank & mobile money",
+                        hint: "Secured by Flutterwave",
+                      },
+                    ] as { value: Provider; label: string; hint: string }[]
+                  ).map((opt) => (
                     <label
                       key={opt.value}
                       className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
-                        provider === opt.value ? "border-foreground bg-secondary/40" : "hover:bg-secondary/20"
+                        provider === opt.value
+                          ? "border-foreground bg-secondary/40"
+                          : "hover:bg-secondary/20"
                       }`}
                     >
                       <input
@@ -547,7 +605,9 @@ export function CheckoutExperience({
                       />
                       <span className="flex flex-col">
                         <span className="text-sm font-medium">{opt.label}</span>
-                        <span className="text-xs text-muted-foreground">{opt.hint}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {opt.hint}
+                        </span>
                       </span>
                     </label>
                   ))}
@@ -581,7 +641,10 @@ export function CheckoutExperience({
 
         {/* ── Right column: cart summary (always visible) ── */}
         <div className="w-full lg:w-80 xl:w-96">
-          <CheckoutCartSummary items={items} deliveryFeeNgn={effectiveDeliveryFeeNgn} />
+          <CheckoutCartSummary
+            items={items}
+            deliveryFeeNgn={effectiveDeliveryFeeNgn}
+          />
         </div>
       </div>
     </div>

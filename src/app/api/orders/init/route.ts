@@ -8,7 +8,7 @@
 //  4. Attempt to reuse existing pending order (D-05)
 //  5. If no reuse: generate reference, insert order + order_items in DB
 //  6. Call Paystack initialize with the reference
-//  7. Return { reference, access_code, amount_kobo }
+//  7. Return { reference, access_code, amount_kobo } + the order-view grant
 
 import "server-only";
 
@@ -21,6 +21,11 @@ import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { snapToWeekStart } from "@/lib/admin/week";
 import { db, schema } from "@/lib/db";
 import { findPendingReuse } from "@/lib/orders/findPendingReuse";
+import {
+  ORDER_VIEW_GRANT_COOKIE,
+  ORDER_VIEW_GRANT_TTL_SECONDS,
+  createOrderViewGrant,
+} from "@/lib/orders/orderViewGrant";
 import { initializePaystackTransaction } from "@/lib/paystack/initialize";
 import { initializeFlutterwaveTransaction } from "@/lib/flutterwave/initialize";
 import { buildOrderItemsDraftFromCart } from "@/lib/checkout/cartToOrderDraft";
@@ -61,6 +66,35 @@ const initOrderSchema = z.object({
 });
 
 export type InitOrderRequest = z.infer<typeof initOrderSchema>;
+
+// ─────────────────────────────────────────
+// Post-checkout view grant
+// ─────────────────────────────────────────
+
+/**
+ * Attach the single-order view grant for a reference THIS route just generated.
+ *
+ * A guest who has just paid has proved nothing about their email address, so
+ * /order/[ref] cannot authorize them by `order_session`. The grant covers only
+ * this reference and is issued here — where the server owns the reference —
+ * rather than from a client-callable action that would take the reference on
+ * trust.
+ */
+function withOrderViewGrant(response: NextResponse, ref: string): NextResponse {
+  try {
+    response.cookies.set(ORDER_VIEW_GRANT_COOKIE, createOrderViewGrant(ref), {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: ORDER_VIEW_GRANT_TTL_SECONDS,
+      path: "/",
+    });
+  } catch (err) {
+    // Non-fatal (e.g. AUTH_SECRET unset): worst case the customer lands on the
+    // PII-stripped confirmation view. Never fail a checkout over this.
+    console.error("[/api/orders/init] Could not mint order view grant:", err);
+  }
+  return response;
+}
 
 // ─────────────────────────────────────────
 // Route handler
@@ -214,12 +248,15 @@ export async function POST(req: Request): Promise<NextResponse> {
           phone,
           meta: { customer_name: name, phone },
         });
-        return NextResponse.json({
-          reference: ref,
-          provider: "flutterwave",
-          redirect_url: flw.link,
-          amount_kobo: amountKobo,
-        });
+        return withOrderViewGrant(
+          NextResponse.json({
+            reference: ref,
+            provider: "flutterwave",
+            redirect_url: flw.link,
+            amount_kobo: amountKobo,
+          }),
+          ref
+        );
       }
 
       const paystack = await initializePaystackTransaction({
@@ -229,13 +266,16 @@ export async function POST(req: Request): Promise<NextResponse> {
         callback_url: `${origin}/order/${ref}`,
         metadata: { customer_name: name, phone },
       });
-      return NextResponse.json({
-        reference: ref,
-        provider: "paystack",
-        access_code: paystack.access_code,
-        authorization_url: paystack.authorization_url,
-        amount_kobo: amountKobo,
-      });
+      return withOrderViewGrant(
+        NextResponse.json({
+          reference: ref,
+          provider: "paystack",
+          access_code: paystack.access_code,
+          authorization_url: paystack.authorization_url,
+          amount_kobo: amountKobo,
+        }),
+        ref
+      );
     } catch (err) {
       console.error(
         `[/api/orders/init] ${provider} initialization error:`,

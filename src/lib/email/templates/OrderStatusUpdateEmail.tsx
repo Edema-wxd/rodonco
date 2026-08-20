@@ -1,3 +1,8 @@
+// src/lib/email/templates/OrderStatusUpdateEmail.tsx
+// Customer-facing notification sent when an admin moves an order to a new
+// status. Structure and styles mirror DeliveryReminderEmail, including the
+// shared ctaWrap/ctaButton "track your order" pattern.
+
 import {
   Body,
   Container,
@@ -9,15 +14,54 @@ import {
 } from "react-email";
 import * as React from "react";
 
-function formatDate(iso: string): string {
-  const date = new Date(iso);
-  return date.toLocaleDateString("en-NG", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+/**
+ * The only statuses that produce a customer email. "paid" is already covered
+ * by the order receipt and "pending" is a pre-payment internal state, so
+ * neither is notifiable — see shouldNotifyStatusChange().
+ */
+export type NotifiableOrderStatus = "processing" | "delivered" | "cancelled";
+
+interface StatusCopy {
+  subject: (reference: string) => string;
+  preview: string;
+  heading: string;
+  body: string;
+  callout: string;
+  tone: "positive" | "neutral";
 }
+
+export const STATUS_COPY: Record<NotifiableOrderStatus, StatusCopy> = {
+  processing: {
+    subject: (reference) => `We're preparing your order ${reference}`,
+    preview: "Good news — your Rodo & Co order is being prepared",
+    heading: "Your order is being prepared",
+    body:
+      "our team has started putting your order together. We'll pack everything fresh and " +
+      "have it ready for your Saturday delivery.",
+    callout: "Status: Being prepared",
+    tone: "positive",
+  },
+  delivered: {
+    subject: (reference) => `Your order ${reference} has been delivered`,
+    preview: "Your Rodo & Co order has been delivered",
+    heading: "Your order has been delivered",
+    body:
+      "your order is with you — enjoy! If anything isn't quite right, reply to this email " +
+      "and we'll sort it out straight away.",
+    callout: "Status: Delivered",
+    tone: "positive",
+  },
+  cancelled: {
+    subject: (reference) => `Your order ${reference} has been cancelled`,
+    preview: "Your Rodo & Co order has been cancelled",
+    heading: "Your order has been cancelled",
+    body:
+      "this order has been cancelled and will not be delivered. If you paid for it, your " +
+      "refund is on its way. Reply to this email if you have any questions.",
+    callout: "Status: Cancelled",
+    tone: "neutral",
+  },
+};
 
 const main: React.CSSProperties = {
   backgroundColor: "#fffaf5",
@@ -72,7 +116,13 @@ const paragraph: React.CSSProperties = {
   margin: "0 0 16px",
 };
 
-const deliveryCallout: React.CSSProperties = {
+const referenceLine: React.CSSProperties = {
+  color: "#777",
+  fontSize: "13px",
+  margin: "0 0 20px",
+};
+
+const positiveCallout: React.CSSProperties = {
   backgroundColor: "#f0faf0",
   border: "1px solid #b8ddb8",
   borderRadius: "6px",
@@ -80,8 +130,23 @@ const deliveryCallout: React.CSSProperties = {
   margin: "0 0 24px",
 };
 
-const deliveryText: React.CSSProperties = {
+const positiveCalloutText: React.CSSProperties = {
   color: "#1a6e1a",
+  fontSize: "14px",
+  fontWeight: "600",
+  margin: "0",
+};
+
+const neutralCallout: React.CSSProperties = {
+  backgroundColor: "#faf6f2",
+  border: "1px solid #e0d2c4",
+  borderRadius: "6px",
+  padding: "14px 16px",
+  margin: "0 0 24px",
+};
+
+const neutralCalloutText: React.CSSProperties = {
+  color: "#8a5a34",
   fontSize: "14px",
   fontWeight: "600",
   margin: "0",
@@ -118,22 +183,28 @@ const ctaHint: React.CSSProperties = {
   margin: "10px 0 0",
 };
 
-export interface DeliveryReminderEmailProps {
+export interface OrderStatusUpdateEmailProps {
   customerName: string;
-  weekOf: string; // ISO YYYY-MM-DD (Saturday)
+  reference: string;
+  status: NotifiableOrderStatus;
   /** One-click link back to this order. Omitted when it can't be built. */
   trackUrl?: string | null;
 }
 
-export function DeliveryReminderEmail({
+export function OrderStatusUpdateEmail({
   customerName,
-  weekOf,
+  reference,
+  status,
   trackUrl,
-}: DeliveryReminderEmailProps) {
+}: OrderStatusUpdateEmailProps) {
+  const copy = STATUS_COPY[status];
+  const calloutStyle = copy.tone === "positive" ? positiveCallout : neutralCallout;
+  const calloutTextStyle = copy.tone === "positive" ? positiveCalloutText : neutralCalloutText;
+
   return (
     <Html>
       <Head />
-      <Preview>Your Rodo &amp; Co delivery is this Saturday — {formatDate(weekOf)}</Preview>
+      <Preview>{copy.preview}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={headerSection}>
@@ -142,21 +213,21 @@ export function DeliveryReminderEmail({
           </Section>
 
           <Section style={contentSection}>
-            <Text style={h1}>Your delivery is coming this Saturday!</Text>
+            <Text style={h1}>{copy.heading}</Text>
+            <Text style={referenceLine}>Order {reference}</Text>
             <Text style={paragraph}>
-              Hi {customerName}, just a reminder that your Rodo &amp; Co order is scheduled for
-              delivery this Saturday. We&apos;re preparing everything fresh for you!
+              Hi {customerName}, {copy.body}
             </Text>
 
-            <Section style={deliveryCallout}>
-              <Text style={deliveryText}>Delivery date: {formatDate(weekOf)}</Text>
+            <Section style={calloutStyle}>
+              <Text style={calloutTextStyle}>{copy.callout}</Text>
             </Section>
 
             {/* Primary action: one-click back into this order's live status */}
             {trackUrl && (
               <Section style={ctaWrap}>
                 <a href={trackUrl} style={ctaButton}>
-                  View your order →
+                  Track your order →
                 </a>
                 <Text style={ctaHint}>
                   Opens your order status — no password needed. Link valid for 7 days.
@@ -181,4 +252,4 @@ export function DeliveryReminderEmail({
   );
 }
 
-export default DeliveryReminderEmail;
+export default OrderStatusUpdateEmail;

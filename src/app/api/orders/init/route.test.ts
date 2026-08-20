@@ -1,6 +1,7 @@
 // src/app/api/orders/init/route.test.ts
 // TDD tests for POST /api/orders/init.
-// Covers: validation, ordering-closed guard, DB insert, Paystack init, response shape, error cases.
+// Covers: validation, ordering-closed guard, DB insert, Paystack init, response
+// shape, the post-checkout order-view grant, error cases.
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
@@ -201,6 +202,7 @@ describe("POST /api/orders/init", () => {
       reference: "RDC-test1234567",
     };
     delete process.env.FLW_SECRET_KEY;
+    process.env.AUTH_SECRET = "test_auth_secret_abc123";
   });
 
   describe("validation", () => {
@@ -404,6 +406,84 @@ describe("POST /api/orders/init", () => {
       const bodyStr = JSON.stringify(body);
       expect(bodyStr).not.toContain("at ");
       expect(bodyStr).not.toContain(".ts:");
+    });
+  });
+
+  // The reference is generated here, so this is the one place a post-checkout
+  // grant can be issued without taking a client-supplied reference on trust.
+  describe("post-checkout view grant", () => {
+    async function grantFrom(res: Awaited<ReturnType<typeof POST>>) {
+      const { verifyOrderViewGrant } = await import("@/lib/orders/orderViewGrant");
+      const cookie = res.cookies.get("order_view_grant");
+      return { cookie, payload: cookie ? verifyOrderViewGrant(cookie.value) : null };
+    }
+
+    it("grants view of exactly the reference it just created", async () => {
+      setupSuccessfulDbSelect();
+      setupSuccessfulDbInsert();
+
+      const res = await POST(makeRequest(validPayload));
+      const body = await res.json();
+      const { cookie, payload } = await grantFrom(res);
+
+      expect(payload).toEqual({ reference: body.reference });
+      expect(cookie?.httpOnly).toBe(true);
+      // One cookie for this order — never one per order the customer owns.
+      expect(res.cookies.getAll()).toHaveLength(1);
+    });
+
+    it("grants view of the fresh reference when a pending order is reused", async () => {
+      setupSuccessfulDbSelect();
+      mockState.pendingReuseResult = {
+        id: "existing-order-id",
+        reference: "RDC-stale-ref",
+        total_ngn: 300000,
+        week_of: "2026-05-03",
+        payment_method: "paystack",
+      };
+
+      const res = await POST(makeRequest(validPayload));
+      const body = await res.json();
+      const { payload } = await grantFrom(res);
+
+      expect(payload).toEqual({ reference: body.reference });
+      expect(payload?.reference).not.toBe("RDC-stale-ref");
+    });
+
+    it("grants view of the reference on the Flutterwave redirect path", async () => {
+      process.env.FLW_SECRET_KEY = "FLWSECK_TEST-abc";
+      setupSuccessfulDbSelect();
+      setupSuccessfulDbInsert();
+
+      const res = await POST(makeRequest({ ...validPayload, provider: "flutterwave" }));
+      const body = await res.json();
+      const { payload } = await grantFrom(res);
+
+      expect(body.redirect_url).toBeDefined();
+      expect(payload).toEqual({ reference: body.reference });
+    });
+
+    it("does not grant view when the gateway call fails", async () => {
+      setupSuccessfulDbSelect();
+      setupSuccessfulDbInsert();
+      mockState.paystackError = new Error("gateway down");
+
+      const res = await POST(makeRequest(validPayload));
+
+      expect(res.status).toBe(503);
+      expect(res.cookies.get("order_view_grant")).toBeUndefined();
+    });
+
+    it("still completes checkout when the grant cannot be signed", async () => {
+      delete process.env.AUTH_SECRET;
+      setupSuccessfulDbSelect();
+      setupSuccessfulDbInsert();
+
+      const res = await POST(makeRequest(validPayload));
+
+      // Worst case is the PII-stripped confirmation view, never a failed order.
+      expect(res.status).toBe(200);
+      expect(res.cookies.get("order_view_grant")).toBeUndefined();
     });
   });
 

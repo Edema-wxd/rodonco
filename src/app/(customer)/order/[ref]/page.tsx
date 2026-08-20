@@ -4,6 +4,8 @@
 // CONF-01: reference textual lookup
 // CONF-02: paid gate — non-paid orders render error state
 // CONF-03: unknown ref renders error state
+// Full detail requires either an `order_session` whose verified email owns the
+// order, or a signed single-order `order_view_grant` from checkout.
 
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -11,6 +13,11 @@ import { getOrderForConfirmation } from "@/lib/orders/getOrderForConfirmation";
 import { markOrderPaid } from "@/lib/orders/markOrderPaid";
 import { verifyPaystackTransaction } from "@/lib/paystack/verifyTransaction";
 import { verifyFlutterwaveTransaction } from "@/lib/flutterwave/verifyTransaction";
+import { verifyOrderSessionToken } from "@/lib/orders/orderSessionToken";
+import {
+  ORDER_VIEW_GRANT_COOKIE,
+  grantCoversReference,
+} from "@/lib/orders/orderViewGrant";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { getSiteSettings } from "@/lib/admin/config";
 import { OrderConfirmationView } from "@/components/order/OrderConfirmationView";
@@ -64,8 +71,6 @@ export default async function OrderConfirmationPage({
     }
   }
 
-  const hasViewCookie = cookieStore.has(`order_view_${ref}`);
-
   const errorVariant =
     data.kind === "pending"
       ? "pending"
@@ -75,8 +80,33 @@ export default async function OrderConfirmationPage({
           ? "not-found"
           : undefined;
 
-  // Strip PII from the view when the viewer didn't arrive via the post-payment redirect
-  const stripped = data.kind === "paid" && !hasViewCookie;
+  // Two ways to earn full detail, both settled server-side. Anyone else — a
+  // guessed reference, a forwarded link — gets the PII-stripped view.
+  //
+  //  1. `order_session`: the magic-link cookie carries an email this app itself
+  //     verified. It unlocks an order only when the DB row says that email
+  //     placed it, so one customer's session can never open another's order.
+  //  2. `order_view_grant`: a signed single-order token minted by
+  //     /api/orders/init for the browser that started this checkout, so a guest
+  //     who just paid sees full detail without an email round-trip.
+  //
+  // Note both are checked against `ref`/the order row rather than being taken
+  // on trust: a cookie is client-controlled, so an unsigned marker naming a
+  // reference would be forgeable for any reference.
+  const sessionToken = cookieStore.get("order_session")?.value;
+  const session = sessionToken ? verifyOrderSessionToken(sessionToken) : null;
+
+  const ownsViaSession =
+    data.kind === "paid" &&
+    session !== null &&
+    session.email.toLowerCase() === data.order.customer_email.toLowerCase();
+
+  const ownsViaGrant = grantCoversReference(
+    cookieStore.get(ORDER_VIEW_GRANT_COOKIE)?.value,
+    ref
+  );
+
+  const stripped = data.kind === "paid" && !ownsViaSession && !ownsViaGrant;
 
   return (
     <OrderConfirmationView
