@@ -42,6 +42,9 @@ export const productPayloadSchema = z
       z.string().max(50).nullable().optional(),
     ),
     is_active: z.boolean(),
+    // Teaser: still listed on the shop, but blurred, labelled "Coming Soon",
+    // and not orderable.
+    coming_soon: z.boolean().default(false),
     images: z.array(productImageSchema).max(5).default([]),
     variants: z.array(variantSchema).max(20),
     prep_options: z.array(prepOptionSchema).max(20),

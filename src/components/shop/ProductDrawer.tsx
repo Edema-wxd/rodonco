@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { OrderingClosedBanner } from "@/components/shop/OrderingClosedBanner";
+import { SideDrawer } from "@/components/ui/SideDrawer";
 import { useCartStore } from "@/store/cart";
 import { useCartUiStore } from "@/store/cartUi";
 import type { PrepOption, Product, ProductVariant } from "@/types";
@@ -48,17 +49,6 @@ export function ProductDrawer({
   const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartUiStore((s) => s.openCart);
-  const [isOpen, setIsOpen] = useState(true);
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 640px)");
-    setIsDesktop(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
   const isKit = product.type === "cooking_kit";
   const isProduce = product.type === "fresh_produce";
 
@@ -99,20 +89,26 @@ export function ProductDrawer({
 
   const subtotalKobo = useMemo(() => unitPriceKobo * quantity, [unitPriceKobo, quantity]);
 
+  // Teaser products are reachable by a direct ?drawer=<id> link, so the drawer
+  // enforces the same rule the card does: preview only, never orderable.
+  const comingSoon = product.coming_soon;
   const selectionSatisfied = (!needsVariant || !!selectedVariant) && (!needsPrep || !!selectedPrep);
-  const canAddToCart = selectionSatisfied && quantity >= 1;
+  const canAddToCart = !comingSoon && selectionSatisfied && quantity >= 1;
 
-  const CLOSE_DELAY = 150;
+  // The cart opens only once this drawer has finished sliding out, so the two
+  // panels hand over cleanly instead of overlapping mid-slide.
+  const openCartOnClose = useRef(false);
 
-  const close = () => {
-    setIsOpen(false);
-    window.setTimeout(() => {
-      if (onRequestClose) return onRequestClose();
-      router.back();
-    }, CLOSE_DELAY);
+  const handleClosed = () => {
+    if (openCartOnClose.current) {
+      openCartOnClose.current = false;
+      openCart();
+    }
+    if (onRequestClose) return onRequestClose();
+    router.back();
   };
 
-  const onAddToCart = () => {
+  const onAddToCart = (close: () => void) => {
     if (!canAddToCart) return;
 
     const variantLabel = isKit ? selectedVariant?.label ?? null : null;
@@ -128,57 +124,24 @@ export function ProductDrawer({
       subtotalNgn: subtotalKobo,
     });
 
-    openCart();
+    openCartOnClose.current = true;
     close();
   };
 
-  const drawerInitial = skipEnterAnimation
-    ? {}
-    : isDesktop
-      ? { x: "100%" }
-      : { y: "100%" };
-  const drawerAnimate = isDesktop ? { x: 0 } : { y: 0 };
-  const drawerExit = isDesktop ? { x: "100%" } : { y: "100%" };
-
   return (
-    <AnimatePresence mode="wait">
-      {isOpen ? (
-        <div className="fixed inset-0 z-[70]">
-          <motion.button
-            type="button"
-            aria-label="Close product drawer"
-            className="absolute inset-0 bg-black/40"
-            onClick={close}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.12, ease: "easeOut" }}
-            style={{ willChange: "opacity" }}
-          />
-
-          <motion.aside
-            role="dialog"
-            aria-modal="true"
-            aria-label={product.name}
-            className={[
-              "absolute bottom-0 left-0 right-0 flex max-h-[92vh] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl",
-              "sm:bottom-auto sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[520px] sm:rounded-none",
-            ].join(" ")}
-            initial={drawerInitial}
-            animate={drawerAnimate}
-            exit={drawerExit}
-            transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={0.05}
-            onDragEnd={(_, info) => {
-              if (info.offset.y > 120 || info.velocity.y > 800) close();
-            }}
-            style={{ willChange: "transform" }}
-          >
-          <div className="flex items-start justify-between gap-4 border-b px-4 py-4">
+    <SideDrawer
+      label={product.name}
+      onClose={handleClosed}
+      backdropLabel="Close product"
+      skipEnterAnimation={skipEnterAnimation}
+    >
+      {(close) => (
+        <>
+          <div className="flex shrink-0 items-start justify-between gap-4 border-b px-4 pb-4 pt-2 sm:pt-4">
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-black/60">Product</p>
+              <p className="text-xs font-semibold text-black/60">
+                {comingSoon ? "Coming soon" : "Product"}
+              </p>
               <h2 className="truncate text-base font-semibold text-black">{product.name}</h2>
               {product.description ? (
                 <p className="mt-1 line-clamp-2 text-sm text-black/70">{product.description}</p>
@@ -195,11 +158,13 @@ export function ProductDrawer({
             </button>
           </div>
 
-          <OrderingClosedBanner
-            isOpen={isOrderingOpen}
-            cutoffMessage={cutoffMessage}
-            nextDeliveryDate={nextDeliveryDate}
-          />
+          {!comingSoon ? (
+            <OrderingClosedBanner
+              isOpen={isOrderingOpen}
+              cutoffMessage={cutoffMessage}
+              nextDeliveryDate={nextDeliveryDate}
+            />
+          ) : null}
 
           <div className="flex-1 overflow-auto px-4 py-4">
             <div className="space-y-6">
@@ -211,16 +176,33 @@ export function ProductDrawer({
                       src={activeImageUrl}
                       alt={product.name}
                       loading="lazy"
-                      className="absolute inset-0 h-full w-full object-cover"
+                      aria-hidden={comingSoon || undefined}
+                      className={[
+                        "absolute inset-0 h-full w-full object-cover",
+                        comingSoon ? "scale-105 blur-md saturate-[0.85]" : "",
+                      ].join(" ")}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.25 }}
                     />
                   </AnimatePresence>
+                  {comingSoon ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/25">
+                      <span className="rounded-full bg-zinc-900/85 px-5 py-2 text-xs font-black uppercase tracking-widest text-white backdrop-blur-sm">
+                        Coming Soon
+                      </span>
+                    </div>
+                  ) : null}
                 </div>
               )}
-              {isKit ? (
+              {comingSoon ? (
+                <p className="text-sm text-black/70">
+                  This one isn’t on the menu yet — we’re still prepping it. Check back soon.
+                </p>
+              ) : null}
+
+              {!comingSoon && isKit ? (
                 <section>
                   <h3 className="text-sm font-semibold text-black">Choose a size</h3>
                   {variants.length === 0 ? (
@@ -255,7 +237,7 @@ export function ProductDrawer({
                 </section>
               ) : null}
 
-              {prepOptions.length > 0 ? (
+              {!comingSoon && prepOptions.length > 0 ? (
                 <section>
                   <h3 className="text-sm font-semibold text-black">Choose a prep option</h3>
                   <div className="mt-3 grid grid-cols-1 gap-2">
@@ -286,6 +268,7 @@ export function ProductDrawer({
                 </section>
               ) : null}
 
+              {!comingSoon ? (
               <section className="rounded-2xl border bg-white p-4">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-sm font-semibold text-black">Quantity</p>
@@ -319,7 +302,9 @@ export function ProductDrawer({
                   </p>
                 ) : null}
               </section>
+              ) : null}
 
+              {!comingSoon ? (
               <section className="rounded-2xl border bg-white p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold text-black">Subtotal</p>
@@ -327,37 +312,39 @@ export function ProductDrawer({
                 </div>
                 <p className="mt-1 text-xs text-black/60">Subtotal only (unit price is implied).</p>
               </section>
+              ) : null}
             </div>
           </div>
 
-          <div className="border-t px-4 py-4">
+          <div className="shrink-0 border-t px-4 py-4">
             <button
               type="button"
               className={[
                 "w-full rounded-2xl px-4 py-3 text-center text-sm font-semibold sm:py-3.5",
                 canAddToCart ? "bg-black text-white hover:bg-black/90" : "bg-gray-100 text-gray-500",
               ].join(" ")}
-              onClick={onAddToCart}
+              onClick={() => onAddToCart(close)}
               disabled={!canAddToCart}
               title={
-                !selectionSatisfied
-                  ? "Select the required option to add to cart"
-                  : undefined
+                comingSoon
+                  ? "This product isn’t available to order yet"
+                  : !selectionSatisfied
+                    ? "Select the required option to add to cart"
+                    : undefined
               }
             >
-              Add to cart
+              {comingSoon ? "Coming soon" : "Add to cart"}
             </button>
 
-            {!isOrderingOpen ? (
+            {!isOrderingOpen && !comingSoon ? (
               <p className="mt-2 text-center text-xs text-black/60">
                 Ordering is currently closed — items added now will be saved for when ordering reopens.
               </p>
             ) : null}
           </div>
-          </motion.aside>
-        </div>
-      ) : null}
-    </AnimatePresence>
+        </>
+      )}
+    </SideDrawer>
   );
 }
 

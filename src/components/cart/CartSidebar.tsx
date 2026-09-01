@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
 import { OrderingClosedBanner } from "@/components/shop/OrderingClosedBanner";
+import { SideDrawer } from "@/components/ui/SideDrawer";
 import { useCartStore } from "@/store/cart";
 import { useCartUiStore } from "@/store/cartUi";
 
@@ -41,49 +41,19 @@ export function CartSidebar({
 
   const isViewOnly = !isOrderingOpen;
 
-  const [isDesktop, setIsDesktop] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 640px)");
-    setIsDesktop(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  const drawerInitial = isDesktop ? { x: "100%" } : { y: "100%" };
-  const drawerAnimate = isDesktop ? { x: 0 } : { y: 0 };
-  const drawerExit = isDesktop ? { x: "100%" } : { y: "100%" };
+  if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[60]">
-          <motion.button
-            type="button"
-            aria-label="Close cart"
-            className="absolute inset-0 bg-black/40"
-            onClick={closeCart}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.12, ease: "easeOut" }}
-          />
-
-          <motion.aside
-            role="dialog"
-            aria-modal="true"
-            aria-label="Cart"
-            className={[
-              "absolute bottom-0 left-0 right-0 flex max-h-[85vh] flex-col overflow-hidden rounded-t-2xl bg-card shadow-2xl",
-              "sm:bottom-auto sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[420px] sm:rounded-none",
-            ].join(" ")}
-            initial={drawerInitial}
-            animate={drawerAnimate}
-            exit={drawerExit}
-            transition={{ duration: 0.15, ease: [0.32, 0.72, 0, 1] }}
-            style={{ willChange: "transform" }}
-          >
-        <div className="flex items-center justify-between border-b border-border px-4 py-4">
+    <SideDrawer
+      label="Cart"
+      onClose={closeCart}
+      backdropLabel="Close cart"
+      widthClass="sm:w-[420px] sm:max-w-[calc(100vw-2.5rem)]"
+      zIndexClass="z-[60]"
+    >
+      {(close) => (
+        <>
+        <div className="flex shrink-0 items-center justify-between border-b border-border px-4 pb-4 pt-2 sm:pt-4">
           <div>
             <p className="font-heading text-lg italic text-foreground">Your cart</p>
             <p className="mt-0.5 text-xs text-muted-foreground">{items.length} item(s)</p>
@@ -91,7 +61,7 @@ export function CartSidebar({
           <button
             type="button"
             className="inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary transition-colors"
-            onClick={closeCart}
+            onClick={close}
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -193,7 +163,7 @@ export function CartSidebar({
           )}
         </div>
 
-        <div className="border-t px-4 py-4">
+        <div className="shrink-0 border-t px-4 py-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-black">Subtotal</p>
             <p className="text-sm font-semibold text-black">{formatNgn(subtotalKobo)}</p>
@@ -201,7 +171,7 @@ export function CartSidebar({
           <p className="mt-1 text-xs text-black/60">Flat ₦1,000 delivery fee (selected areas only)</p>
           <Link
             href="/checkout"
-            onClick={closeCart}
+            onClick={close}
             className={[
               "mt-4 flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition-colors sm:py-3.5",
               items.length > 0 && !isViewOnly
@@ -214,10 +184,9 @@ export function CartSidebar({
             {isViewOnly ? "Ordering closed" : "Checkout"}
           </Link>
         </div>
-          </motion.aside>
-        </div>
+        </>
       )}
-    </AnimatePresence>
+    </SideDrawer>
   );
 }
 

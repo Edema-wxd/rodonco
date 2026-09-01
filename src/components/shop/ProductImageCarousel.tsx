@@ -7,9 +7,11 @@ type Props = {
   images: { url: string }[];
   alt: string;
   className?: string;
+  /** Teaser mode: blur the image and hide the browsing controls. */
+  blurred?: boolean;
 };
 
-export function ProductImageCarousel({ images, alt, className = "" }: Props) {
+export function ProductImageCarousel({ images, alt, className = "", blurred = false }: Props) {
   const [current, setCurrent] = React.useState(0);
 
   const prev = () => setCurrent((c) => (c - 1 + images.length) % images.length);
@@ -32,10 +34,25 @@ export function ProductImageCarousel({ images, alt, className = "" }: Props) {
         src={images[current].url}
         alt={images.length > 1 ? `${alt} — ${current + 1} of ${images.length}` : alt}
         loading={current === 0 ? "eager" : "lazy"}
-        className="h-full w-full object-cover transition-opacity duration-200"
+        aria-hidden={blurred || undefined}
+        className={[
+          "h-full w-full object-cover transition-opacity duration-200",
+          blurred ? "scale-105 blur-lg saturate-[0.85]" : "",
+        ].join(" ")}
       />
 
-      {images.length > 1 && (
+      {blurred && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/25">
+          <span
+            className="rounded-full bg-zinc-900/85 px-6 py-2.5 text-xs font-black uppercase tracking-widest text-white backdrop-blur-sm"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            Coming Soon
+          </span>
+        </div>
+      )}
+
+      {!blurred && images.length > 1 && (
         <>
           {/* Prev */}
           <button

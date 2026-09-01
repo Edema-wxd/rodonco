@@ -23,6 +23,8 @@ export interface Product {
   image_url: string | null;
   images: ProductImage[];
   is_active: boolean;
+  /** Teaser: shown blurred with a "Coming Soon" label, not orderable. */
+  coming_soon: boolean;
   created_at: string;
 }
 

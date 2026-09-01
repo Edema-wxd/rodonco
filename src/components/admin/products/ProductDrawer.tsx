@@ -18,6 +18,7 @@ const EMPTY_DEFAULTS: ProductPayload = {
   type: "fresh_produce",
   category: null,
   is_active: true,
+  coming_soon: false,
   images: [],
   variants: [],
   prep_options: [],
@@ -87,6 +88,7 @@ export function ProductDrawer({
             type: product.type as ProductPayload["type"],
             category: product.category ?? null,
             is_active: product.is_active,
+            coming_soon: product.coming_soon,
             images: product.images.map((img) => ({
               id: img.id,
               url: img.url,
@@ -329,6 +331,35 @@ export function ProductDrawer({
                   }
                   className="h-4 w-4 accent-red-600"
                 />
+              </div>
+
+              {/* Coming Soon toggle */}
+              <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="prod-coming-soon"
+                    className="text-sm font-bold text-zinc-800"
+                    style={{ fontFamily: "var(--font-quicksand)" }}
+                  >
+                    Coming soon (teaser)
+                  </label>
+                  <input
+                    id="prod-coming-soon"
+                    type="checkbox"
+                    checked={form.watch("coming_soon")}
+                    onChange={(e) =>
+                      form.setValue("coming_soon", e.target.checked, { shouldDirty: true })
+                    }
+                    className="h-4 w-4 accent-red-600"
+                  />
+                </div>
+                <p
+                  className="mt-1 text-xs text-stone-500"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                >
+                  Stays on the shop with a blurred image and a “Coming Soon” label — customers
+                  can’t add it to an order.
+                </p>
               </div>
 
               {/* Size Variants */}

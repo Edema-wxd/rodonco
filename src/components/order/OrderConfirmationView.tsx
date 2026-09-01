@@ -271,7 +271,7 @@ const NEXT_STEPS = [
   {
     icon: Mail,
     label: "Confirmation email sent",
-    description: "Check your inbox — we've sent your order receipt with full details.",
+    description: "Check your inbox. Your order receipt is waiting for you.",
     done: true,
   },
   {
@@ -283,7 +283,8 @@ const NEXT_STEPS = [
   {
     icon: Truck,
     label: "Delivered to your door",
-    description: "We'll deliver on the date shown below. No need to be home — leave delivery instructions if needed.",
+    description:
+      "Your order will be delivered this Saturday. If you won't be home, please leave clear delivery instructions for our delivery team.",
     done: false,
   },
 ];
@@ -482,16 +483,10 @@ function ConfirmedOrder({ order, items, nextDeliveryDate, contactEmail, whatsapp
         {/* ── Support footer ── */}
         <div className="rounded-xl border bg-muted/40 px-5 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold">Questions or need to change something?</p>
+            <p className="text-sm font-semibold">Need to make a change to your order?</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Message us on WhatsApp or email{" "}
-              <a
-                href={`mailto:${contactEmail}`}
-                className="underline underline-offset-2 text-foreground"
-              >
-                {contactEmail}
-              </a>{" "}
-              as soon as possible — changes can only be made before preparation begins.
+              Please reach out to us before Thursday night. Changes cannot be
+              accommodated after this deadline.
             </p>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">

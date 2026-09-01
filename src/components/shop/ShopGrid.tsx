@@ -1,6 +1,7 @@
 import { getActiveProductsWithStartingPriceForShop } from "@/lib/shop/products";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { OrderingClosedBanner } from "@/components/shop/OrderingClosedBanner";
+import { OrderingSchedule } from "@/components/shop/OrderingSchedule";
 import { ShopContent } from "@/components/shop/ShopContent";
 
 export default async function ShopGrid() {
@@ -36,7 +37,8 @@ export default async function ShopGrid() {
             Choose your kits and produce for the week. Tap any item to select options, then add it to your order.
           </p>
         </div>
-   
+
+        <OrderingSchedule />
 
         <ShopContent freshProduce={freshProduce} cookingKits={cookingKits} />
       </div>

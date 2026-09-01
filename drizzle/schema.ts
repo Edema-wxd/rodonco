@@ -24,6 +24,9 @@ export const products = pgTable("products", {
   category: text("category"), // 'vegetable' | 'tuber' | 'herb_spice' | 'legume' — null for kits
   image_url: text("image_url"),
   is_active: boolean("is_active").notNull().default(true),
+  // Teaser flag: product stays listed but is blurred, labelled "Coming Soon",
+  // and cannot be added to an order.
+  coming_soon: boolean("coming_soon").notNull().default(false),
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

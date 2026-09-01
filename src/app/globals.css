@@ -146,6 +146,59 @@
   .waitlist-rise { opacity: 0; animation: waitlist-rise 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
 }
 
+/* ── Side drawer (product pop-up, cart) ───────────────────────────────────
+   One source of truth for where a drawer rests and how it moves. The slide
+   axis is resolved by the browser from the viewport — a bottom sheet under
+   640px, a right-hand panel above it — so the panel can never be caught
+   mid-swap between two axes the way a JS-measured breakpoint can. */
+
+@keyframes drawer-enter-y { from { transform: translateY(100%); } }
+@keyframes drawer-enter-x { from { transform: translateX(100%); } }
+@keyframes drawer-backdrop-in { from { opacity: 0; } }
+
+.drawer-panel {
+  transform: translateY(var(--drawer-drag, 0px));
+  transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+  animation: drawer-enter-y 260ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+
+/* A dragging finger sets the position directly; easing would lag behind it. */
+.drawer-panel[data-dragging="true"] { transition: none; }
+
+/* The panel is already on screen (a skeleton held its place) — don't re-slide. */
+.drawer-panel[data-enter="skip"] { animation: none; }
+
+.drawer-panel[data-state="closed"] {
+  animation: none;
+  transform: translateY(100%);
+}
+
+@media (min-width: 640px) {
+  .drawer-panel {
+    transform: none;
+    animation-name: drawer-enter-x;
+  }
+  .drawer-panel[data-state="closed"] { transform: translateX(100%); }
+}
+
+.drawer-backdrop {
+  animation: drawer-backdrop-in 160ms ease-out;
+  transition: opacity 160ms ease-out;
+}
+.drawer-backdrop[data-enter="skip"] { animation: none; }
+.drawer-backdrop[data-state="closed"] { animation: none; opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-panel,
+  .drawer-panel[data-state="closed"],
+  .drawer-backdrop,
+  .drawer-backdrop[data-state="closed"] {
+    animation-duration: 1ms;
+    transition-duration: 1ms;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

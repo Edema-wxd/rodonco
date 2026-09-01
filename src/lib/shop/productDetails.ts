@@ -56,6 +56,7 @@ export async function getProductDetailsById(productId: string): Promise<ProductD
           image_url: productRow.image_url ?? null,
           images: imageRows.map((r) => ({ url: r.url })),
           is_active: productRow.is_active,
+          coming_soon: productRow.coming_soon,
           created_at: toIsoString(productRow.created_at),
         },
         variants: variantRows.map((v) => ({
@@ -73,7 +74,7 @@ export async function getProductDetailsById(productId: string): Promise<ProductD
         })),
       };
     },
-    ["shop-product-details-v1", productId],
+    ["shop-product-details-v2", productId],
     { tags: ["shop-products"] },
   )();
 }

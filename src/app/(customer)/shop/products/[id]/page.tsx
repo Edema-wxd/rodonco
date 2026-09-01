@@ -43,6 +43,7 @@ export default async function ProductPage({
   }
 
   const hasChoices = details.variants.length > 0 || details.prepOptions.length > 0;
+  const comingSoon = details.product.coming_soon;
 
   return (
     <div className="bg-stone-100 py-16 sm:py-20">
@@ -63,6 +64,7 @@ export default async function ProductPage({
               images={details.product.images}
               alt={details.product.name}
               className="h-[420px] w-full"
+              blurred={comingSoon}
             />
           </div>
 
@@ -79,27 +81,40 @@ export default async function ProductPage({
 
             <div className="mt-8 rounded-[32px] bg-white p-8 outline outline-1 outline-stone-200/50">
               <p className="text-xs font-black uppercase tracking-wider text-stone-500" style={{ fontFamily: "var(--font-quicksand)" }}>
-                Ordering
+                {comingSoon ? "Coming soon" : "Ordering"}
               </p>
               <p className="mt-2 text-sm text-stone-600" style={{ fontFamily: "var(--font-inter)" }}>
-                {ordering.is_ordering_open ? "Open now" : "Closed right now"}.
+                {comingSoon
+                  ? "This one isn’t on the menu yet — we’re still prepping it. Check back soon."
+                  : `${ordering.is_ordering_open ? "Open now" : "Closed right now"}.`}
               </p>
 
               <div className="mt-6">
-                <Link
-                  href={`/shop?drawer=${encodeURIComponent(details.product.id)}`}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-stone-100 py-4 text-base font-bold text-zinc-800 transition-colors hover:bg-stone-200"
-                  style={{ fontFamily: "var(--font-quicksand)" }}
-                >
-                  {hasChoices ? "Choose options & add to order" : "Add to order"}
-                </Link>
-                <p className="mt-2 text-xs text-stone-600" style={{ fontFamily: "var(--font-inter)" }}>
-                  Opens the sidebar to select quantity and options.
-                </p>
+                {comingSoon ? (
+                  <p
+                    className="w-full rounded-full bg-stone-50 py-4 text-center text-base font-bold text-stone-400"
+                    style={{ fontFamily: "var(--font-quicksand)" }}
+                  >
+                    Coming Soon
+                  </p>
+                ) : (
+                  <>
+                    <Link
+                      href={`/shop?drawer=${encodeURIComponent(details.product.id)}`}
+                      className="inline-flex w-full items-center justify-center rounded-full bg-stone-100 py-4 text-base font-bold text-zinc-800 transition-colors hover:bg-stone-200"
+                      style={{ fontFamily: "var(--font-quicksand)" }}
+                    >
+                      {hasChoices ? "Choose options & add to order" : "Add to order"}
+                    </Link>
+                    <p className="mt-2 text-xs text-stone-600" style={{ fontFamily: "var(--font-inter)" }}>
+                      Opens the sidebar to select quantity and options.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
-            {(details.variants.length > 0 || details.prepOptions.length > 0) && (
+            {!comingSoon && (details.variants.length > 0 || details.prepOptions.length > 0) && (
               <div className="mt-10 space-y-6">
                 {details.variants.length > 0 ? (
                   <section>

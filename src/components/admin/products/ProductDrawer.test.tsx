@@ -25,6 +25,7 @@ function makeProduct(partial: Partial<AdminProduct> & Pick<AdminProduct, "id" | 
     type: partial.type ?? "fresh_produce",
     category: partial.category ?? null,
     is_active: partial.is_active ?? true,
+    coming_soon: partial.coming_soon ?? false,
     images: partial.images ?? [],
     variants: partial.variants ?? [],
     prep_options: partial.prep_options ?? [],

@@ -16,9 +16,9 @@ const quicksand = Quicksand({
 });
 
 export const metadata: Metadata = {
-  title: "rodo&co — Nigeria's First High-Fidelity Meal Prep",
+  title: "rodo&co — Preps fresh produce + ready-to-cook kits in Lagos",
   description:
-    "Premium prepped ingredients and chef-crafted sauces delivered to your door. From stovetop to table in under 15 minutes.",
+    "Shop fresh produce prepped your way and ready-to-cook kits in Lagos. Rodo & Co. makes meal prep easier with clean, sorted and prepped ingredients delivered to you.",
 };
 
 export default function RootLayout({

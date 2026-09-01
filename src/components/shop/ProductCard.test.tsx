@@ -43,6 +43,7 @@ function makeProduct(partial: Partial<Product> & Pick<Product, "id" | "name">): 
     image_url: partial.image_url ?? null,
     images: partial.images ?? [],
     is_active: partial.is_active ?? true,
+    coming_soon: partial.coming_soon ?? false,
     created_at: partial.created_at ?? new Date(0).toISOString(),
   };
 }
@@ -63,6 +64,29 @@ describe("ProductCard", () => {
 
     fireEvent.click(ctaButton);
     expect(mockReplace).toHaveBeenCalledWith(`/shop?drawer=${product.id}`, { scroll: false });
+  });
+
+  it("renders a coming-soon product as an inert, blurred teaser", () => {
+    const product = makeProduct({
+      id: "p2",
+      name: "Egusi Kit",
+      coming_soon: true,
+      images: [{ url: "https://example.com/egusi.jpg" }],
+    });
+
+    const { container } = render(<ProductCard product={product} startingPriceNgn={5_000} />);
+
+    // Teaser label replaces the price and the Add to Order CTA.
+    expect(screen.getAllByText("Coming Soon").length).toBeGreaterThan(0);
+    expect(screen.queryByText("From ₦5,000")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Add to Order" })).toBeNull();
+
+    // Nothing on the card routes anywhere.
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
+
+    // The image is blurred.
+    const img = container.querySelector('img[src="https://example.com/egusi.jpg"]');
+    expect(img?.className).toContain("blur-md");
   });
 });
 

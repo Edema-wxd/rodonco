@@ -30,10 +30,11 @@ export async function getActiveProductsForShop(): Promise<Product[]> {
         image_url: row.image_url ?? null,
         images: [],
         is_active: row.is_active,
+        coming_soon: row.coming_soon,
         created_at: toIsoString(row.created_at),
       }));
     },
-    ["shop-active-products-v1"],
+    ["shop-active-products-v2"],
     { tags: ["shop-products"] },
   )();
 }
@@ -62,6 +63,7 @@ export async function getActiveProductsWithStartingPriceForShop(): Promise<
         image_url: row.image_url ?? null,
         images: [],
         is_active: row.is_active,
+        coming_soon: row.coming_soon,
         created_at: toIsoString(row.created_at),
       }));
 
@@ -102,7 +104,7 @@ export async function getActiveProductsWithStartingPriceForShop(): Promise<
 
       return products.map((product) => {
         const startingPrice = priceByProductId.get(product.id);
-        if (startingPrice == null) {
+        if (startingPrice == null && !product.coming_soon) {
           console.error(
             `[getActiveProductsWithStartingPriceForShop] Missing variants for product_id=${product.id}; defaulting starting_price_ngn=0`,
           );
@@ -115,7 +117,7 @@ export async function getActiveProductsWithStartingPriceForShop(): Promise<
         };
       });
     },
-    ["shop-active-products-with-price-v1"],
+    ["shop-active-products-with-price-v2"],
     { tags: ["shop-products"] },
   )();
 }

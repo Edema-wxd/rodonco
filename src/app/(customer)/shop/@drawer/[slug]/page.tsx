@@ -1,6 +1,11 @@
 import Link from "next/link";
 
 import { ProductDrawer } from "@/components/shop/ProductDrawer";
+import {
+  DRAWER_BACKDROP_CLASS,
+  DRAWER_ROOT_CLASS,
+  drawerPanelClass,
+} from "@/components/ui/drawerPanel";
 import { getOrderingConfig } from "@/lib/shop/orderingConfig";
 import { getProductDetailsById } from "@/lib/shop/productDetails";
 
@@ -15,18 +20,15 @@ export default async function DrawerPage({
 
   if (!details) {
     return (
-      <div className="fixed inset-0 z-[70]">
-        <div className="absolute inset-0 bg-black/40" />
+      <div className={`${DRAWER_ROOT_CLASS} z-[70]`}>
+        <div className={DRAWER_BACKDROP_CLASS} />
         <aside
           role="dialog"
           aria-modal="true"
           aria-label="Product not found"
-          className={[
-            "absolute bottom-0 left-0 right-0 flex max-h-[70vh] flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl",
-            "sm:bottom-auto sm:left-auto sm:right-0 sm:top-0 sm:h-full sm:max-h-none sm:w-[520px] sm:rounded-none",
-          ].join(" ")}
+          className={drawerPanelClass()}
         >
-          <div className="flex items-center justify-between border-b px-4 py-4">
+          <div className="flex shrink-0 items-center justify-between border-b px-4 py-4">
             <p className="text-sm font-semibold text-black">Product not found</p>
             <Link
               href="/shop"

@@ -54,6 +54,43 @@ const testimonials = [
     cardBg: "bg-green-300/20",
     stars: false,
   },
+  {
+    quote:
+      '"It\'s very user-friendly, and I really love that you guys added the option for known allergies. That was a really nice addition."',
+    name: "Motun",
+    role: "",
+    avatarBg: "bg-red-700",
+    cardBg: "bg-stone-100",
+    stars: false,
+  },
+  {
+    quote:
+      '"I love it so much. I like that I get to see pictures of the quantity and what it looks like whole and sliced. The whole process was seamless."',
+    name: "Adesewa",
+    role: "",
+    avatarBg: "bg-green-800",
+    cardBg: "bg-white",
+    stars: false,
+    outlined: true,
+  },
+  {
+    quote:
+      '"It\'s very seamless and easy to navigate. I love the website font too. It feels oddly personal, like I\'m interacting with people instead of a machine."',
+    name: "Boluwaduro",
+    role: "",
+    avatarBg: "bg-fuchsia-300",
+    cardBg: "bg-green-300/20",
+    stars: false,
+  },
+  {
+    quote:
+      '"The allergy options at checkout were the highlight for me. I also love how easy and straightforward the whole process is."',
+    name: "Tolulope",
+    role: "",
+    avatarBg: "bg-red-400",
+    cardBg: "bg-stone-100",
+    stars: false,
+  },
 ] as const;
 
 export function Testimonials() {

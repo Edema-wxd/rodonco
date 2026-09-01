@@ -32,6 +32,7 @@ export type AdminProduct = {
   type: string;
   category: string | null;
   is_active: boolean;
+  coming_soon: boolean;
   images: AdminProductImage[];
   variants: AdminProductVariant[];
   prep_options: AdminProductPrepOption[];
@@ -73,6 +74,7 @@ export async function getAdminProducts(): Promise<AdminProduct[]> {
     type: p.type,
     category: p.category ?? null,
     is_active: p.is_active,
+    coming_soon: p.coming_soon,
     images: imagesByProduct.get(p.id) ?? [],
     variants: variantsByProduct.get(p.id) ?? [],
     prep_options: prepByProduct.get(p.id) ?? [],

@@ -33,7 +33,8 @@ export async function POST(req: Request) {
     );
   }
 
-  const { name, description, type, category, is_active, images, variants, prep_options } = parsed.data;
+  const { name, description, type, category, is_active, coming_soon, images, variants, prep_options } =
+    parsed.data;
   const primaryImageUrl = images[0]?.url ?? null;
 
   const [created] = await db
@@ -45,6 +46,7 @@ export async function POST(req: Request) {
       category: type === "fresh_produce" ? category ?? null : null,
       image_url: primaryImageUrl,
       is_active,
+      coming_soon,
     })
     .returning({ id: products.id });
 

@@ -151,6 +151,14 @@ export function ProductsList({ initialProducts }: { initialProducts: AdminProduc
                     >
                       {p.name}
                     </span>
+                    {p.coming_soon ? (
+                      <span
+                        className="ml-2 inline-flex rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800"
+                        style={{ fontFamily: "var(--font-quicksand)" }}
+                      >
+                        Coming soon
+                      </span>
+                    ) : null}
                   </td>
                   <td className="px-6 py-4">
                     <span

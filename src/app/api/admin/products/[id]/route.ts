@@ -38,7 +38,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   }
 
   const { id } = await params;
-  const { name, description, type, category, is_active, images, variants, prep_options } = parsed.data;
+  const { name, description, type, category, is_active, coming_soon, images, variants, prep_options } =
+    parsed.data;
   const primaryImageUrl = images[0]?.url ?? null;
 
   // Update core product fields
@@ -51,6 +52,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       category: type === "fresh_produce" ? category ?? null : null,
       image_url: primaryImageUrl,
       is_active,
+      coming_soon,
     })
     .where(eq(products.id, id));
 

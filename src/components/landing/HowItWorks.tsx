@@ -7,7 +7,8 @@ const steps = [
     number: "01",
     color: "text-red-700",
     title: "Choose Your Ingredients",
-    description: "Browse fresh produce or ready-to-cook kits.",
+    description:
+      "Browse fresh produce or ready-to-cook kits from Monday through Thursday.",
     accent: "bg-red-700",
   },
   {
@@ -15,7 +16,7 @@ const steps = [
     color: "text-green-800",
     title: "Freshly Prepped",
     description:
-      "Your ingredients arrive cleaned, sorted, and ready for your selected prep style.",
+      "Your ingredients arrive on Saturday, cleaned, sorted, and prepped your way.",
     accent: "bg-green-800",
   },
   {
