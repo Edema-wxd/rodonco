@@ -22,7 +22,7 @@ export default async function ShopGrid() {
       />
 
       <div className="mx-auto max-w-7xl px-8">
-        <div className="mx-auto mb-14 max-w-2xl text-center hidden sm:flex">
+        <div className="mx-auto mb-14 max-w-2xl text-center hidden sm:block">
       
           <h1
             className="mt-6 text-2xl sm:text-3xl md:text-5xl font-black text-zinc-800"

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { MENU_PREVIEW_MAX_PRODUCTS } from "@/lib/homepage/menuPreviewShared";
+
 const emptyStringToUndefined = (v: unknown) =>
   typeof v === "string" && v.trim() === "" ? undefined : v;
 
@@ -98,6 +100,33 @@ export const siteSettingsPatchSchema = z
   );
 
 export type SiteSettingsPatch = z.infer<typeof siteSettingsPatchSchema>;
+
+const menuPreviewText = (max: number) => z.string().trim().min(1, "Required").max(max);
+
+export const menuPreviewPatchSchema = z
+  .object({
+    is_visible: z.boolean(),
+    heading: menuPreviewText(80),
+    heading_accent: z.string().trim().max(40),
+    subheading: z.string().trim().max(240),
+    card_button_label: menuPreviewText(30),
+    cta_label: menuPreviewText(40),
+    cta_href: z
+      .string()
+      .trim()
+      .max(300)
+      .refine(
+        (v) => (v.startsWith("/") && !v.startsWith("//")) || /^https?:\/\/\S+$/.test(v),
+        "Link must be a site path like /shop or a full http(s) URL",
+      ),
+    product_ids: z
+      .array(z.string().uuid())
+      .max(MENU_PREVIEW_MAX_PRODUCTS, `Pick at most ${MENU_PREVIEW_MAX_PRODUCTS} products`)
+      .refine((ids) => new Set(ids).size === ids.length, "Duplicate products"),
+  })
+  .strict();
+
+export type MenuPreviewPatch = z.infer<typeof menuPreviewPatchSchema>;
 
 export const bulkStatusTransitionSchema = z
   .object({

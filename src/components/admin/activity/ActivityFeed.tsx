@@ -69,6 +69,11 @@ const ACTION_META: Record<string, ActionMeta> = {
     color: "text-stone-600 bg-stone-100",
     label: () => "Updated site settings",
   },
+  "settings.homepage_updated": {
+    Icon: Lucide.LayoutTemplate,
+    color: "text-stone-600 bg-stone-100",
+    label: () => "Updated homepage content",
+  },
   "system.payment_amount_mismatch": {
     Icon: Lucide.AlertOctagon,
     color: "text-red-600 bg-red-50",

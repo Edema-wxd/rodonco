@@ -4,9 +4,12 @@ import { auth } from "@/auth";
 import { ContactSettingsForm } from "@/components/admin/settings/ContactSettingsForm";
 import { DeliveryConfigForm } from "@/components/admin/settings/DeliveryConfigForm";
 import { DeliveryZonesForm } from "@/components/admin/settings/DeliveryZonesForm";
+import { MenuPreviewForm } from "@/components/admin/settings/MenuPreviewForm";
 import { OrderingToggle } from "@/components/admin/settings/OrderingToggle";
 import { ReminderForm } from "@/components/admin/settings/ReminderForm";
 import { getOrderingConfig, getSiteSettings } from "@/lib/admin/config";
+import { getCachedMenuPreviewConfig } from "@/lib/homepage/menuPreview";
+import { getActiveProductsForShop } from "@/lib/shop/products";
 
 export const dynamic = "force-dynamic";
 
@@ -28,9 +31,11 @@ export default async function AdminSettingsPage() {
   const session = await auth();
   if (!session?.user) redirect("/admin");
 
-  const [config, siteSettings] = await Promise.all([
+  const [config, siteSettings, menuPreview, activeProducts] = await Promise.all([
     getOrderingConfig(),
     getSiteSettings(),
+    getCachedMenuPreviewConfig(),
+    getActiveProductsForShop(),
   ]);
 
   return (
@@ -72,6 +77,20 @@ export default async function AdminSettingsPage() {
             />
             <DeliveryZonesForm initialZones={config.delivery_zones} />
           </div>
+        </section>
+
+        {/* ── Section: Homepage ── */}
+        <section>
+          <SectionLabel>Homepage</SectionLabel>
+          <MenuPreviewForm
+            initialConfig={menuPreview}
+            products={activeProducts.map((p) => ({
+              id: p.id,
+              name: p.name,
+              type: p.type,
+              coming_soon: p.coming_soon,
+            }))}
+          />
         </section>
 
         {/* ── Section: Contact ── */}

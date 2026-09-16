@@ -17,6 +17,7 @@ export type ActivityAction =
   | "product.deleted"
   | "settings.ordering_config_updated"
   | "settings.site_settings_updated"
+  | "settings.homepage_updated"
   | "abandoned_cart.marked_contacted"
   | "abandoned_cart.marked_not_contacted"
   | "abandoned_cart.deleted"

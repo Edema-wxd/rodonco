@@ -11,27 +11,31 @@ const schedule = [
  */
 export function OrderingSchedule() {
   return (
-    <div className="mb-10 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-      {schedule.map(({ icon: Icon, label, value }) => (
-        <div
-          key={label}
-          className="flex items-center gap-2 rounded-full bg-white px-4 py-2 outline outline-1 outline-stone-200"
-        >
-          <Icon className="h-4 w-4 shrink-0 text-stone-400" aria-hidden="true" />
-          <span
-            className="text-[10px] font-bold uppercase tracking-widest text-stone-400"
-            style={{ fontFamily: "var(--font-quicksand)" }}
-          >
-            {label}
-          </span>
-          <span
-            className="text-xs font-bold text-zinc-800 sm:text-sm"
-            style={{ fontFamily: "var(--font-quicksand)" }}
-          >
-            {value}
-          </span>
-        </div>
-      ))}
+    <div className="mb-10 flex justify-center">
+      <div className="flex items-center rounded-full bg-white px-3.5 py-2.5 shadow-sm outline outline-1 outline-stone-200 sm:px-6">
+        {schedule.map(({ icon: Icon, label, value }, i) => (
+          <div key={label} className="flex items-center">
+            {i > 0 && (
+              <span className="mx-3 h-5 w-px bg-stone-200 sm:mx-5" aria-hidden="true" />
+            )}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Icon className="hidden h-4 w-4 shrink-0 text-stone-400 min-[400px]:block" aria-hidden="true" />
+              <span
+                className="text-[10px] font-bold uppercase tracking-wider text-stone-400 sm:tracking-widest"
+                style={{ fontFamily: "var(--font-quicksand)" }}
+              >
+                {label}
+              </span>
+              <span
+                className="whitespace-nowrap text-xs font-bold text-zinc-800 sm:text-sm"
+                style={{ fontFamily: "var(--font-quicksand)" }}
+              >
+                {value}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

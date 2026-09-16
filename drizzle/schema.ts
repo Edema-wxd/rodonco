@@ -133,6 +133,26 @@ export const site_settings = pgTable("site_settings", {
 });
 
 // ============================================================
+// HOMEPAGE MENU PREVIEW (single-row table — id always 1)
+// Admin-editable "Ready for the Pot." section. product_ids is an ordered
+// array of product UUIDs; empty means "first 3 active cooking kits".
+// ============================================================
+export const homepage_menu_preview = pgTable("homepage_menu_preview", {
+  id: integer("id").primaryKey().default(1),
+  is_visible: boolean("is_visible").notNull().default(true),
+  heading: text("heading").notNull().default("Ready for the"),
+  heading_accent: text("heading_accent").notNull().default("Pot."),
+  subheading: text("subheading")
+    .notNull()
+    .default("Check out our curated kits, prepped to make cooking easier."),
+  card_button_label: text("card_button_label").notNull().default("Add to Box"),
+  cta_label: text("cta_label").notNull().default("View All Products"),
+  cta_href: text("cta_href").notNull().default("/shop"),
+  product_ids: jsonb("product_ids").notNull().default([]),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ============================================================
 // ADMINS (new table — D-06)
 // ============================================================
 export const admins = pgTable("admins", {
