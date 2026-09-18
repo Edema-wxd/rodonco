@@ -10,8 +10,11 @@ export default async function ShopGrid() {
     getOrderingConfig(),
   ]);
 
-  const freshProduce = products.filter((p) => p.type === "fresh_produce");
-  const cookingKits = products.filter((p) => p.type === "cooking_kit");
+  // Coming-soon teasers move to their own section at the bottom, so they're
+  // excluded from the two orderable sections above it.
+  const comingSoon = products.filter((p) => p.coming_soon);
+  const freshProduce = products.filter((p) => !p.coming_soon && p.type === "fresh_produce");
+  const cookingKits = products.filter((p) => !p.coming_soon && p.type === "cooking_kit");
 
   return (
     <section className="bg-stone-100 py-8 sm:py-28">
@@ -40,7 +43,11 @@ export default async function ShopGrid() {
 
         <OrderingSchedule />
 
-        <ShopContent freshProduce={freshProduce} cookingKits={cookingKits} />
+        <ShopContent
+          freshProduce={freshProduce}
+          cookingKits={cookingKits}
+          comingSoon={comingSoon}
+        />
       </div>
     </section>
   );
