@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Check, Loader2, ArrowRight } from "lucide-react";
+import { Check, Loader2, ArrowRight, MessageCircle } from "lucide-react";
+
+const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/DWxLecVGd3h0NhtznSSUow";
 
 const waitlistFormSchema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(200),
@@ -63,6 +65,16 @@ export function WaitlistForm() {
           Thanks for joining. We&apos;ll email you the moment rodo&amp;co is delivering to your
           neighbourhood — you&apos;ll be first through the door.
         </p>
+        <a
+          href={WHATSAPP_COMMUNITY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-[#1ebe5a]"
+        >
+          <MessageCircle className="h-4 w-4" aria-hidden="true" />
+          Join our WhatsApp community
+        </a>
+        <p className="mt-2 text-xs text-stone-400">Early updates, menus and launch news.</p>
       </div>
     );
   }

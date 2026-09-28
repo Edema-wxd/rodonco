@@ -11,11 +11,9 @@ const BASE_SECTIONS = [
   { id: "cooking-kits", label: "Cooking Kits", accent: "text-red-700" },
 ] as const;
 
-const COMING_SOON_SECTION = {
-  id: "coming-soon",
-  label: "Coming Soon",
-  accent: "text-stone-400",
-} as const;
+// Recipes isn't built yet — shown in the Browse nav as a greyed-out,
+// non-clickable placeholder.
+const RECIPES_NAV_LABEL = "Recipes";
 
 // Friendlier labels for the original built-in categories; any admin-created
 // category falls back to a title-cased version of its slug.
@@ -81,11 +79,7 @@ export function ShopContent({
     ];
   }, [freshProduce]);
 
-  // The Coming Soon nav entry only exists when there are teasers to show.
-  const sections = useMemo(
-    () => (comingSoon.length > 0 ? [...BASE_SECTIONS, COMING_SOON_SECTION] : [...BASE_SECTIONS]),
-    [comingSoon.length],
-  );
+  const sections = BASE_SECTIONS;
 
   const filteredFresh = filterProducts(freshProduce, query, activeCategory);
   const filteredKits = filterProducts(cookingKits, query, "all");
@@ -151,6 +145,17 @@ export function ShopContent({
               {label}
             </button>
           ))}
+          <span
+            aria-disabled="true"
+            className="flex cursor-not-allowed select-none items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-stone-300"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-stone-200" />
+            {RECIPES_NAV_LABEL}
+            <span className="rounded-full bg-stone-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-stone-400">
+              Soon
+            </span>
+          </span>
         </div>
       </aside>
 
@@ -198,6 +203,13 @@ export function ShopContent({
                 {label}
               </button>
             ))}
+            <span
+              aria-disabled="true"
+              className="shrink-0 cursor-not-allowed select-none pb-1 text-sm font-bold text-stone-300"
+              style={{ fontFamily: "var(--font-quicksand)" }}
+            >
+              {RECIPES_NAV_LABEL}
+            </span>
           </div>
         )}
 
