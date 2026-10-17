@@ -73,13 +73,15 @@ export function ProductDrawer({
 
   const activeImageUrl = useMemo(() => {
     if (!product.images.length) return null;
-    if (isProduce && selectedPrepId) {
+    // Images are ordered to match prep options (image i shows prep option i),
+    // for both produce and kits.
+    if (selectedPrepId) {
       const prepIdx = prepOptions.findIndex((p) => p.id === selectedPrepId);
       const img = product.images[prepIdx];
       return img?.url ?? product.images[0].url;
     }
     return product.images[0].url;
-  }, [isProduce, selectedPrepId, prepOptions, product.images]);
+  }, [selectedPrepId, prepOptions, product.images]);
 
   const unitPriceKobo = useMemo(() => {
     const extra = selectedPrep?.extra_cost_ngn ?? 0;

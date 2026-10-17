@@ -34,8 +34,8 @@ const nextConfig: NextConfig = {
               // Tighten with nonce-based CSP post-launch.
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.paystack.co https://checkout.paystack.com https://va.vercel-scripts.com",
               "style-src 'self' 'unsafe-inline'",
-              // utfs.io = UploadThing CDN for product images (Phase 4)
-              "img-src 'self' blob: data: https://utfs.io https://checkout.paystack.com",
+              // utfs.io (legacy) and <appId>.ufs.sh (current) = UploadThing CDN for product images
+              "img-src 'self' blob: data: https://utfs.io https://*.ufs.sh https://checkout.paystack.com",
               "connect-src 'self' https://api.paystack.co https://checkout.paystack.com https://api.resend.com https://uploadthing.com https://*.ingest.uploadthing.com",
               // Paystack inline popup: the script is on js.paystack.co, the checkout
               // iframe is served from checkout.paystack.com — both must be allowed.
