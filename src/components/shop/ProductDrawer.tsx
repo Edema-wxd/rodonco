@@ -50,7 +50,6 @@ export function ProductDrawer({
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartUiStore((s) => s.openCart);
   const isKit = product.type === "cooking_kit";
-  const isProduce = product.type === "fresh_produce";
 
   const needsVariant = isKit && variants.length > 0;
   const needsPrep = prepOptions.length > 0;
@@ -71,15 +70,18 @@ export function ProductDrawer({
 
   const baseProducePriceKobo = useMemo(() => getCheapestVariantPriceKobo(variants), [variants]);
 
+  // Images are paired to prep options by position: the Nth image in the gallery
+  // is the photo for the Nth prep option. This holds for kits as well as produce
+  // (a Jollof base looks different whole vs. rough vs. smooth blended).
   const activeImageUrl = useMemo(() => {
     if (!product.images.length) return null;
-    if (isProduce && selectedPrepId) {
+    if (selectedPrepId) {
       const prepIdx = prepOptions.findIndex((p) => p.id === selectedPrepId);
-      const img = product.images[prepIdx];
+      const img = prepIdx >= 0 ? product.images[prepIdx] : undefined;
       return img?.url ?? product.images[0].url;
     }
     return product.images[0].url;
-  }, [isProduce, selectedPrepId, prepOptions, product.images]);
+  }, [selectedPrepId, prepOptions, product.images]);
 
   const unitPriceKobo = useMemo(() => {
     const extra = selectedPrep?.extra_cost_ngn ?? 0;
@@ -112,7 +114,7 @@ export function ProductDrawer({
     if (!canAddToCart) return;
 
     const variantLabel = isKit ? selectedVariant?.label ?? null : null;
-    const prepOption = isProduce ? selectedPrep?.label ?? null : null;
+    const prepOption = selectedPrep?.label ?? null;
 
     addItem({
       productId: product.id,
