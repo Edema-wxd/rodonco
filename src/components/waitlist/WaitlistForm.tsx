@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Check, Loader2, ArrowRight, MessageCircle } from "lucide-react";
 
+import { trackLead } from "@/lib/facebook-pixel";
+
 const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/DWxLecVGd3h0NhtznSSUow";
 
 const waitlistFormSchema = z.object({
@@ -49,6 +51,7 @@ export function WaitlistForm() {
         throw new Error(body?.error ?? "Something went wrong. Please try again.");
       }
       setSubmitted(true);
+      trackLead("Waitlist");
     } catch (err) {
       setServerError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     }

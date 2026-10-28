@@ -8,6 +8,7 @@ import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
+import { FacebookPixel } from "@/components/analytics/facebook-pixel";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={quicksand.variable}>
       <body>
+        <FacebookPixel />
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         {children}
         <Toaster richColors position="bottom-center" />

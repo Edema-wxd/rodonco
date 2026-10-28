@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { OrderingClosedBanner } from "@/components/shop/OrderingClosedBanner";
 import { SideDrawer } from "@/components/ui/SideDrawer";
+import { trackAddToCart, trackViewContent } from "@/lib/facebook-pixel";
 import { useCartStore } from "@/store/cart";
 import { useCartUiStore } from "@/store/cartUi";
 import type { PrepOption, Product, ProductVariant } from "@/types";
@@ -94,6 +95,17 @@ export function ProductDrawer({
   // Teaser products are reachable by a direct ?drawer=<id> link, so the drawer
   // enforces the same rule the card does: preview only, never orderable.
   const comingSoon = product.coming_soon;
+
+  // Opening the drawer is the closest thing this shop has to a product page
+  // view, so that's where ViewContent fires — once per product, not on every
+  // size/prep tweak.
+  useEffect(() => {
+    trackViewContent({
+      productId: product.id,
+      productName: product.name,
+      valueNgn: isKit ? getCheapestVariantPriceKobo(variants) : baseProducePriceKobo,
+    });
+  }, [product.id, product.name, isKit, variants, baseProducePriceKobo]);
   const selectionSatisfied = (!needsVariant || !!selectedVariant) && (!needsPrep || !!selectedPrep);
   const canAddToCart = !comingSoon && selectionSatisfied && quantity >= 1;
 
@@ -116,7 +128,7 @@ export function ProductDrawer({
     const variantLabel = isKit ? selectedVariant?.label ?? null : null;
     const prepOption = selectedPrep?.label ?? null;
 
-    addItem({
+    const item = {
       productId: product.id,
       productName: product.name,
       variantLabel,
@@ -124,7 +136,10 @@ export function ProductDrawer({
       quantity,
       unitPriceNgn: unitPriceKobo,
       subtotalNgn: subtotalKobo,
-    });
+    };
+
+    addItem(item);
+    trackAddToCart({ item, productName: product.name });
 
     openCartOnClose.current = true;
     close();
