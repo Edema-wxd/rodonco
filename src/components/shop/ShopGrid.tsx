@@ -26,21 +26,8 @@ export default async function ShopGrid() {
       />
 
       <div className="mx-auto max-w-7xl px-8">
-        <div className="mx-auto mb-14 max-w-2xl text-center hidden sm:block">
-      
-          <h1
-            className="mt-6 text-2xl sm:text-3xl md:text-5xl font-black text-zinc-800"
-            style={{ fontFamily: "var(--font-quicksand)" }}
-          >
-            The Local-Global Menu
-          </h1>
-          <p
-            className="mt-3 text-xs sm:text-sm md:text-base leading-5 md:leading-6 text-stone-600"
-            style={{ fontFamily: "var(--font-inter)" }}
-          >
-            Choose your kits and produce for the week. Tap any item to select options, then add it to your order.
-          </p>
-        </div>
+        {/* Not shown on any screen size; kept for screen readers and search engines. */}
+        <h1 className="sr-only">The Local-Global Menu</h1>
 
         <OrderingSchedule />
 
