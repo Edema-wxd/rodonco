@@ -1,6 +1,6 @@
-import { FACEBOOK_PIXEL_ID } from "@/lib/facebook-pixel";
+import Script from "next/script";
 
-import { FacebookPixelRouteTracker } from "./facebook-pixel-route-tracker";
+import { FACEBOOK_PIXEL_ID } from "@/lib/facebook-pixel";
 
 const baseCode = `
 !function(f,b,e,v,n,t,s)
@@ -16,18 +16,22 @@ fbq('track', 'PageView');
 `;
 
 /**
- * Facebook pixel base code. Rendered once in the root layout so it loads on
- * every page. Renders nothing when NEXT_PUBLIC_FACEBOOK_PIXEL_ID is unset.
+ * Facebook pixel base code. Rendered on the waitlist page only — that's the
+ * one page we track. Renders nothing when NEXT_PUBLIC_FACEBOOK_PIXEL_ID is
+ * unset.
+ *
+ * next/script rather than a raw <script>: React doesn't execute inline scripts
+ * it inserts on the client, so a raw tag silently does nothing whenever the
+ * page is reached by a soft navigation.
  */
 export function FacebookPixel() {
   if (!FACEBOOK_PIXEL_ID) return null;
 
   return (
     <>
-      <script
-        id="facebook-pixel"
-        dangerouslySetInnerHTML={{ __html: baseCode }}
-      />
+      <Script id="facebook-pixel" strategy="afterInteractive">
+        {baseCode}
+      </Script>
       <noscript>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -38,7 +42,6 @@ export function FacebookPixel() {
           src={`https://www.facebook.com/tr?id=${FACEBOOK_PIXEL_ID}&ev=PageView&noscript=1`}
         />
       </noscript>
-      <FacebookPixelRouteTracker />
     </>
   );
 }

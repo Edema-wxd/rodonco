@@ -24,7 +24,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { trackPurchaseOnce } from "@/lib/facebook-pixel";
 import {
   Card,
   CardContent,
@@ -548,23 +547,6 @@ export function OrderConfirmationView({
   whatsappNumber,
   reference,
 }: OrderConfirmationViewProps) {
-  // Purchase reports here rather than at checkout because this page is the one
-  // point every payment path reaches (Paystack popup, Flutterwave redirect,
-  // hosted-page fallback). Skipped on the stripped view: that means this
-  // browser doesn't own the order — a forwarded link — so reporting it would
-  // attribute the sale to the wrong person. Value is the order total, which
-  // includes delivery, so Meta's reported revenue matches what was charged.
-  const order = data?.order;
-  const items = data?.items;
-  useEffect(() => {
-    if (!order || !items || stripped) return;
-    trackPurchaseOnce({
-      reference: order.reference,
-      totalNgn: order.total_ngn,
-      items,
-    });
-  }, [order, items, stripped]);
-
   if (!data) {
     return (
       <ErrorState

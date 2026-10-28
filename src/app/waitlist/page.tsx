@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Leaf } from "lucide-react";
 
+import { FacebookPixel } from "@/components/analytics/facebook-pixel";
 import { HeroBackground } from "@/components/landing/HeroBackground";
 import { WaitlistForm } from "@/components/waitlist/WaitlistForm";
 
@@ -44,6 +45,7 @@ function ProduceSeal() {
 export default function WaitlistPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#171310] text-white">
+      <FacebookPixel />
       {/* Rotating full-bleed food imagery (same crossfade as the landing hero) */}
       <HeroBackground />
 

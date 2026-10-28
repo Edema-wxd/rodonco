@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Check, Loader2 } from "lucide-react";
 
-import {
-  trackAddPaymentInfo,
-  trackInitiateCheckout,
-} from "@/lib/facebook-pixel";
 import { useCartStore } from "@/store/cart";
 import { useHasHydrated } from "@/hooks/useHasHydrated";
 import {
@@ -162,17 +158,6 @@ export function CheckoutExperience({
     }
   }, [hasHydrated, items.length, router, isSubmitting]);
 
-  // InitiateCheckout once the cart has rehydrated from storage — before that
-  // `items` is empty and the event would report a ₦0 checkout. The ref keeps
-  // it to one event per visit rather than one per cart edit on this page.
-  const initiateCheckoutReported = useRef(false);
-  useEffect(() => {
-    if (!hasHydrated || items.length === 0) return;
-    if (initiateCheckoutReported.current) return;
-    initiateCheckoutReported.current = true;
-    trackInitiateCheckout(items);
-  }, [hasHydrated, items]);
-
   const {
     register,
     handleSubmit,
@@ -216,7 +201,6 @@ export function CheckoutExperience({
       await saveDraft({ ...payload, cart: items });
       setSavedPayload(payload);
       setStep("payment");
-      trackAddPaymentInfo(items);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       setServerError(
