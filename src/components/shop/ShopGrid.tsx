@@ -10,11 +10,12 @@ export default async function ShopGrid() {
     getOrderingConfig(),
   ]);
 
-  // Coming-soon teasers move to their own section at the bottom, so they're
-  // excluded from the two orderable sections above it.
-  const comingSoon = products.filter((p) => p.coming_soon);
-  const freshProduce = products.filter((p) => !p.coming_soon && p.type === "fresh_produce");
-  const cookingKits = products.filter((p) => !p.coming_soon && p.type === "cooking_kit");
+  // Coming-soon teasers stay in their own type's section, listed after
+  // everything that can be ordered now (sort is stable, so order is kept).
+  const orderableFirst = (a: (typeof products)[number], b: (typeof products)[number]) =>
+    Number(a.coming_soon) - Number(b.coming_soon);
+  const freshProduce = products.filter((p) => p.type === "fresh_produce").sort(orderableFirst);
+  const cookingKits = products.filter((p) => p.type === "cooking_kit").sort(orderableFirst);
 
   return (
     <section className="bg-stone-100 py-8 sm:py-28">
@@ -46,7 +47,6 @@ export default async function ShopGrid() {
         <ShopContent
           freshProduce={freshProduce}
           cookingKits={cookingKits}
-          comingSoon={comingSoon}
         />
       </div>
     </section>

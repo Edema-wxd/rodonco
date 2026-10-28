@@ -58,11 +58,9 @@ function filterProducts(
 export function ShopContent({
   freshProduce,
   cookingKits,
-  comingSoon,
 }: {
   freshProduce: ActiveProductWithStartingPrice[];
   cookingKits: ActiveProductWithStartingPrice[];
-  comingSoon: ActiveProductWithStartingPrice[];
 }) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<ProduceCategory | "all">("all");
@@ -83,10 +81,8 @@ export function ShopContent({
 
   const filteredFresh = filterProducts(freshProduce, query, activeCategory);
   const filteredKits = filterProducts(cookingKits, query, "all");
-  const filteredComingSoon = filterProducts(comingSoon, query, "all");
   const isSearching = query.trim().length > 0;
-  const hasAnyResults =
-    filteredFresh.length > 0 || filteredKits.length > 0 || filteredComingSoon.length > 0;
+  const hasAnyResults = filteredFresh.length > 0 || filteredKits.length > 0;
 
   // Track active section based on scroll position
   useEffect(() => {
@@ -312,35 +308,6 @@ export function ShopContent({
                   No products available yet.
                 </p>
               )}
-            </section>
-          )}
-
-          {filteredComingSoon.length > 0 && (
-            <section id="coming-soon">
-              <div className="pb-6">
-                <h2
-                  className="sm:text-4xl text-2xl font-black uppercase leading-10 text-zinc-800"
-                  style={{ fontFamily: "var(--font-quicksand)" }}
-                >
-                  Coming{" "}
-                  <span className="text-stone-400">Soon</span>
-                </h2>
-                <p
-                  className="mt-2 text-sm text-stone-500"
-                  style={{ fontFamily: "var(--font-inter)" }}
-                >
-                  Not on the menu yet — we&apos;re still prepping these.
-                </p>
-              </div>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {filteredComingSoon.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    startingPriceNgn={product.starting_price_ngn}
-                  />
-                ))}
-              </div>
             </section>
           )}
         </div>
