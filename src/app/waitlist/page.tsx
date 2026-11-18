@@ -4,6 +4,7 @@ import { Leaf } from "lucide-react";
 
 import { FacebookPixel } from "@/components/analytics/facebook-pixel";
 import { HeroBackground } from "@/components/landing/HeroBackground";
+import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { WaitlistForm } from "@/components/waitlist/WaitlistForm";
 
 export const metadata: Metadata = {
@@ -44,80 +45,84 @@ function ProduceSeal() {
 
 export default function WaitlistPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#171310] text-white">
-      <FacebookPixel />
-      {/* Rotating full-bleed food imagery (same crossfade as the landing hero) */}
-      <HeroBackground />
+    // Banner + hero share one screen: the hero fills whatever height the banner leaves.
+    <div className="flex min-h-screen flex-col">
+      <AnnouncementBanner />
+      <main className="relative flex flex-1 flex-col overflow-hidden bg-[#171310] text-white">
+        <FacebookPixel />
+        {/* Rotating full-bleed food imagery (same crossfade as the landing hero) */}
+        <HeroBackground />
 
-      {/* Legibility overlays: darken toward the bottom, and toward the content side */}
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/25" />
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/10 to-transparent" />
+        {/* Legibility overlays: darken toward the bottom, and toward the content side */}
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/25" />
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/10 to-transparent" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-5 py-6 sm:px-8 sm:py-8">
-        {/* ── Top bar (logo only — not a link; ordering isn't open yet) ── */}
-        <header className="flex items-center">
-          <span className="inline-flex items-center rounded-full bg-white/95 px-3 py-1.5 shadow-sm backdrop-blur">
-            <Image src="/logo.svg" alt="rodo&co" width={104} height={30} className="h-7 w-auto" priority />
-          </span>
-        </header>
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 py-6 sm:px-8 sm:py-8">
+          {/* ── Top bar (logo only — not a link; ordering isn't open yet) ── */}
+          <header className="flex items-center">
+            <span className="inline-flex items-center rounded-full bg-white/95 px-3 py-1.5 shadow-sm backdrop-blur">
+              <Image src="/logo.svg" alt="rodo&co" width={104} height={30} className="h-7 w-auto" priority />
+            </span>
+          </header>
 
-        {/* ── Hero ── */}
-        <div className="grid flex-1 items-center gap-12 py-12 lg:grid-cols-[1.05fr_minmax(380px,460px)] lg:gap-16">
-          {/* Left: message */}
-          <div className="flex flex-col items-start">
-            <div
-              className="waitlist-rise inline-flex items-center gap-2 rounded-full bg-[#d0f1c3] px-3.5 py-1.5"
-              style={{ animationDelay: "0.02s" }}
-            >
-              <Leaf className="h-3.5 w-3.5 text-green-900" aria-hidden="true" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green-900">
-                The waitlist is open
-              </span>
+          {/* ── Hero ── */}
+          <div className="grid flex-1 items-center gap-12 py-12 lg:grid-cols-[1.05fr_minmax(380px,460px)] lg:gap-16">
+            {/* Left: message */}
+            <div className="flex flex-col items-start">
+              <div
+                className="waitlist-rise inline-flex items-center gap-2 rounded-full bg-[#d0f1c3] px-3.5 py-1.5"
+                style={{ animationDelay: "0.02s" }}
+              >
+                <Leaf className="h-3.5 w-3.5 text-green-900" aria-hidden="true" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-green-900">
+                  The waitlist is open
+                </span>
+              </div>
+
+              <h1
+                className="waitlist-rise mt-5 max-w-xl text-[2.6rem] leading-[1.03] tracking-[-0.02em] drop-shadow-[0_2px_16px_rgba(0,0,0,0.35)] sm:text-6xl"
+                style={{ animationDelay: "0.09s" }}
+              >
+                <span className="font-light text-white/85">Your kitchen assistant</span>
+                <br />
+                <span className="font-bold text-white">
+                  is <span className="text-[#ff5a2c]">on the way.</span>
+                </span>
+              </h1>
+
+              <p
+                className="waitlist-rise mt-5 max-w-md text-[15px] leading-relaxed text-stone-100/90 drop-shadow-[0_1px_10px_rgba(0,0,0,0.4)] sm:text-base"
+                style={{ animationDelay: "0.16s" }}
+              >
+                We deliver freshly prepped ingredients and ready-to-cook kits — dinner on the table
+                in 15 minutes. Tell us where you live and we&apos;ll email you the day rodo&amp;co
+                reaches your door.
+              </p>
+
+              <p
+                className="waitlist-rise mt-8 text-xs font-semibold uppercase tracking-[0.12em] text-white/70"
+                style={{ animationDelay: "0.24s" }}
+              >
+                Freshly prepped&nbsp;·&nbsp;Ready-to-cook kits&nbsp;·&nbsp;15-minute dinners
+              </p>
             </div>
 
-            <h1
-              className="waitlist-rise mt-5 max-w-xl text-[2.6rem] leading-[1.03] tracking-[-0.02em] drop-shadow-[0_2px_16px_rgba(0,0,0,0.35)] sm:text-6xl"
-              style={{ animationDelay: "0.09s" }}
-            >
-              <span className="font-light text-white/85">Your kitchen assistant</span>
-              <br />
-              <span className="font-bold text-white">
-                is <span className="text-[#ff5a2c]">on the way.</span>
-              </span>
-            </h1>
-
-            <p
-              className="waitlist-rise mt-5 max-w-md text-[15px] leading-relaxed text-stone-100/90 drop-shadow-[0_1px_10px_rgba(0,0,0,0.4)] sm:text-base"
-              style={{ animationDelay: "0.16s" }}
-            >
-              We deliver freshly prepped ingredients and ready-to-cook kits — dinner on the table
-              in 15 minutes. Tell us where you live and we&apos;ll email you the day rodo&amp;co
-              reaches your door.
-            </p>
-
-            <p
-              className="waitlist-rise mt-8 text-xs font-semibold uppercase tracking-[0.12em] text-white/70"
-              style={{ animationDelay: "0.24s" }}
-            >
-              Freshly prepped&nbsp;·&nbsp;Ready-to-cook kits&nbsp;·&nbsp;15-minute dinners
-            </p>
-          </div>
-
-          {/* Right: form card with the seal stamped on its corner */}
-          <div className="waitlist-rise relative w-full" style={{ animationDelay: "0.14s" }}>
-            <div className="absolute -right-2 -top-7 z-20 sm:-right-4 sm:-top-8">
-              <ProduceSeal />
+            {/* Right: form card with the seal stamped on its corner */}
+            <div className="waitlist-rise relative w-full" style={{ animationDelay: "0.14s" }}>
+              <div className="absolute -right-2 -top-7 z-20 sm:-right-4 sm:-top-8">
+                <ProduceSeal />
+              </div>
+              <WaitlistForm />
             </div>
-            <WaitlistForm />
           </div>
+
+          {/* ── Footer ── */}
+          <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-white/15 pt-5 text-xs text-white/60">
+            <span>© {new Date().getFullYear()} rodo&amp;co</span>
+            <span className="font-medium uppercase tracking-[0.12em]">Freshly prepped, never frozen</span>
+          </footer>
         </div>
-
-        {/* ── Footer ── */}
-        <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-white/15 pt-5 text-xs text-white/60">
-          <span>© {new Date().getFullYear()} rodo&amp;co</span>
-          <span className="font-medium uppercase tracking-[0.12em]">Freshly prepped, never frozen</span>
-        </footer>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
