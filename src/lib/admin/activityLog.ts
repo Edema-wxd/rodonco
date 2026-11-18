@@ -12,6 +12,7 @@ export type ActivityAction =
   | "order.deleted"
   | "order.bulk_status_changed"
   | "order.refunded"
+  | "order.recovery_email_sent"
   | "product.created"
   | "product.updated"
   | "product.deleted"

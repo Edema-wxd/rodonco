@@ -8,7 +8,8 @@ export type EmailType =
   | "admin_invite"
   | "delivery_reminder"
   | "order_history_link"
-  | "order_status_update";
+  | "order_status_update"
+  | "cart_recovery";
 
 export interface LogEmailInput {
   type: EmailType;
