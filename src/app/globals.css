@@ -199,6 +199,92 @@
   }
 }
 
+/* ── Announcement banner (delivery areas) ─────────────────────────────────
+   A continuous marquee above the Navbar. Two identical groups slide left by
+   one group width plus the gap, so the loop has no visible seam. */
+
+.announcement {
+  --announcement-gap: 2rem;
+  /* One loop moves two copies of the message: roughly 60px per second. */
+  --announcement-duration: 52s;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+}
+
+.announcement-track {
+  display: flex;
+  gap: var(--announcement-gap);
+}
+
+.announcement-group {
+  display: flex;
+  flex-shrink: 0;
+  min-width: 100%;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--announcement-gap);
+  animation: announcement-scroll var(--announcement-duration) linear infinite;
+}
+
+.announcement-item {
+  padding-block: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.announcement-sep {
+  opacity: 0.7;
+}
+
+.announcement-link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.announcement-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Let people stop the text to read it or tap the WhatsApp number. */
+.announcement:hover .announcement-group,
+.announcement:focus-within .announcement-group {
+  animation-play-state: paused;
+}
+
+@keyframes announcement-scroll {
+  to { transform: translateX(calc(-100% - var(--announcement-gap))); }
+}
+
+@media (max-width: 639px) {
+  .announcement-item { font-size: 0.75rem; }
+}
+
+/* No motion: show the full message once, wrapped and centred. */
+@media (prefers-reduced-motion: reduce) {
+  .announcement-group { animation: none; width: 100%; }
+
+  .announcement-group[aria-hidden="true"],
+  .announcement-item[aria-hidden="true"],
+  .announcement-sep {
+    display: none;
+  }
+
+  .announcement-item {
+    padding-inline: 1rem;
+    text-align: center;
+    white-space: normal;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
