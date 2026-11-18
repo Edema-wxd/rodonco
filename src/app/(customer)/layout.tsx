@@ -1,3 +1,4 @@
+import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { Navbar } from "@/components/layout/Navbar";
 import { CartSidebar } from "@/components/cart/CartSidebar";
 import { Footer } from "@/components/landing/Footer";
@@ -12,6 +13,7 @@ export default async function CustomerLayout({
 
   return (
     <>
+      <AnnouncementBanner />
       <Navbar />
       <main>{children}</main>
       <Footer />

@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/landing/Footer";
 
 export default function NotFound() {
   return (
     <>
+      <AnnouncementBanner />
       <Navbar />
       <main className="flex min-h-[60vh] flex-col items-center justify-center bg-stone-100 py-32 px-8 text-center">
         {/* Section label */}
