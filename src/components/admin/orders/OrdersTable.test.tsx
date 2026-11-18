@@ -12,7 +12,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("sonner", () => ({
-  toast: { error: vi.fn() },
+  toast: { error: vi.fn(), success: vi.fn() },
 }));
 
 vi.mock("@/app/admin/orders/_actions", () => ({
@@ -170,6 +170,40 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
     expect(call).not.toContain("search=");
 
     vi.useRealTimers();
+  });
+
+  it("pending orders can be deleted from the expanded row", async () => {
+    const fetchMock = vi.fn(async () => ({ ok: true })) as any;
+    (globalThis as any).fetch = fetchMock;
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    render(
+      <OrdersTable
+        initialOrders={[
+          makeOrder({ id: "o1", reference: "REF-001", status: "pending" }),
+          makeOrder({ id: "o2", reference: "REF-002", status: "paid" }),
+        ]}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByText("REF-001")[0]!);
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText("Delete order REF-001"));
+    });
+
+    expect(confirmSpy).toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledWith("/api/admin/orders/o1", { method: "DELETE" });
+    expect(screen.queryByText("REF-001")).toBeNull();
+    expect(screen.queryByText("REF-002")).not.toBeNull();
+
+    confirmSpy.mockRestore();
+  });
+
+  it("non-pending orders do not offer delete", () => {
+    render(<OrdersTable initialOrders={[makeOrder({ id: "o1", reference: "REF-001", status: "paid" })]} />);
+
+    fireEvent.click(screen.getAllByText("REF-001")[0]!);
+    expect(screen.queryByLabelText("Delete order REF-001")).toBeNull();
   });
 
   it("OPS-03: week filter navigates with ?weekOf= param", () => {

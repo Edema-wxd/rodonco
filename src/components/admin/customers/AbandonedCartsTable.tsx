@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 
 import type { AbandonedCart, AbandonedCartItem } from "@/lib/admin/abandonedCarts";
 import { serializeAbandonedCartsCsv } from "@/lib/admin/csv";
-import { loadMoreAbandonedCartsAction } from "@/app/admin/abandoned-carts/_actions";
-import { ABANDONED_CARTS_PAGE_SIZE } from "@/app/admin/abandoned-carts/_constants";
+import { loadMoreAbandonedCartsAction } from "@/app/admin/customers/_actions";
+import { ABANDONED_CARTS_PAGE_SIZE } from "@/app/admin/customers/_constants";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

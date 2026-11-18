@@ -71,6 +71,32 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
     });
   }
 
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function deleteOrder(order: AdminOrder) {
+    const confirmed = window.confirm(
+      `Delete unpaid order ${order.reference}? This cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    setDeletingId(order.id);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        toast.error("Failed to delete order.");
+        return;
+      }
+      setOrders((prev) => prev.filter((o) => o.id !== order.id));
+      toast.success("Order deleted.");
+      // Refresh server components so the sidebar's pending badge updates.
+      router.refresh();
+    } catch {
+      toast.error("Failed to delete order.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   function toggleRow(id: string) {
     setExpanded((prev) => {
       const next = new Map(prev);
@@ -238,6 +264,8 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
                   order={o}
                   expanded={!!expanded.get(o.id)}
                   onToggle={() => toggleRow(o.id)}
+                  onDelete={() => void deleteOrder(o)}
+                  deleting={deletingId === o.id}
                 />
               ))}
             </tbody>

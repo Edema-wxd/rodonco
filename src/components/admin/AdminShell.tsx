@@ -8,12 +8,10 @@ import { AdminSidebar } from "./AdminSidebar";
 export function AdminShell({
   adminEmail,
   pendingBadge,
-  abandonedBadge,
   children,
 }: {
   adminEmail: string | null;
   pendingBadge?: React.ReactNode;
-  abandonedBadge?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -56,7 +54,6 @@ export function AdminShell({
       <AdminSidebar
         adminEmail={adminEmail}
         pendingBadge={pendingBadge}
-        abandonedBadge={abandonedBadge}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
       />
