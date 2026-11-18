@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white flex items-center justify-center px-4">
+    <main className="flex-1 bg-white flex items-center justify-center px-4">
       <div className="flex flex-col items-center text-center gap-8 max-w-sm w-full">
 
         {/* Logo — replace src with your logo file in /public */}

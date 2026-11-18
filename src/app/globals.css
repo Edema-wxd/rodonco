@@ -5,3 +5,108 @@
   margin: 0;
   padding: 0;
 }
+
+/* ---------- Announcement banner ---------- */
+
+:root {
+  --announcement-bg: #000000;
+  --announcement-fg: #ffffff;
+  --announcement-gap: 2rem;
+  /* One loop moves two copies of the message: roughly 60px per second. */
+  --announcement-duration: 55s;
+}
+
+.announcement {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  overflow: hidden;
+  background: var(--announcement-bg);
+  color: var(--announcement-fg);
+}
+
+.announcement-track {
+  display: flex;
+  gap: var(--announcement-gap);
+}
+
+.announcement-group {
+  display: flex;
+  flex-shrink: 0;
+  min-width: 100%;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--announcement-gap);
+  animation: announcement-scroll var(--announcement-duration) linear infinite;
+}
+
+.announcement-sep {
+  opacity: 0.7;
+}
+
+.announcement-item {
+  padding-block: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.announcement-link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.announcement-link:focus-visible {
+  outline: 2px solid var(--announcement-fg);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Let people stop the text to read it or tap the WhatsApp number. */
+.announcement:hover .announcement-group,
+.announcement:focus-within .announcement-group {
+  animation-play-state: paused;
+}
+
+@keyframes announcement-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--announcement-gap)));
+  }
+}
+
+@media (max-width: 640px) {
+  .announcement-item {
+    font-size: 0.75rem;
+  }
+}
+
+/* No motion: show the full message once, wrapped and centred. */
+@media (prefers-reduced-motion: reduce) {
+  .announcement-group {
+    animation: none;
+  }
+
+  .announcement-group[aria-hidden="true"],
+  .announcement-item[aria-hidden="true"],
+  .announcement-sep {
+    display: none;
+  }
+
+  .announcement-group {
+    width: 100%;
+  }
+
+  .announcement-item {
+    padding-inline: 1rem;
+    text-align: center;
+    white-space: normal;
+  }
+}
