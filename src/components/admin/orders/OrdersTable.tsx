@@ -97,6 +97,40 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
     }
   }
 
+  const [emailStates, setEmailStates] = useState<Map<string, "sending" | "sent">>(new Map());
+
+  function setEmailState(id: string, state: "sending" | "sent" | null) {
+    setEmailStates((prev) => {
+      const next = new Map(prev);
+      if (state) next.set(id, state);
+      else next.delete(id);
+      return next;
+    });
+  }
+
+  async function emailReminder(order: AdminOrder) {
+    const confirmed = window.confirm(
+      `Email ${order.customer_name} (${order.customer_email}) a reminder to complete order ${order.reference}?`,
+    );
+    if (!confirmed) return;
+
+    setEmailState(order.id, "sending");
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/recovery-email`, { method: "POST" });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        toast.error(data.error ?? "Failed to send the email.");
+        setEmailState(order.id, null);
+        return;
+      }
+      setEmailState(order.id, "sent");
+      toast.success(`Reminder emailed to ${order.customer_email}.`);
+    } catch {
+      toast.error("Failed to send the email.");
+      setEmailState(order.id, null);
+    }
+  }
+
   function toggleRow(id: string) {
     setExpanded((prev) => {
       const next = new Map(prev);
@@ -266,6 +300,8 @@ export function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) 
                   onToggle={() => toggleRow(o.id)}
                   onDelete={() => void deleteOrder(o)}
                   deleting={deletingId === o.id}
+                  onEmailReminder={() => void emailReminder(o)}
+                  emailState={emailStates.get(o.id) ?? "idle"}
                 />
               ))}
             </tbody>

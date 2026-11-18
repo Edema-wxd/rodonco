@@ -40,6 +40,7 @@ const TYPE_LABELS: Record<string, string> = {
   admin_alert: "Admin Alert",
   admin_invite: "Admin Invite",
   delivery_reminder: "Delivery Reminder",
+  cart_recovery: "Order Reminder",
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -47,6 +48,7 @@ const TYPE_COLORS: Record<string, string> = {
   admin_alert: "bg-orange-50 text-orange-700",
   admin_invite: "bg-purple-50 text-purple-700",
   delivery_reminder: "bg-green-50 text-green-700",
+  cart_recovery: "bg-amber-50 text-amber-700",
 };
 
 function formatDate(iso: string) {
@@ -106,6 +108,7 @@ export function EmailLogsTable({ logs }: { logs: EmailLog[] }) {
           <option value="admin_alert">Admin Alert</option>
           <option value="admin_invite">Admin Invite</option>
           <option value="delivery_reminder">Delivery Reminder</option>
+          <option value="cart_recovery">Order Reminder</option>
         </select>
 
         <select

@@ -199,11 +199,50 @@ describe("Admin OrdersTable (ORD-01..ORD-05)", () => {
     confirmSpy.mockRestore();
   });
 
+  it("unpaid orders get a WhatsApp link pre-filled with the customer's name and items", () => {
+    render(
+      <OrdersTable
+        initialOrders={[
+          makeOrder({ id: "o1", reference: "REF-001", status: "pending", customer_phone: "08031234567" }),
+        ]}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByText("REF-001")[0]!);
+    const link = screen.getByLabelText("Message Ada Lovelace on WhatsApp about order REF-001");
+    const href = link.getAttribute("href") ?? "";
+    expect(href.startsWith("https://wa.me/2348031234567?text=")).toBe(true);
+    const text = decodeURIComponent(href.split("?text=")[1]);
+    expect(text).toContain("Hi Ada");
+    expect(text).toContain("2 × Tomatoes (Chopped)");
+    expect(link.getAttribute("target")).toBe("_blank");
+  });
+
+  it("the Email button sends a reminder after confirmation", async () => {
+    const fetchMock = vi.fn(async () => ({ ok: true, json: async () => ({ ok: true }) })) as any;
+    (globalThis as any).fetch = fetchMock;
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    render(<OrdersTable initialOrders={[makeOrder({ id: "o1", reference: "REF-001", status: "pending" })]} />);
+
+    fireEvent.click(screen.getAllByText("REF-001")[0]!);
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText("Email Ada Lovelace a reminder about order REF-001"));
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith("/api/admin/orders/o1/recovery-email", { method: "POST" });
+    expect(screen.getByText("Email sent")).toBeTruthy();
+
+    confirmSpy.mockRestore();
+  });
+
   it("non-pending orders do not offer delete", () => {
     render(<OrdersTable initialOrders={[makeOrder({ id: "o1", reference: "REF-001", status: "paid" })]} />);
 
     fireEvent.click(screen.getAllByText("REF-001")[0]!);
     expect(screen.queryByLabelText("Delete order REF-001")).toBeNull();
+    expect(screen.queryByText("WhatsApp")).toBeNull();
+    expect(screen.queryByText("Email")).toBeNull();
   });
 
   it("OPS-03: week filter navigates with ?weekOf= param", () => {

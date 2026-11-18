@@ -1,9 +1,10 @@
 "use client";
 
-import { ChevronDown, MapPin, AlertTriangle, Trash2 } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, Loader2, Mail, MapPin, MessageCircle, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import type { AdminOrder } from "@/lib/admin/orders";
+import { buildRecoveryWhatsAppLink, firstName, recoveryCheckoutUrl } from "@/lib/admin/cartRecovery";
 import { formatNgn } from "@/lib/admin/format";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,8 @@ export function OrderRow({
   onToggle,
   onDelete,
   deleting = false,
+  onEmailReminder,
+  emailState = "idle",
 }: {
   order: AdminOrder;
   expanded: boolean;
@@ -22,8 +25,15 @@ export function OrderRow({
   /** Only offered for pending (unpaid) orders, which used to live on /admin/pending. */
   onDelete?: () => void;
   deleting?: boolean;
+  /** Emails the customer a reminder to finish paying. Pending orders only. */
+  onEmailReminder?: () => void;
+  emailState?: "idle" | "sending" | "sent";
 }) {
-  const canDelete = order.status === "pending" && !!onDelete;
+  const isPending = order.status === "pending";
+  const canDelete = isPending && !!onDelete;
+  const whatsappLink = isPending
+    ? buildRecoveryWhatsAppLink(order, recoveryCheckoutUrl(process.env.NEXT_PUBLIC_APP_URL))
+    : null;
 
   return (
     <>
@@ -97,7 +107,7 @@ export function OrderRow({
                 transition={{ duration: 0.15, ease: "easeOut" }}
                 className="overflow-hidden"
               >
-                <div className="rounded-2xl bg-stone-50 p-5 outline outline-1 outline-stone-100">
+                <div className="sticky left-6 max-w-[calc(100vw-5rem)] rounded-2xl bg-stone-50 p-5 outline outline-1 outline-stone-100 sm:static sm:max-w-none">
                   {/* Line items */}
                   <ul className="space-y-2">
                     {order.items.map((item) => (
@@ -145,25 +155,73 @@ export function OrderRow({
                     ) : null}
                   </div>
 
-                  {canDelete ? (
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4">
+                  {isPending ? (
+                    <div className="mt-4 space-y-3 border-t border-stone-100 pt-4">
                       <p
                         className="text-xs text-stone-500"
                         style={{ fontFamily: "var(--font-inter)" }}
                       >
-                        Checkout started but payment was never completed.
+                        Checkout started but payment was never completed. Remind{" "}
+                        {firstName(order.customer_name)} to finish it:
                       </p>
-                      <button
-                        type="button"
-                        aria-label={`Delete order ${order.reference}`}
-                        disabled={deleting}
-                        onClick={onDelete}
-                        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
-                        style={{ fontFamily: "var(--font-quicksand)" }}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        {deleting ? "Deleting…" : "Delete unpaid order"}
-                      </button>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {whatsappLink ? (
+                          <a
+                            href={whatsappLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Message ${order.customer_name} on WhatsApp about order ${order.reference}`}
+                            className="inline-flex items-center gap-1.5 rounded-full bg-green-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-green-700"
+                            style={{ fontFamily: "var(--font-quicksand)" }}
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" />
+                            WhatsApp
+                          </a>
+                        ) : (
+                          <span
+                            className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-4 py-2 text-xs font-bold text-stone-400"
+                            title="No usable phone number on this order"
+                            style={{ fontFamily: "var(--font-quicksand)" }}
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" />
+                            No WhatsApp number
+                          </span>
+                        )}
+
+                        {onEmailReminder ? (
+                          <button
+                            type="button"
+                            aria-label={`Email ${order.customer_name} a reminder about order ${order.reference}`}
+                            disabled={emailState !== "idle"}
+                            onClick={onEmailReminder}
+                            className="inline-flex items-center gap-1.5 rounded-full bg-zinc-800 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            style={{ fontFamily: "var(--font-quicksand)" }}
+                          >
+                            {emailState === "sending" ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : emailState === "sent" ? (
+                              <Check className="h-3.5 w-3.5" />
+                            ) : (
+                              <Mail className="h-3.5 w-3.5" />
+                            )}
+                            {emailState === "sending" ? "Sending…" : emailState === "sent" ? "Email sent" : "Email"}
+                          </button>
+                        ) : null}
+
+                        {canDelete ? (
+                          <button
+                            type="button"
+                            aria-label={`Delete order ${order.reference}`}
+                            disabled={deleting}
+                            onClick={onDelete}
+                            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-red-600 sm:ml-auto transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                            style={{ fontFamily: "var(--font-quicksand)" }}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            {deleting ? "Deleting…" : "Delete unpaid order"}
+                          </button>
+                        ) : null}
+                      </div>
                     </div>
                   ) : null}
                 </div>

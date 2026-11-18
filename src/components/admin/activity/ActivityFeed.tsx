@@ -34,6 +34,11 @@ const ACTION_META: Record<string, ActionMeta> = {
     color: "text-red-600 bg-red-50",
     label: (e) => `Deleted order ${e.entity_label ?? ""}`,
   },
+  "order.recovery_email_sent": {
+    Icon: Lucide.Mail,
+    color: "text-blue-600 bg-blue-50",
+    label: (e) => `Emailed a payment reminder for ${e.entity_label ?? "order"}`,
+  },
   "order.bulk_status_changed": {
     Icon: Lucide.Layers,
     color: "text-blue-600 bg-blue-50",
