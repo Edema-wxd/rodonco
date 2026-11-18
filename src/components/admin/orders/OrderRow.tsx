@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, MapPin, AlertTriangle } from "lucide-react";
+import { ChevronDown, MapPin, AlertTriangle, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import type { AdminOrder } from "@/lib/admin/orders";
@@ -13,11 +13,17 @@ export function OrderRow({
   order,
   expanded,
   onToggle,
+  onDelete,
+  deleting = false,
 }: {
   order: AdminOrder;
   expanded: boolean;
   onToggle: () => void;
+  /** Only offered for pending (unpaid) orders, which used to live on /admin/pending. */
+  onDelete?: () => void;
+  deleting?: boolean;
 }) {
+  const canDelete = order.status === "pending" && !!onDelete;
 
   return (
     <>
@@ -138,6 +144,28 @@ export function OrderRow({
                       </p>
                     ) : null}
                   </div>
+
+                  {canDelete ? (
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4">
+                      <p
+                        className="text-xs text-stone-500"
+                        style={{ fontFamily: "var(--font-inter)" }}
+                      >
+                        Checkout started but payment was never completed.
+                      </p>
+                      <button
+                        type="button"
+                        aria-label={`Delete order ${order.reference}`}
+                        disabled={deleting}
+                        onClick={onDelete}
+                        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        style={{ fontFamily: "var(--font-quicksand)" }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        {deleting ? "Deleting…" : "Delete unpaid order"}
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
               </motion.div>
             </td>

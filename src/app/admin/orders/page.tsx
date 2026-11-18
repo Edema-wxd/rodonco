@@ -1,8 +1,10 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { OrdersTable } from "@/components/admin/orders/OrdersTable";
 import { getAdminOrders, type OrderFilters } from "@/lib/admin/orders";
+import { getPendingOrdersCount } from "@/lib/admin/pendingOrders";
 import { ORDERS_PAGE_SIZE } from "./_constants";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +24,11 @@ export default async function AdminOrdersPage({
     search: params.search,
   };
 
-  const initialOrders = await getAdminOrders({ limit: ORDERS_PAGE_SIZE, filters });
+  const [initialOrders, pendingCount] = await Promise.all([
+    getAdminOrders({ limit: ORDERS_PAGE_SIZE, filters }),
+    getPendingOrdersCount(),
+  ]);
+  const showingPending = filters.status === "pending";
   // Key forces OrdersTable to remount (reset pagination) when filters change.
   const filterKey = `${filters.status ?? ""}-${filters.weekOf ?? ""}-${filters.search ?? ""}`;
 
@@ -41,6 +47,26 @@ export default async function AdminOrdersPage({
         >
           Orders
         </h1>
+        {showingPending ? (
+          <p
+            className="mt-2 text-base text-stone-500"
+            style={{ fontFamily: "var(--font-inter)" }}
+          >
+            Checkouts that were started but never paid for. Open a row to delete it.
+          </p>
+        ) : pendingCount > 0 ? (
+          <Link
+            href="/admin/orders?status=pending"
+            className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-sm font-bold text-zinc-800 shadow-sm outline outline-1 outline-stone-200/60 transition-colors hover:bg-stone-50"
+            style={{ fontFamily: "var(--font-quicksand)" }}
+          >
+            <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">
+              {pendingCount}
+            </span>
+            pending (unpaid) order{pendingCount === 1 ? "" : "s"}
+            <span aria-hidden="true" className="text-stone-400">→</span>
+          </Link>
+        ) : null}
       </div>
 
       <OrdersTable key={filterKey} initialOrders={initialOrders} />

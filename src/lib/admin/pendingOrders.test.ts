@@ -27,10 +27,6 @@ vi.mock("../../../drizzle/schema", () => ({
 
 import { getPendingOrdersCount } from "./pendingOrders";
 
-describe("getPendingOrders", () => {
-  it.todo("returns only status=pending orders");
-});
-
 describe("getPendingOrdersCount", () => {
   beforeEach(() => {
     vi.clearAllMocks();

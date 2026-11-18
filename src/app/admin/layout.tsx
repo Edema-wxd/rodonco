@@ -3,18 +3,18 @@ import * as React from "react";
 import { auth } from "@/auth";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { getPendingOrdersCount } from "@/lib/admin/pendingOrders";
-import { getUncContactedCount } from "@/lib/admin/abandonedCarts";
 
 export const dynamic = "force-dynamic";
 
 async function PendingBadge() {
   const count = await getPendingOrdersCount();
-  return count > 0 ? count : null;
-}
-
-async function AbandonedBadge() {
-  const count = await getUncContactedCount();
-  return count > 0 ? count : null;
+  if (count === 0) return null;
+  return (
+    <>
+      {count}
+      <span className="sr-only"> pending</span>
+    </>
+  );
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -32,11 +32,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       pendingBadge={
         <React.Suspense fallback={null}>
           <PendingBadge />
-        </React.Suspense>
-      }
-      abandonedBadge={
-        <React.Suspense fallback={null}>
-          <AbandonedBadge />
         </React.Suspense>
       }
     >
