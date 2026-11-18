@@ -30,7 +30,8 @@ function Separator() {
 }
 
 /**
- * Scrolling delivery-area announcement shown above the Navbar.
+ * Scrolling delivery-area announcement shown above the Navbar, and at the top
+ * of the standalone /waitlist page.
  *
  * It sits outside the sticky <header> and scrolls away with the page, so the
  * Navbar keeps sticking at top-0 and the elements offset from it (shop sidebar,
