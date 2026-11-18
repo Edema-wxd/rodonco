@@ -9,12 +9,11 @@
 /* ---------- Announcement banner ---------- */
 
 :root {
-  /* Logo red (#ec2d01) deepened slightly so white text passes WCAG AA (5.1:1). */
-  --announcement-bg: #d42901;
+  --announcement-bg: #000000;
   --announcement-fg: #ffffff;
   --announcement-gap: 2rem;
   /* One loop moves two copies of the message: roughly 60px per second. */
-  --announcement-duration: 48s;
+  --announcement-duration: 55s;
 }
 
 .announcement {
@@ -47,10 +46,11 @@
 
 .announcement-item {
   padding-block: 0.625rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: 0.8125rem;
+  font-weight: 500;
   line-height: 1.4;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -84,7 +84,7 @@
 
 @media (max-width: 640px) {
   .announcement-item {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
   }
 }
 
