@@ -343,7 +343,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     await db.insert(schema.order_items).values(itemDrafts);
 
     // Option A auto-cleanup: delete any abandoned_carts rows for this email so
-    // we don't keep draft checkout details for customers who went on to order.
+    // converted customers don't appear in the abandoned carts admin view.
     db.delete(schema.abandoned_carts)
       .where(eq(schema.abandoned_carts.customer_email, email))
       .catch((err) =>

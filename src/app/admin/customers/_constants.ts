@@ -1,0 +1,1 @@
+export const ABANDONED_CARTS_PAGE_SIZE = 25;

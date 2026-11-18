@@ -61,4 +61,4 @@ For a full project review (scope, architecture, data model, setup, deployment, a
 
 A Vercel Cron job runs daily at **03:00 UTC** and calls `GET /api/cron/purge-abandoned-carts`, which deletes all `abandoned_carts` rows where `created_at < NOW() - 90 days`. The deleted count is logged and returned in the response body for visibility in Vercel's cron dashboard.
 
-The route is protected by the existing `CRON_SECRET` environment variable (Bearer token).
+The route is protected by the existing `CRON_SECRET` environment variable (Bearer token). Records can also be reviewed and deleted manually in the admin under **Customers → Abandoned carts** (`/admin/customers?view=abandoned`).
